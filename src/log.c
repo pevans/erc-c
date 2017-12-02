@@ -2,14 +2,16 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
+#include "log.h"
+
 static FILE *log_stream = NULL;
 
 void
 log_open()
 {
-    log_stream = fopen("/tmp/emp.log", "w");
+    log_stream = fopen(LOG_FILENAME, "w");
     if (log_stream == NULL) {
-        perror("Couldn't open log file (/tmp/emp.log)");
+        perror("Couldn't open log file (" LOG_FILENAME ")");
         exit(1);
     }
 }

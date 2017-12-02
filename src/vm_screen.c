@@ -19,6 +19,12 @@ vm_screen_new_context()
 }
 
 void
+vm_screen_free_context(vm_screen_context *context)
+{
+    free(context);
+}
+
+void
 vm_screen_set_color(vm_screen_context *context,
                     int red,
                     int green,

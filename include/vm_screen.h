@@ -9,6 +9,7 @@ typedef struct {
 } vm_screen_context;
 
 extern void vm_screen_draw_rect(vm_screen_context *, int, int, int, int);
+extern void vm_screen_free_context(vm_screen_context *);
 extern vm_screen_context *vm_screen_new_context();
 extern void vm_screen_set_color(vm_screen_context *, int, int, int, int);
 

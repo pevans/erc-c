@@ -1,5 +1,13 @@
 set(emp_sources
 	log.c
+	mos6502.c
+	mos6502.addr.c
+	mos6502.arith.c
+	mos6502.bits.c
+	mos6502.branch.c
+	mos6502.exec.c
+	mos6502.loadstor.c
+	mos6502.stat.c
 	vm_screen.c
 	vm_segment.c
 	)
