@@ -24,6 +24,13 @@
 #define END_ADDR_MODE() \
     mos6502_free(cpu)
 
+#define START_CPU_TEST(t) \
+    t *cpu; \
+    cpu = t##_create()
+
+#define END_CPU_TEST(t) \
+    t##_free(cpu)
+
 #define DEFINE_INST(inst) \
     void mos6502_handle_##inst (mos6502 *cpu, vm_8bit oper)
 

@@ -20,6 +20,7 @@
  *   pointers to all of that in the chip structure
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "log.h"
@@ -141,11 +142,25 @@ mos6502_modify_status(mos6502 *cpu, int statuses, vm_8bit oper)
         }
     }
 
-    if (statuses & ZERO) {
-        cpu->P &= ~ZERO;
-        if (oper == 0) {
-            cpu->P |= ZERO;
+    if (statuses & OVERFLOW) {
+        cpu->P &= ~OVERFLOW;
+        if (oper & OVERFLOW) {
+            cpu->P |= OVERFLOW;
         }
+    }
+
+    // We're kind of dumb about break, decimal and interrupt. I'm
+    // probably lacking some knowledge about how these work...
+    if (statuses & BREAK) {
+        cpu->P |= BREAK;
+    }
+
+    if (statuses & DECIMAL) {
+        cpu->P |= DECIMAL;
+    }
+
+    if (statuses & INTERRUPT) {
+        cpu->P |= INTERRUPT;
     }
 
     if (statuses & CARRY) {
@@ -154,4 +169,12 @@ mos6502_modify_status(mos6502 *cpu, int statuses, vm_8bit oper)
             cpu->P |= CARRY;
         }
     }
+
+    if (statuses & ZERO) {
+        cpu->P &= ~ZERO;
+        if (oper == 0) {
+            cpu->P |= ZERO;
+        }
+    }
+
 }

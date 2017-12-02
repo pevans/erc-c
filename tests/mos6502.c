@@ -35,3 +35,56 @@ Test(mos6502, next_byte) {
 
     END_ADDR_MODE();
 }
+
+Test(mos6502, push_stack)
+{
+    START_CPU_TEST(mos6502);
+
+    mos6502_push_stack(cpu, 0x1234);
+    cr_assert_eq(vm_segment_get(cpu->memory, 0x0100), 0x12);
+    cr_assert_eq(vm_segment_get(cpu->memory, 0x0101), 0x34);
+
+    END_CPU_TEST(mos6502);
+}
+
+Test(mos6502, pop_stack)
+{
+    START_CPU_TEST(mos6502);
+
+    mos6502_push_stack(cpu, 0x1234);
+    cr_assert_eq(mos6502_pop_stack(cpu), 0x1234);
+
+    END_CPU_TEST(mos6502);
+}
+
+Test(mos6502, modify_status)
+{
+    START_CPU_TEST(mos6502);
+
+    mos6502_modify_status(cpu, NEGATIVE, 130);
+    cr_assert_eq(cpu->P & NEGATIVE, NEGATIVE);
+    mos6502_modify_status(cpu, NEGATIVE, 123);
+    cr_assert_neq(cpu->P & NEGATIVE, NEGATIVE);
+
+    mos6502_modify_status(cpu, OVERFLOW, 123);
+    cr_assert_eq(cpu->P & OVERFLOW, OVERFLOW);
+    mos6502_modify_status(cpu, OVERFLOW, 44);
+    cr_assert_neq(cpu->P & OVERFLOW, OVERFLOW);
+
+    mos6502_modify_status(cpu, BREAK, 0);
+    mos6502_modify_status(cpu, INTERRUPT, 0);
+    mos6502_modify_status(cpu, DECIMAL, 0);
+    cr_assert_eq(cpu->P & BREAK & INTERRUPT & DECIMAL, BREAK & INTERRUPT & DECIMAL);
+
+    mos6502_modify_status(cpu, CARRY, 23);
+    cr_assert_eq(cpu->P & CARRY, CARRY);
+    mos6502_modify_status(cpu, CARRY, 0);
+    cr_assert_neq(cpu->P & CARRY, CARRY);
+
+    mos6502_modify_status(cpu, ZERO, 0);
+    cr_assert_eq(cpu->P & ZERO, ZERO);
+    mos6502_modify_status(cpu, ZERO, 1);
+    cr_assert_neq(cpu->P & ZERO, ZERO);
+
+    END_CPU_TEST(mos6502);
+}
