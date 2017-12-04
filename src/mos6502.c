@@ -133,48 +133,39 @@ mos6502_pop_stack(mos6502 *cpu)
 }
 
 void
-mos6502_modify_status(mos6502 *cpu, int statuses, vm_8bit oper)
+mos6502_set_status(mos6502 *cpu, vm_8bit status)
 {
-    if (statuses & NEGATIVE) {
+    cpu->P = status;
+}
+
+void
+mos6502_modify_status(mos6502 *cpu, vm_8bit status, vm_8bit oper)
+{
+    if (status & NEGATIVE) {
         cpu->P &= ~NEGATIVE;
         if (oper & 0x80) {
             cpu->P |= NEGATIVE;
         }
     }
 
-    if (statuses & OVERFLOW) {
+    if (status & OVERFLOW) {
         cpu->P &= ~OVERFLOW;
         if (oper & OVERFLOW) {
             cpu->P |= OVERFLOW;
         }
     }
 
-    // We're kind of dumb about break, decimal and interrupt. I'm
-    // probably lacking some knowledge about how these work...
-    if (statuses & BREAK) {
-        cpu->P |= BREAK;
-    }
-
-    if (statuses & DECIMAL) {
-        cpu->P |= DECIMAL;
-    }
-
-    if (statuses & INTERRUPT) {
-        cpu->P |= INTERRUPT;
-    }
-
-    if (statuses & CARRY) {
+    if (status & CARRY) {
         cpu->P &= ~CARRY;
         if (oper > 0) {
             cpu->P |= CARRY;
         }
     }
 
-    if (statuses & ZERO) {
+    if (status & ZERO) {
         cpu->P &= ~ZERO;
         if (oper == 0) {
             cpu->P |= ZERO;
         }
     }
-
 }

@@ -71,11 +71,6 @@ Test(mos6502, modify_status)
     mos6502_modify_status(cpu, OVERFLOW, 44);
     cr_assert_neq(cpu->P & OVERFLOW, OVERFLOW);
 
-    mos6502_modify_status(cpu, BREAK, 0);
-    mos6502_modify_status(cpu, INTERRUPT, 0);
-    mos6502_modify_status(cpu, DECIMAL, 0);
-    cr_assert_eq(cpu->P & BREAK & INTERRUPT & DECIMAL, BREAK & INTERRUPT & DECIMAL);
-
     mos6502_modify_status(cpu, CARRY, 23);
     cr_assert_eq(cpu->P & CARRY, CARRY);
     mos6502_modify_status(cpu, CARRY, 0);
@@ -85,6 +80,16 @@ Test(mos6502, modify_status)
     cr_assert_eq(cpu->P & ZERO, ZERO);
     mos6502_modify_status(cpu, ZERO, 1);
     cr_assert_neq(cpu->P & ZERO, ZERO);
+
+    END_CPU_TEST(mos6502);
+}
+
+Test(mos6502, set_status)
+{
+    START_CPU_TEST(mos6502);
+
+    mos6502_set_status(cpu, BREAK | INTERRUPT | DECIMAL);
+    cr_assert_eq(cpu->P & (BREAK | INTERRUPT | DECIMAL), BREAK | INTERRUPT | DECIMAL);
 
     END_CPU_TEST(mos6502);
 }

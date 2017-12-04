@@ -63,5 +63,5 @@ DEFINE_INST(iny)
 DEFINE_INST(sbc)
 {
     CARRY_BIT();
-    cpu->A -= oper - carry;
+    cpu->A = cpu->A - oper - carry;
 }

@@ -82,7 +82,8 @@ extern void mos6502_free(mos6502 *);
 extern vm_8bit mos6502_next_byte(mos6502 *);
 extern void mos6502_push_stack(mos6502 *, vm_16bit);
 extern vm_16bit mos6502_pop_stack(mos6502 *);
-extern void mos6502_modify_status(mos6502 *, int, vm_8bit);
+extern void mos6502_set_status(mos6502 *, vm_8bit);
+extern void mos6502_modify_status(mos6502 *, vm_8bit, vm_8bit);
 
 extern mos6502_address_resolver mos6502_get_address_resolver(int);
 

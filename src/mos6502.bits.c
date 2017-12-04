@@ -12,11 +12,12 @@ DEFINE_INST(and)
 
 DEFINE_INST(asl)
 {
-    oper <<= 1;
-
+    cpu->P &= ~CARRY;
     if (oper & 0x80) {
         cpu->P |= CARRY;
     }
+
+    oper <<= 1;
 
     if (cpu->last_addr) {
         vm_segment_set(cpu->memory, cpu->last_addr, oper);
@@ -27,18 +28,20 @@ DEFINE_INST(asl)
 
 DEFINE_INST(bit)
 {
+    cpu->P &= ~NEGATIVE;
     if (oper & NEGATIVE) {
         cpu->P |= NEGATIVE;
     }
 
+    cpu->P &= ~OVERFLOW;
     if (oper & OVERFLOW) {
         cpu->P |= OVERFLOW;
     }
 
     if (oper & cpu->A) {
-        cpu->P |= ZERO;
-    } else {
         cpu->P &= ~ZERO;
+    } else {
+        cpu->P |= ZERO;
     }
 }
 
@@ -49,11 +52,12 @@ DEFINE_INST(eor)
 
 DEFINE_INST(lsr)
 {
-    oper >>= 1;
-
+    cpu->P &= ~CARRY;
     if (oper & 0x01) {
         cpu->P |= CARRY;
     }
+
+    oper >>= 1;
 
     if (cpu->last_addr) {
         vm_segment_set(cpu->memory, cpu->last_addr, oper);
