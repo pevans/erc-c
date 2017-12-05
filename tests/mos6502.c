@@ -93,3 +93,31 @@ Test(mos6502, set_status)
 
     END_CPU_TEST(mos6502);
 }
+
+Test(mos6502, instruction)
+{
+    cr_assert_eq(mos6502_instruction(0x1D), ORA);
+    cr_assert_eq(mos6502_instruction(0xD8), CLD);
+    cr_assert_eq(mos6502_instruction(0x98), TYA);
+}
+
+Test(mos6502, cycles)
+{
+    START_CPU_TEST(mos6502);
+
+    cr_assert_eq(mos6502_cycles(cpu, 0x76), 6);
+    cr_assert_eq(mos6502_cycles(cpu, 0xBA), 2);
+
+    // In this case, we aren't cross a page boundary, and the number of
+    // cycles should stay at 4
+    cpu->last_addr = 0x5070;
+    cpu->X = 23;
+    cr_assert_eq(mos6502_cycles(cpu, 0x1D), 4);
+
+    // Testing that crossing a page boundary adds one to the number of
+    // cycles
+    cpu->X = 200;
+    cr_assert_eq(mos6502_cycles(cpu, 0x1D), 5);
+
+    END_CPU_TEST(mos6502);
+}

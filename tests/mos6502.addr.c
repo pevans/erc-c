@@ -3,6 +3,13 @@
 #include "mos6502.h"
 #include "mos6502.enums.h"
 
+Test(mos6502, addr_mode)
+{
+    cr_assert_eq(mos6502_addr_mode(0xEA), IMP);
+    cr_assert_eq(mos6502_addr_mode(0xD6), ZPX);
+    cr_assert_eq(mos6502_addr_mode(0xF0), REL);
+}
+
 Test(mos6502, get_address_resolver) {
     INIT_ADDR_MODE();
 

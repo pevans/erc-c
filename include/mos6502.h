@@ -46,6 +46,21 @@ typedef struct {
     // we found the value we care about.
     vm_16bit last_addr;
 
+    /*
+     * This field contains the number of CPU cycles that the last
+     * instruction handled should consume. In order to accurately
+     * emulate any architecture, we must model the type of "wait" time
+     * each instruction would cause.
+     *
+     * It should also be pointed out that the number of cycles is both
+     * informed by the instruction _and_ the address mode. For example,
+     * an instruction executed in zero-page address mode would consume
+     * fewer cycles than one executed in absolute address mode, because
+     * in the latter, the CPU would have to read ahead to discover a
+     * 16-bit operand vs. the 8-bit operand in the former.
+     */
+    int cycles;
+
     // Our program counter register; this is what we'll use to determine
     // where we're "at" in memory while executing opcodes. We use a
     // 16-bit register because our memory is 64k large.
@@ -84,7 +99,13 @@ extern void mos6502_push_stack(mos6502 *, vm_16bit);
 extern vm_16bit mos6502_pop_stack(mos6502 *);
 extern void mos6502_set_status(mos6502 *, vm_8bit);
 extern void mos6502_modify_status(mos6502 *, vm_8bit, vm_8bit);
+extern int mos6502_cycles(mos6502 *, vm_8bit);
+extern int mos6502_instruction(vm_8bit);
 
+/*
+ * Below are some functions that are defined in mos6502.addr.c
+ */
+extern int mos6502_addr_mode(vm_8bit);
 extern mos6502_address_resolver mos6502_get_address_resolver(int);
 
 /*
@@ -129,7 +150,8 @@ DECL_ADDR_MODE(zpx);
 DECL_ADDR_MODE(zpy);
 
 /*
- * And now, our instruction handlers
+ * And now, our instruction handlers; held generally in mos6502.*.c
+ * (excepting mos6502.addr.c).
  */
 DECL_INST(adc);
 DECL_INST(and);

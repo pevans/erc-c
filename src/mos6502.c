@@ -49,6 +49,26 @@ static int instructions[] = {
     BEQ, SBC, NOP, NOP, NOP, SBC, INC, NOP, SED, SBC, NOP, NOP, NOP, SBC, INC, NOP, // Fx
 };
 
+static int cycles[] = {
+//   00   01   02   03   04   05   06   07   08   09   0A   0B   0C   0D   0E   0F
+      7,   6,   0,   0,   0,   3,   5,   0,   3,   2,   2,   0,   0,   4,   6,   0, // 0x
+      2,   5,   0,   0,   0,   4,   6,   0,   2,   4,   0,   0,   0,   4,   7,   0, // 1x
+      6,   6,   0,   0,   3,   3,   5,   0,   4,   2,   2,   0,   4,   4,   6,   0, // 2x
+      2,   5,   0,   0,   0,   4,   6,   0,   2,   4,   0,   0,   0,   4,   7,   0, // 3x
+      6,   6,   0,   0,   0,   3,   5,   0,   3,   2,   2,   0,   3,   4,   6,   0, // 4x
+      2,   5,   0,   0,   0,   4,   6,   0,   2,   4,   0,   0,   0,   4,   7,   0, // 5x
+      6,   6,   0,   0,   0,   3,   5,   0,   4,   2,   2,   0,   5,   4,   6,   0, // 6x
+      2,   5,   0,   0,   0,   4,   6,   0,   2,   4,   0,   0,   0,   4,   7,   0, // 7x
+      0,   6,   0,   0,   3,   3,   3,   0,   2,   0,   2,   0,   4,   4,   4,   0, // 8x
+      2,   6,   0,   0,   4,   4,   4,   0,   2,   5,   2,   0,   0,   5,   0,   0, // 9x
+      2,   6,   2,   0,   3,   3,   3,   0,   2,   2,   2,   0,   4,   4,   4,   0, // Ax
+      2,   5,   0,   0,   4,   4,   4,   0,   2,   4,   2,   0,   4,   4,   4,   0, // Bx
+      2,   6,   0,   0,   3,   3,   5,   0,   2,   2,   2,   0,   4,   4,   3,   0, // Cx
+      2,   5,   0,   0,   0,   4,   6,   0,   2,   4,   0,   0,   0,   4,   7,   0, // Dx
+      2,   6,   0,   0,   3,   3,   5,   0,   2,   2,   2,   0,   4,   4,   6,   0, // Ex
+      2,   5,   0,   0,   0,   4,   6,   0,   2,   4,   0,   0,   0,   4,   7,   0, // Fx
+};
+
 /*
  * Build a new mos6502 struct object, and also build the memory contents
  * used therein. All registers should be zeroed out.
@@ -168,4 +188,51 @@ mos6502_modify_status(mos6502 *cpu, vm_8bit status, vm_8bit oper)
             cpu->P |= ZERO;
         }
     }
+}
+
+int
+mos6502_instruction(vm_8bit opcode)
+{
+    return instructions[opcode];
+}
+
+int
+mos6502_cycles(mos6502 *cpu, vm_8bit opcode)
+{
+    /*
+     * In some contexts, we may need to return an additional cycle.
+     */
+    int modif = 0;
+
+    int addr_mode;
+    int lo_addr;
+
+    addr_mode = mos6502_addr_mode(opcode);
+
+    // Mainly we care about the lo byte of the last effective address
+    lo_addr = cpu->last_addr & 0xFF;
+
+    // Ok, here's the deal: if you are using an address mode that uses
+    // any of the index registers, you need to return an additional
+    // cycle if the lo byte of the address plus that index would cross a
+    // memory page boundary
+    switch (addr_mode) {
+        case ABX:
+            if (lo_addr + cpu->X > 255) {
+                modif = 1;
+            }
+            break;
+
+        case ABY:
+        case INY:
+            if (lo_addr + cpu->Y > 255) {
+                modif = 1;
+            }
+            break;
+
+        default:
+            break;
+    }
+
+    return cycles[opcode] + modif;
 }

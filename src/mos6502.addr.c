@@ -84,6 +84,12 @@ mos6502_get_address_resolver(int addr_mode)
     vm_16bit eff_addr = addr; \
     cpu->last_addr = eff_addr
 
+int
+mos6502_addr_mode(vm_8bit opcode)
+{
+    return addr_modes[opcode];
+}
+
 /*
  * In the ACC address mode, the instruction will consider just the A
  * register. (It's probably the simplest resolution mode for us to
