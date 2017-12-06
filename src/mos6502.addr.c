@@ -85,10 +85,24 @@ mos6502_get_address_resolver(vm_8bit opcode)
     vm_16bit addr; \
     addr = mos6502_next_byte(cpu)
 
+/*
+ * This will both define the `eff_addr` variable (which is the effective
+ * address) and assign that value to the `last_addr` field of the cpu.
+ */
 #define EFF_ADDR(addr) \
     vm_16bit eff_addr = addr; \
     cpu->last_addr = eff_addr
 
+/*
+ * A tiny convenience macro to help us define address resolver
+ * functions.
+ */
+#define DEFINE_ADDR(mode) \
+    vm_8bit mos6502_resolve_##mode (mos6502 *cpu)
+
+/*
+ * Return the address mode for a given opcode.
+ */
 int
 mos6502_addr_mode(vm_8bit opcode)
 {
@@ -100,8 +114,7 @@ mos6502_addr_mode(vm_8bit opcode)
  * register. (It's probably the simplest resolution mode for us to
  * execute.)
  */
-vm_8bit
-mos6502_resolve_acc(mos6502 *cpu)
+DEFINE_ADDR(acc)
 {
     EFF_ADDR(0);
     return cpu->A;
@@ -112,8 +125,7 @@ mos6502_resolve_acc(mos6502 *cpu)
  * in memory at which our looked-for value resides, so we consume those
  * bytes and return the value located therein.
  */
-vm_8bit
-mos6502_resolve_abs(mos6502 *cpu)
+DEFINE_ADDR(abs)
 {
     ADDR_HILO(cpu);
     EFF_ADDR(addr);
@@ -126,8 +138,7 @@ mos6502_resolve_abs(mos6502 *cpu)
  * value to what we read -- plus one if we have the carry bit set. This
  * is a mode you would use if you were scanning a table, for instance.
  */
-vm_8bit
-mos6502_resolve_abx(mos6502 *cpu)
+DEFINE_ADDR(abx)
 {
     ADDR_HILO(cpu);
     CARRY_BIT();
@@ -140,8 +151,7 @@ mos6502_resolve_abx(mos6502 *cpu)
  * Very much the mirror opposite of the ABX address mode; the only
  * difference is we use the Y register, not the X.
  */
-vm_8bit
-mos6502_resolve_aby(mos6502 *cpu)
+DEFINE_ADDR(aby)
 {
     ADDR_HILO(cpu);
     CARRY_BIT();
@@ -156,8 +166,7 @@ mos6502_resolve_aby(mos6502 *cpu)
  * you wanted to say "foo + 5"; 5 would be the operand we return from
  * here.
  */
-vm_8bit
-mos6502_resolve_imm(mos6502 *cpu)
+DEFINE_ADDR(imm)
 {
     EFF_ADDR(0);
     return mos6502_next_byte(cpu);
@@ -169,8 +178,7 @@ mos6502_resolve_imm(mos6502 *cpu)
  * two bytes, then dereference the two bytes found at that point, and
  * _that_ is what our value will be.
  */
-vm_8bit
-mos6502_resolve_ind(mos6502 *cpu)
+DEFINE_ADDR(ind)
 {
     vm_8bit ind_hi, ind_lo;
 
@@ -190,8 +198,7 @@ mos6502_resolve_ind(mos6502 *cpu)
  * X to it, which is the address of what we next dereference. Carry does
  * not factor into the arithmetic.
  */
-vm_8bit
-mos6502_resolve_idx(mos6502 *cpu)
+DEFINE_ADDR(idx)
 {
     ADDR_LO(cpu);
     EFF_ADDR(addr + cpu->X);
@@ -207,8 +214,7 @@ mos6502_resolve_idx(mos6502 *cpu)
  * The ensuing address will then have Y added to it, and then
  * dereferenced for the final time. Carry _is_ factored in here.
  */
-vm_8bit
-mos6502_resolve_idy(mos6502 *cpu)
+DEFINE_ADDR(idy)
 {
     ADDR_LO(cpu);
     CARRY_BIT();
@@ -223,8 +229,7 @@ mos6502_resolve_idy(mos6502 *cpu)
  * means if addr > 127, then we treat the operand as though it
  * were negative. 
  */
-vm_8bit
-mos6502_resolve_rel(mos6502 *cpu)
+DEFINE_ADDR(rel)
 {
     vm_16bit orig_pc;
 
@@ -249,8 +254,7 @@ mos6502_resolve_rel(mos6502 *cpu)
  * that (which is, by convention, always going to be an address in the
  * zero page of memory).
  */
-vm_8bit
-mos6502_resolve_zpg(mos6502 *cpu)
+DEFINE_ADDR(zpg)
 {
     ADDR_LO(cpu);
     EFF_ADDR(addr);
@@ -262,8 +266,7 @@ mos6502_resolve_zpg(mos6502 *cpu)
  * In zero-page x-indexed mode, we read the next byte; add X to that;
  * and dereference the result. Carry is not a factor here.
  */
-vm_8bit
-mos6502_resolve_zpx(mos6502 *cpu)
+DEFINE_ADDR(zpx)
 {
     ADDR_LO(cpu);
     EFF_ADDR(addr + cpu->X);
@@ -276,8 +279,7 @@ mos6502_resolve_zpx(mos6502 *cpu)
  * zero-page x-indexed mode. We simply use the Y register and not the X,
  * and here as well, we do not factor in the carry bit.
  */
-vm_8bit
-mos6502_resolve_zpy(mos6502 *cpu)
+DEFINE_ADDR(zpy)
 {
     ADDR_LO(cpu);
     EFF_ADDR(addr + cpu->Y);
