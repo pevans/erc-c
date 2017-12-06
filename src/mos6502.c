@@ -309,3 +309,47 @@ mos6502_get_instruction_handler(vm_8bit opcode)
 {
     return instruction_handlers[mos6502_instruction(opcode)];
 }
+
+/*
+ * This code does the execution step that the 6502 processor would take,
+ * from soup to nuts.
+ */
+void
+mos6502_execute(mos6502 *cpu, vm_8bit opcode)
+{
+    vm_8bit operand;
+    int cycles;
+    mos6502_address_resolver resolver;
+    mos6502_instruction_handler handler;
+
+    // First, we need to know how to resolve our effective address and
+    // how to execute anything.
+    resolver = mos6502_get_address_resolver(opcode);
+    handler = mos6502_get_instruction_handler(opcode);
+
+    // The operand is the effective operand, the value that the
+    // instruction handler cares about (if it cares about any such
+    // value). For example, the operand could be the literal value that
+    // you pass into an instruction via immediate mode. As a
+    // side-effect, resolver will set the last_addr field in cpu to the
+    // effective address where the operand can be found in memory, or
+    // zero if that does not apply (such as in immediate mode).
+    operand = resolver(cpu);
+
+    // Here's where the magic happens. Whatever the instruction does, it
+    // happens in the handler function.
+    handler(cpu, operand);
+
+    // This will be the number of cycles we should spend on the
+    // instruction. Of course, we can execute instructions pretty
+    // quickly in a modern architecture, but a lot of code was written
+    // with the idea that certain instructions -- in certain address
+    // modes -- were more expensive than others, and you want those
+    // programs to feel faster or slower in relation to that.
+    cycles = mos6502_cycles(cpu, opcode);
+
+    // FIXME: actually emulate the cycles
+
+    // Ok -- we're done! This wasn't so hard, was it?
+    return;
+}

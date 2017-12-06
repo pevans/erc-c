@@ -12,6 +12,11 @@
 #include "mos6502.h"
 #include "mos6502.enums.h"
 
+/*
+ * This is a table of all the possible opcodes the 6502 understands,
+ * mapped to the correct address mode. (Well -- I _hope_ it's the
+ * correct address mode!)
+ */
 static int addr_modes[] = {
 //   00   01   02   03   04   05   06   07   08   09   0A   0B   0C   0D   0E   0F
     IMP, IDX, NOA, NOA, NOA, ZPG, ZPG, NOA, IMP, IMM, ACC, NOA, NOA, ABS, ABS, NOA, // 0x
@@ -39,9 +44,9 @@ static int addr_modes[] = {
  * cpu) that an instruction will use.
  */
 mos6502_address_resolver
-mos6502_get_address_resolver(int addr_mode)
+mos6502_get_address_resolver(vm_8bit opcode)
 {
-    switch (addr_mode) {
+    switch (mos6502_addr_mode(opcode)) {
         case ACC: return mos6502_resolve_acc;
         case ABS: return mos6502_resolve_abs;
         case ABX: return mos6502_resolve_abx;
