@@ -45,7 +45,7 @@ If you're feeling a bit nosy, you can run unit tests by doing the following:
 ```
 cd tests/build
 cmake ..
-make; ./emp-test
+make; ./erc-test
 ```
 
 This will execute the testing build of the software, which is handled through [Criterion](https://github.com/Snaipe/Criterion).
