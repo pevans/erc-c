@@ -2,11 +2,12 @@
 
 #include "mos6502.h"
 #include "mos6502.enums.h"
+#include "mos6502.tests.h"
 
-Test(mos6502, create) {
-    mos6502 *cpu;
+TestSuite(mos6502, .init = setup, .fini = teardown);
 
-    cpu = mos6502_create();
+Test(mos6502, create)
+{
     cr_assert_neq(cpu, NULL);
 
     cr_assert_eq(cpu->memory->size, MOS6502_MEMSIZE);
@@ -17,13 +18,10 @@ Test(mos6502, create) {
     cr_assert_eq(cpu->Y, 0);
     cr_assert_eq(cpu->P, 0);
     cr_assert_eq(cpu->S, 0);
-
-    mos6502_free(cpu);
 }
 
-Test(mos6502, next_byte) {
-    INIT_ADDR_MODE();
-
+Test(mos6502, next_byte)
+{
     cpu->PC = 128;
     vm_segment_set(cpu->memory, cpu->PC, 123);
     vm_segment_set(cpu->memory, cpu->PC + 1, 234);
@@ -32,35 +30,23 @@ Test(mos6502, next_byte) {
     cr_assert_eq(mos6502_next_byte(cpu), 123);
     cr_assert_eq(mos6502_next_byte(cpu), 234);
     cr_assert_eq(mos6502_next_byte(cpu), 12);
-
-    END_ADDR_MODE();
 }
 
 Test(mos6502, push_stack)
 {
-    START_CPU_TEST(mos6502);
-
     mos6502_push_stack(cpu, 0x1234);
     cr_assert_eq(vm_segment_get(cpu->memory, 0x0100), 0x12);
     cr_assert_eq(vm_segment_get(cpu->memory, 0x0101), 0x34);
-
-    END_CPU_TEST(mos6502);
 }
 
 Test(mos6502, pop_stack)
 {
-    START_CPU_TEST(mos6502);
-
     mos6502_push_stack(cpu, 0x1234);
     cr_assert_eq(mos6502_pop_stack(cpu), 0x1234);
-
-    END_CPU_TEST(mos6502);
 }
 
 Test(mos6502, modify_status)
 {
-    START_CPU_TEST(mos6502);
-
     mos6502_modify_status(cpu, NEGATIVE, 130);
     cr_assert_eq(cpu->P & NEGATIVE, NEGATIVE);
     mos6502_modify_status(cpu, NEGATIVE, 123);
@@ -80,18 +66,12 @@ Test(mos6502, modify_status)
     cr_assert_eq(cpu->P & ZERO, ZERO);
     mos6502_modify_status(cpu, ZERO, 1);
     cr_assert_neq(cpu->P & ZERO, ZERO);
-
-    END_CPU_TEST(mos6502);
 }
 
 Test(mos6502, set_status)
 {
-    START_CPU_TEST(mos6502);
-
     mos6502_set_status(cpu, BREAK | INTERRUPT | DECIMAL);
     cr_assert_eq(cpu->P & (BREAK | INTERRUPT | DECIMAL), BREAK | INTERRUPT | DECIMAL);
-
-    END_CPU_TEST(mos6502);
 }
 
 Test(mos6502, instruction)
@@ -103,8 +83,6 @@ Test(mos6502, instruction)
 
 Test(mos6502, cycles)
 {
-    START_CPU_TEST(mos6502);
-
     cr_assert_eq(mos6502_cycles(cpu, 0x76), 6);
     cr_assert_eq(mos6502_cycles(cpu, 0xBA), 2);
 
@@ -118,8 +96,6 @@ Test(mos6502, cycles)
     // cycles
     cpu->X = 200;
     cr_assert_eq(mos6502_cycles(cpu, 0x1D), 5);
-
-    END_CPU_TEST(mos6502);
 }
 
 Test(mos6502, get_instruction_handler)
@@ -131,21 +107,13 @@ Test(mos6502, get_instruction_handler)
 
 Test(mos6502, execute)
 {
-    START_CPU_TEST(mos6502);
-
     vm_segment_set(cpu->memory, 0, 34);
     mos6502_execute(cpu, 0x69);
     cr_assert_eq(cpu->A, 34);
-
-    END_CPU_TEST(mos6502);
 }
 
 Test(mos6502, read_byte)
 {
-    START_CPU_TEST(mos6502);
-
     vm_segment_set(cpu->memory, 0, 0x54);
     cr_assert_eq(mos6502_read_byte(cpu), 0x54);
-
-    END_CPU_TEST(mos6502);
 }

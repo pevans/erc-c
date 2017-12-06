@@ -2,81 +2,55 @@
 
 #include "mos6502.h"
 #include "mos6502.enums.h"
+#include "mos6502.tests.h"
 
-Test(mos6502, clc)
+TestSuite(mos6502_stat, .init = setup, .fini = teardown);
+
+Test(mos6502_stat, clc)
 {
-    START_CPU_TEST(mos6502);
-
     cpu->P = CARRY | DECIMAL;
     mos6502_handle_clc(cpu, 0);
     cr_assert_eq(cpu->P & CARRY, 0);
-
-    END_CPU_TEST(mos6502);
 }
 
-Test(mos6502, cld)
+Test(mos6502_stat, cld)
 {
-    START_CPU_TEST(mos6502);
-
     cpu->P = DECIMAL | CARRY;
     mos6502_handle_cld(cpu, 0);
     cr_assert_eq(cpu->P & DECIMAL, 0);
-
-    END_CPU_TEST(mos6502);
 }
 
-Test(mos6502, cli)
+Test(mos6502_stat, cli)
 {
-    START_CPU_TEST(mos6502);
-
     cpu->P = CARRY | INTERRUPT;
     mos6502_handle_cli(cpu, 0);
     cr_assert_eq(cpu->P & INTERRUPT, 0);
-
-    END_CPU_TEST(mos6502);
 }
 
-Test(mos6502, clv)
+Test(mos6502_stat, clv)
 {
-    START_CPU_TEST(mos6502);
-
     cpu->P = CARRY | OVERFLOW;
     mos6502_handle_clv(cpu, 0);
     cr_assert_eq(cpu->P & OVERFLOW, 0);
-
-    END_CPU_TEST(mos6502);
 }
 
-Test(mos6502, sec)
+Test(mos6502_stat, sec)
 {
-    START_CPU_TEST(mos6502);
-
     cpu->P = 0;
     mos6502_handle_sec(cpu, 0);
     cr_assert_eq(cpu->P & CARRY, CARRY);
-
-    END_CPU_TEST(mos6502);
 }
 
-Test(mos6502, sed)
+Test(mos6502_stat, sed)
 {
-    START_CPU_TEST(mos6502);
-
     cpu->P = 0;
     mos6502_handle_sed(cpu, 0);
     cr_assert_eq(cpu->P & DECIMAL, DECIMAL);
-
-    END_CPU_TEST(mos6502);
 }
 
-Test(mos6502, sei)
+Test(mos6502_stat, sei)
 {
-    START_CPU_TEST(mos6502);
-
     cpu->P = 0;
     mos6502_handle_sei(cpu, 0);
     cr_assert_eq(cpu->P & INTERRUPT, INTERRUPT);
-
-    END_CPU_TEST(mos6502);
 }
-

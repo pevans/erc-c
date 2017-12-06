@@ -2,11 +2,12 @@
 
 #include "mos6502.h"
 #include "mos6502.enums.h"
+#include "mos6502.tests.h"
 
-Test(mos6502, and)
+TestSuite(mos6502_bits, .init = setup, .fini = teardown);
+
+Test(mos6502_bits, and)
 {
-    START_CPU_TEST(mos6502);
-
     cpu->A = 5;
     mos6502_handle_and(cpu, 1);
     cr_assert_eq(cpu->A, 1);
@@ -14,28 +15,20 @@ Test(mos6502, and)
     cpu->A = 5;
     mos6502_handle_and(cpu, 4);
     cr_assert_eq(cpu->A, 4);
-
-    END_CPU_TEST(mos6502);
 }
 
-Test(mos6502, asl)
+Test(mos6502_bits, asl)
 {
-    START_CPU_TEST(mos6502);
-
     mos6502_handle_asl(cpu, 5);
     cr_assert_eq(cpu->A, 10);
 
     cpu->last_addr = 123;
     mos6502_handle_asl(cpu, 22);
     cr_assert_eq(vm_segment_get(cpu->memory, 123), 44);
-
-    END_CPU_TEST(mos6502);
 }
 
-Test(mos6502, bit)
+Test(mos6502_bits, bit)
 {
-    START_CPU_TEST(mos6502);
-
     cpu->A = 5;
     mos6502_handle_bit(cpu, 129);
     cr_assert_eq(cpu->P & NEGATIVE, NEGATIVE);
@@ -61,14 +54,10 @@ Test(mos6502, bit)
     cr_assert_eq(cpu->P & NEGATIVE, 0);
     cr_assert_eq(cpu->P & OVERFLOW, 0);
     cr_assert_eq(cpu->P & ZERO, ZERO);
-
-    END_CPU_TEST(mos6502);
 }
 
-Test(mos6502, eor)
+Test(mos6502_bits, eor)
 {
-    START_CPU_TEST(mos6502);
-
     cpu->A = 5;
     mos6502_handle_eor(cpu, 4);
     cr_assert_eq(cpu->A, 1);
@@ -76,14 +65,10 @@ Test(mos6502, eor)
     cpu->A = 5;
     mos6502_handle_eor(cpu, 1);
     cr_assert_eq(cpu->A, 4);
-
-    END_CPU_TEST(mos6502);
 }
 
-Test(mos6502, lsr)
+Test(mos6502_bits, lsr)
 {
-    START_CPU_TEST(mos6502);
-
     mos6502_handle_lsr(cpu, 5);
     cr_assert_eq(cpu->A, 2);
     cr_assert_eq(cpu->P & CARRY, CARRY);
@@ -92,14 +77,10 @@ Test(mos6502, lsr)
     mos6502_handle_lsr(cpu, 22);
     cr_assert_eq(vm_segment_get(cpu->memory, 123), 11);
     cr_assert_eq(cpu->P & CARRY, 0);
-
-    END_CPU_TEST(mos6502);
 }
 
-Test(mos6502, ora)
+Test(mos6502_bits, ora)
 {
-    START_CPU_TEST(mos6502);
-
     cpu->A = 5;
     mos6502_handle_ora(cpu, 4);
     cr_assert_eq(cpu->A, 5);
@@ -107,34 +88,24 @@ Test(mos6502, ora)
     cpu->A = 5;
     mos6502_handle_ora(cpu, 10);
     cr_assert_eq(cpu->A, 15);
-
-    END_CPU_TEST(mos6502);
 }
 
-Test(mos6502, rol)
+Test(mos6502_bits, rol)
 {
-    START_CPU_TEST(mos6502);
-
     mos6502_handle_rol(cpu, 8);
     cr_assert_eq(cpu->A, 16);
 
     cpu->last_addr = 234;
     mos6502_handle_rol(cpu, 128);
     cr_assert_eq(vm_segment_get(cpu->memory, 234), 1);
-
-    END_CPU_TEST(mos6502);
 }
 
-Test(mos6502, ror)
+Test(mos6502_bits, ror)
 {
-    START_CPU_TEST(mos6502);
-
     mos6502_handle_ror(cpu, 64);
     cr_assert_eq(cpu->A, 32);
 
     cpu->last_addr = 123;
     mos6502_handle_ror(cpu, 1);
     cr_assert_eq(vm_segment_get(cpu->memory, 123), 128);
-
-    END_CPU_TEST(mos6502);
 }

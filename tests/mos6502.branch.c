@@ -2,11 +2,12 @@
 
 #include "mos6502.h"
 #include "mos6502.enums.h"
+#include "mos6502.tests.h"
 
-Test(mos6502, bcc)
+TestSuite(mos6502_branch, .init = setup, .fini = teardown);
+
+Test(mos6502_branch, bcc)
 {
-    START_CPU_TEST(mos6502);
-
     cpu->last_addr = 123;
     mos6502_handle_bcc(cpu, 0);
     cr_assert_eq(cpu->PC, 123);
@@ -15,14 +16,10 @@ Test(mos6502, bcc)
     cpu->last_addr = 125;
     mos6502_handle_bcc(cpu, 0);
     cr_assert_neq(cpu->PC, 125);
-
-    END_CPU_TEST(mos6502);
 }
 
-Test(mos6502, bcs)
+Test(mos6502_branch, bcs)
 {
-    START_CPU_TEST(mos6502);
-
     cpu->last_addr = 123;
     mos6502_handle_bcs(cpu, 0);
     cr_assert_neq(cpu->PC, 123);
@@ -31,14 +28,10 @@ Test(mos6502, bcs)
     cpu->last_addr = 125;
     mos6502_handle_bcs(cpu, 0);
     cr_assert_eq(cpu->PC, 125);
-
-    END_CPU_TEST(mos6502);
 }
 
-Test(mos6502, beq)
+Test(mos6502_branch, beq)
 {
-    START_CPU_TEST(mos6502);
-
     cpu->last_addr = 123;
     mos6502_handle_beq(cpu, 0);
     cr_assert_neq(cpu->PC, 123);
@@ -47,14 +40,10 @@ Test(mos6502, beq)
     cpu->last_addr = 125;
     mos6502_handle_beq(cpu, 0);
     cr_assert_eq(cpu->PC, 125);
-
-    END_CPU_TEST(mos6502);
 }
 
-Test(mos6502, bmi)
+Test(mos6502_branch, bmi)
 {
-    START_CPU_TEST(mos6502);
-
     cpu->last_addr = 123;
     mos6502_handle_bmi(cpu, 0);
     cr_assert_neq(cpu->PC, 123);
@@ -63,14 +52,10 @@ Test(mos6502, bmi)
     cpu->last_addr = 125;
     mos6502_handle_bmi(cpu, 0);
     cr_assert_eq(cpu->PC, 125);
-
-    END_CPU_TEST(mos6502);
 }
 
-Test(mos6502, bne)
+Test(mos6502_branch, bne)
 {
-    START_CPU_TEST(mos6502);
-
     cpu->last_addr = 123;
     mos6502_handle_bne(cpu, 0);
     cr_assert_eq(cpu->PC, 123);
@@ -79,14 +64,10 @@ Test(mos6502, bne)
     cpu->last_addr = 125;
     mos6502_handle_bne(cpu, 0);
     cr_assert_neq(cpu->PC, 125);
-
-    END_CPU_TEST(mos6502);
 }
 
-Test(mos6502, bpl)
+Test(mos6502_branch, bpl)
 {
-    START_CPU_TEST(mos6502);
-
     cpu->last_addr = 123;
     mos6502_handle_bpl(cpu, 0);
     cr_assert_eq(cpu->PC, 123);
@@ -95,14 +76,10 @@ Test(mos6502, bpl)
     cpu->last_addr = 125;
     mos6502_handle_bpl(cpu, 0);
     cr_assert_neq(cpu->PC, 125);
-
-    END_CPU_TEST(mos6502);
 }
 
-Test(mos6502, bvc)
+Test(mos6502_branch, bvc)
 {
-    START_CPU_TEST(mos6502);
-
     cpu->last_addr = 123;
     mos6502_handle_bvc(cpu, 0);
     cr_assert_eq(cpu->PC, 123);
@@ -111,14 +88,10 @@ Test(mos6502, bvc)
     cpu->last_addr = 125;
     mos6502_handle_bvc(cpu, 0);
     cr_assert_neq(cpu->PC, 125);
-
-    END_CPU_TEST(mos6502);
 }
 
-Test(mos6502, bvs)
+Test(mos6502_branch, bvs)
 {
-    START_CPU_TEST(mos6502);
-
     cpu->last_addr = 123;
     mos6502_handle_bvs(cpu, 0);
     cr_assert_neq(cpu->PC, 123);
@@ -127,6 +100,4 @@ Test(mos6502, bvs)
     cpu->last_addr = 125;
     mos6502_handle_bvs(cpu, 0);
     cr_assert_eq(cpu->PC, 125);
-
-    END_CPU_TEST(mos6502);
 }
