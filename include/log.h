@@ -1,6 +1,8 @@
 #ifndef _LOG_H_
 #define _LOG_H_
 
+#include <stdio.h>
+
 #define LOG_FILENAME "/tmp/emp.log"
 
 extern void log_write(int, const char *, ...);
