@@ -92,6 +92,12 @@ typedef struct {
  */
 typedef vm_8bit (*mos6502_address_resolver)(mos6502 *);
 
+/*
+ * Another convenience; this type definition is for the functions we
+ * write to handle instruction logic.
+ */
+typedef void (*mos6502_instruction_handler)(mos6502 *, vm_8bit);
+
 extern mos6502 *mos6502_create();
 extern void mos6502_free(mos6502 *);
 extern vm_8bit mos6502_next_byte(mos6502 *);
@@ -101,6 +107,7 @@ extern void mos6502_set_status(mos6502 *, vm_8bit);
 extern void mos6502_modify_status(mos6502 *, vm_8bit, vm_8bit);
 extern int mos6502_cycles(mos6502 *, vm_8bit);
 extern int mos6502_instruction(vm_8bit);
+extern mos6502_instruction_handler mos6502_get_instruction_handler(vm_8bit);
 
 /*
  * Below are some functions that are defined in mos6502.addr.c

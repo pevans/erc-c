@@ -121,3 +121,10 @@ Test(mos6502, cycles)
 
     END_CPU_TEST(mos6502);
 }
+
+Test(mos6502, get_instruction_handler)
+{
+    cr_assert_eq(mos6502_get_instruction_handler(0x00), mos6502_handle_brk);
+    cr_assert_eq(mos6502_get_instruction_handler(0x1D), mos6502_handle_ora);
+    cr_assert_eq(mos6502_get_instruction_handler(0x20), mos6502_handle_jsr);
+}

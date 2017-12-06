@@ -49,6 +49,69 @@ static int instructions[] = {
     BEQ, SBC, NOP, NOP, NOP, SBC, INC, NOP, SED, SBC, NOP, NOP, NOP, SBC, INC, NOP, // Fx
 };
 
+// I just don't want to type out the literal function name every time
+#define INST_HANDLER(x) \
+    mos6502_handle_##x
+
+static mos6502_instruction_handler instruction_handlers[] = {
+    INST_HANDLER(adc),
+    INST_HANDLER(and),
+    INST_HANDLER(asl),
+    INST_HANDLER(bcc),
+    INST_HANDLER(bcs),
+    INST_HANDLER(beq),
+    INST_HANDLER(bit),
+    INST_HANDLER(bmi),
+    INST_HANDLER(bne),
+    INST_HANDLER(bpl),
+    INST_HANDLER(brk),
+    INST_HANDLER(bvc),
+    INST_HANDLER(bvs),
+    INST_HANDLER(clc),
+    INST_HANDLER(cld),
+    INST_HANDLER(cli),
+    INST_HANDLER(clv),
+    INST_HANDLER(cmp),
+    INST_HANDLER(cpx),
+    INST_HANDLER(cpy),
+    INST_HANDLER(dec),
+    INST_HANDLER(dex),
+    INST_HANDLER(dey),
+    INST_HANDLER(eor),
+    INST_HANDLER(inc),
+    INST_HANDLER(inx),
+    INST_HANDLER(iny),
+    INST_HANDLER(jmp),
+    INST_HANDLER(jsr),
+    INST_HANDLER(lda),
+    INST_HANDLER(ldx),
+    INST_HANDLER(ldy),
+    INST_HANDLER(lsr),
+    INST_HANDLER(nop),
+    INST_HANDLER(ora),
+    INST_HANDLER(pha),
+    INST_HANDLER(php),
+    INST_HANDLER(pla),
+    INST_HANDLER(plp),
+    INST_HANDLER(rol),
+    INST_HANDLER(ror),
+    INST_HANDLER(rti),
+    INST_HANDLER(rts),
+    INST_HANDLER(sbc),
+    INST_HANDLER(sec),
+    INST_HANDLER(sed),
+    INST_HANDLER(sei),
+    INST_HANDLER(sta),
+    INST_HANDLER(stx),
+    INST_HANDLER(sty),
+    INST_HANDLER(tax),
+    INST_HANDLER(tay),
+    INST_HANDLER(tsx),
+    INST_HANDLER(txa),
+    INST_HANDLER(txs),
+    INST_HANDLER(tya),
+};
+
 static int cycles[] = {
 //   00   01   02   03   04   05   06   07   08   09   0A   0B   0C   0D   0E   0F
       7,   6,   0,   0,   0,   3,   5,   0,   3,   2,   2,   0,   0,   4,   6,   0, // 0x
@@ -199,9 +262,7 @@ mos6502_instruction(vm_8bit opcode)
 int
 mos6502_cycles(mos6502 *cpu, vm_8bit opcode)
 {
-    /*
-     * In some contexts, we may need to return an additional cycle.
-     */
+    // In some contexts, we may need to return an additional cycle.
     int modif = 0;
 
     int addr_mode;
@@ -235,4 +296,14 @@ mos6502_cycles(mos6502 *cpu, vm_8bit opcode)
     }
 
     return cycles[opcode] + modif;
+}
+
+/*
+ * Here we intend to return the proper resolver function for any given
+ * instruction.
+ */
+mos6502_instruction_handler 
+mos6502_get_instruction_handler(vm_8bit opcode)
+{
+    return instruction_handlers[mos6502_instruction(opcode)];
 }
