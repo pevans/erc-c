@@ -1,4 +1,4 @@
-set(emp_sources
+set(erc_sources
 	apple2.c
 	log.c
 	mos6502.c
