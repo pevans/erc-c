@@ -35,15 +35,19 @@
     void mos6502_handle_##inst (mos6502 *cpu, vm_8bit oper)
 
 typedef struct {
-    // Our memory.
+    /*
+     * Our memory.
+     */
     vm_segment *memory;
 
-    // This contains the last _effective_ address we've resolved in one
-    // of our address modes. In absolute mode, this would be the literal
-    // operand we read from memory; in indirect mode, this will be the
-    // address we _find_ after dereferencing the operand we read from
-    // memory. Another way of thinking of this is, this address is where
-    // we found the value we care about.
+    /*
+     * This contains the last _effective_ address we've resolved in one
+     * of our address modes. In absolute mode, this would be the literal
+     * operand we read from memory; in indirect mode, this will be the
+     * address we _find_ after dereferencing the operand we read from
+     * memory. Another way of thinking of this is, this address is where
+     * we found the value we care about.
+     */
     vm_16bit last_addr;
 
     /*
@@ -61,27 +65,37 @@ typedef struct {
      */
     int cycles;
 
-    // Our program counter register; this is what we'll use to determine
-    // where we're "at" in memory while executing opcodes. We use a
-    // 16-bit register because our memory is 64k large.
+    /*
+     * Our program counter register; this is what we'll use to determine
+     * where we're "at" in memory while executing opcodes. We use a
+     * 16-bit register because our memory is 64k large.
+     */
     vm_16bit PC;
 
-    // This is the accumulator register. It's used in most arithmetic
-    // operations, and anything like that which you need to do will end
-    // up storing the value here.
+    /*
+     * This is the accumulator register. It's used in most arithmetic
+     * operations, and anything like that which you need to do will end
+     * up storing the value here.
+     */
     vm_8bit A;
 
-    // The X and Y registers are our index registers. They're provided
-    // to aid looping over tables, but they can also be used for other
-    // purposes.
+    /*
+     * The X and Y registers are our index registers. They're provided
+     * to aid looping over tables, but they can also be used for other
+     * purposes.
+     */
     vm_8bit X, Y;
 
-    // The P register is our status flag register. (I presume 'P' means
-    // 'predicate'.) Each bit stands for some kind of status.
+    /*
+     * The P register is our status flag register. (I presume 'P' means
+     * 'predicate'.) Each bit stands for some kind of status.
+     */
     vm_8bit P;
 
-    // The S register is our stack counter register. It indicates how
-    // far into the stack we've gone.
+    /*
+     * The S register is our stack counter register. It indicates how
+     * far into the stack we've gone.
+     */
     vm_8bit S;
 } mos6502;
 
