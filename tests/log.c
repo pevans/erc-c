@@ -13,7 +13,7 @@ Test(log, write) {
 
     message_length = strlen(message);
 
-    log_open();
+    log_open(NULL);
     log_write(0, message);
     log_close();
 
