@@ -352,3 +352,18 @@ mos6502_execute(mos6502 *cpu, vm_8bit opcode)
     // Ok -- we're done! This wasn't so hard, was it?
     return;
 }
+
+/*
+ * Return the next byte in memory according to the program counter
+ * register, and then increment the register.
+ */
+vm_8bit
+mos6502_read_byte(mos6502 *cpu)
+{
+    vm_8bit byte;
+
+    byte = vm_segment_get(cpu->memory, cpu->PC);
+    cpu->PC++;
+
+    return byte;
+}

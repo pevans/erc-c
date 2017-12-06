@@ -112,6 +112,7 @@ extern int mos6502_cycles(mos6502 *, vm_8bit);
 extern int mos6502_instruction(vm_8bit);
 extern mos6502_instruction_handler mos6502_get_instruction_handler(vm_8bit);
 extern void mos6502_execute(mos6502 *, vm_8bit);
+extern vm_8bit mos6502_read_byte(mos6502 *);
 
 /*
  * Below are some functions that are defined in mos6502.addr.c

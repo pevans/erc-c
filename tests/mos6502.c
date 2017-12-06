@@ -128,3 +128,24 @@ Test(mos6502, get_instruction_handler)
     cr_assert_eq(mos6502_get_instruction_handler(0x1D), mos6502_handle_ora);
     cr_assert_eq(mos6502_get_instruction_handler(0x20), mos6502_handle_jsr);
 }
+
+Test(mos6502, execute)
+{
+    START_CPU_TEST(mos6502);
+
+    vm_segment_set(cpu->memory, 0, 34);
+    mos6502_execute(cpu, 0x69);
+    cr_assert_eq(cpu->A, 34);
+
+    END_CPU_TEST(mos6502);
+}
+
+Test(mos6502, read_byte)
+{
+    START_CPU_TEST(mos6502);
+
+    vm_segment_set(cpu->memory, 0, 0x54);
+    cr_assert_eq(mos6502_read_byte(cpu), 0x54);
+
+    END_CPU_TEST(mos6502);
+}
