@@ -13,22 +13,18 @@ Test(mos6502, addr_mode)
 Test(mos6502, get_address_resolver) {
     INIT_ADDR_MODE();
 
-    cr_assert_eq(mos6502_get_address_resolver(ACC), mos6502_resolve_acc);
-    cr_assert_eq(mos6502_get_address_resolver(ABS), mos6502_resolve_abs);
-    cr_assert_eq(mos6502_get_address_resolver(ABX), mos6502_resolve_abx);
-    cr_assert_eq(mos6502_get_address_resolver(ABY), mos6502_resolve_aby);
-    cr_assert_eq(mos6502_get_address_resolver(IMM), mos6502_resolve_imm);
-    cr_assert_eq(mos6502_get_address_resolver(IND), mos6502_resolve_ind);
-    cr_assert_eq(mos6502_get_address_resolver(IDX), mos6502_resolve_idx);
-    cr_assert_eq(mos6502_get_address_resolver(IDY), mos6502_resolve_idy);
-    cr_assert_eq(mos6502_get_address_resolver(REL), mos6502_resolve_rel);
-    cr_assert_eq(mos6502_get_address_resolver(ZPG), mos6502_resolve_zpg);
-    cr_assert_eq(mos6502_get_address_resolver(ZPX), mos6502_resolve_zpx);
-    cr_assert_eq(mos6502_get_address_resolver(ZPY), mos6502_resolve_zpy);
-
-    // Trick question: implied mode doesn't require an operand, so there
-    // should be no possible resolution with it.
-    cr_assert_eq(mos6502_get_address_resolver(IMP), NULL);
+    cr_assert_eq(mos6502_get_address_resolver(0x0A), mos6502_resolve_acc);
+    cr_assert_eq(mos6502_get_address_resolver(0x20), mos6502_resolve_abs);
+    cr_assert_eq(mos6502_get_address_resolver(0xBC), mos6502_resolve_abx);
+    cr_assert_eq(mos6502_get_address_resolver(0x19), mos6502_resolve_aby);
+    cr_assert_eq(mos6502_get_address_resolver(0xA0), mos6502_resolve_imm);
+    cr_assert_eq(mos6502_get_address_resolver(0x6C), mos6502_resolve_ind);
+    cr_assert_eq(mos6502_get_address_resolver(0x01), mos6502_resolve_idx);
+    cr_assert_eq(mos6502_get_address_resolver(0x11), mos6502_resolve_idy);
+    cr_assert_eq(mos6502_get_address_resolver(0x10), mos6502_resolve_rel);
+    cr_assert_eq(mos6502_get_address_resolver(0x05), mos6502_resolve_zpg);
+    cr_assert_eq(mos6502_get_address_resolver(0x15), mos6502_resolve_zpx);
+    cr_assert_eq(mos6502_get_address_resolver(0x96), mos6502_resolve_zpy);
 
     END_ADDR_MODE();
 }
