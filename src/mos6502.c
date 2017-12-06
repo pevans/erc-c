@@ -150,7 +150,6 @@ mos6502_create()
     cpu->memory = vm_segment_create(MOS6502_MEMSIZE);
 
     cpu->last_addr = 0;
-    cpu->cycles = 0;
     cpu->PC = 0;
     cpu->A = 0;
     cpu->X = 0;

@@ -55,21 +55,6 @@ typedef struct {
     vm_16bit last_addr;
 
     /*
-     * This field contains the number of CPU cycles that the last
-     * instruction handled should consume. In order to accurately
-     * emulate any architecture, we must model the type of "wait" time
-     * each instruction would cause.
-     *
-     * It should also be pointed out that the number of cycles is both
-     * informed by the instruction _and_ the address mode. For example,
-     * an instruction executed in zero-page address mode would consume
-     * fewer cycles than one executed in absolute address mode, because
-     * in the latter, the CPU would have to read ahead to discover a
-     * 16-bit operand vs. the 8-bit operand in the former.
-     */
-    int cycles;
-
-    /*
      * Our program counter register; this is what we'll use to determine
      * where we're "at" in memory while executing opcodes. We use a
      * 16-bit register because our memory is 64k large.
