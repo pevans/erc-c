@@ -1,4 +1,5 @@
 set(emp_sources
+	apple2.c
 	log.c
 	mos6502.c
 	mos6502.addr.c
