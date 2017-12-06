@@ -4,6 +4,10 @@
 #include "vm_bits.h"
 #include "vm_segment.h"
 
+/*
+ * The size of memory that the MOS 6502 supports is 64k (the limit of
+ * values that a 16-bit address could possibly map to).
+ */
 #define MOS6502_MEMSIZE     65536
 
 #define SET_ARITH_STATUS(v) \
@@ -122,12 +126,13 @@ extern void mos6502_modify_status(mos6502 *, vm_8bit, vm_8bit);
 extern int mos6502_cycles(mos6502 *, vm_8bit);
 extern int mos6502_instruction(vm_8bit);
 extern mos6502_instruction_handler mos6502_get_instruction_handler(vm_8bit);
+extern mos6502_execute(mos6502 *, vm_8bit);
 
 /*
  * Below are some functions that are defined in mos6502.addr.c
  */
 extern int mos6502_addr_mode(vm_8bit);
-extern mos6502_address_resolver mos6502_get_address_resolver(int);
+extern mos6502_address_resolver mos6502_get_address_resolver(vm_8bit);
 
 /*
  * In some address mode resolution, we must factor the carry bit into
