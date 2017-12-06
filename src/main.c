@@ -38,5 +38,5 @@ main(int argc, char **argv)
     atexit(finish);
 
     // ha ha ha ha #nervous #laughter
-	printf("Hello, world\n");
+    printf("Hello, world\n");
 }
