@@ -10,14 +10,6 @@
  */
 #define MOS6502_MEMSIZE     65536
 
-#define SET_ARITH_STATUS(v) \
-    cpu->P &= ~NEGATIVE; \
-    cpu->P &= ~ZERO; \
-    cpu->P &= ~CARRY; \
-    if ((v) == 0) cpu->P |= ZERO; \
-    if ((v) > 0) cpu->P |= CARRY; \
-    if ((v) & 0x80) cpu->P |= NEGATIVE
-
 #define SET_PC_BYTE(cpu, off, byte) \
     vm_segment_set(cpu->memory, cpu->PC + off, byte)
 
