@@ -29,6 +29,13 @@
 // All of our address modes, instructions, etc. are defined here.
 #include "mos6502.enums.h"
 
+/*
+ * This is a table which defines what instruction each opcode is mapped
+ * to. All possible (256) values are defined here. You will note many
+ * cases where we use NOP where opcodes are not _technically_ defined;
+ * this may or may not be the best behavior. It's quite possible we should
+ * instead crash the program when we stumble upon such malformed opcodes
+ */
 static int instructions[] = {
 //   00   01   02   03   04   05   06   07   08   09   0A   0B   0C   0D   0E   0F
     BRK, ORA, NOP, NOP, NOP, ORA, ASL, NOP, PHP, ORA, ASL, NOP, NOP, ORA, ASL, NOP, // 0x
@@ -49,10 +56,17 @@ static int instructions[] = {
     BEQ, SBC, NOP, NOP, NOP, SBC, INC, NOP, SED, SBC, NOP, NOP, NOP, SBC, INC, NOP, // Fx
 };
 
-// I just don't want to type out the literal function name every time
+/*
+ * A small convenience for defining instruction handlers below.
+ */
 #define INST_HANDLER(x) \
     mos6502_handle_##x
 
+/*
+ * Here's another table, this time mapping instruction codes to
+ * instruction handler functions. They are listed in the order defined
+ * in the instruction enum (in mos6502.enums.h).
+ */
 static mos6502_instruction_handler instruction_handlers[] = {
     INST_HANDLER(adc),
     INST_HANDLER(and),
@@ -112,6 +126,11 @@ static mos6502_instruction_handler instruction_handlers[] = {
     INST_HANDLER(tya),
 };
 
+/*
+ * Here we have a table that maps opcodes to the number of cycles each
+ * should cost. In cases where no opcode is defined, we set the number
+ * of cycles to zero.
+ */
 static int cycles[] = {
 //   00   01   02   03   04   05   06   07   08   09   0A   0B   0C   0D   0E   0F
       7,   6,   0,   0,   0,   3,   5,   0,   3,   2,   2,   0,   0,   4,   6,   0, // 0x
@@ -185,6 +204,15 @@ mos6502_next_byte(mos6502 *cpu)
     return byte;
 }
 
+/*
+ * Push a _16-bit_ number to the stack. Generally speaking, only
+ * addresses are pushed to the stack, such that would be contained in
+ * the PC register (which is 16-bit).
+ *
+ * The stack is contained within a single page of memory, so you would
+ * be right in observing that the stack can contain at most 128, not
+ * 256, addresses.
+ */
 void
 mos6502_push_stack(mos6502 *cpu, vm_16bit addr)
 {
@@ -201,6 +229,9 @@ mos6502_push_stack(mos6502 *cpu, vm_16bit addr)
     cpu->S += 2;
 }
 
+/*
+ * Pop an address from the stack and return that.
+ */
 vm_16bit
 mos6502_pop_stack(mos6502 *cpu)
 {
@@ -216,12 +247,21 @@ mos6502_pop_stack(mos6502 *cpu)
         vm_segment_get(cpu->memory, 0x0100 + cpu->S + 1);
 }
 
+/*
+ * Here we set the status register to a given status value, regardless
+ * of its past contents. 
+ */
 void
 mos6502_set_status(mos6502 *cpu, vm_8bit status)
 {
     cpu->P = status;
 }
 
+/*
+ * In contrast, the modify_status function will conditionally set the
+ * contents of certain bits, based upon the value of the operand. Those
+ * bits are the negative, overflow, carry, and zero flags.
+ */
 void
 mos6502_modify_status(mos6502 *cpu, vm_8bit status, vm_8bit oper)
 {
@@ -254,12 +294,20 @@ mos6502_modify_status(mos6502 *cpu, vm_8bit status, vm_8bit oper)
     }
 }
 
+/*
+ * Return the instruction that is mapped to a given opcode.
+ */
 int
 mos6502_instruction(vm_8bit opcode)
 {
     return instructions[opcode];
 }
 
+/*
+ * Return the number of cycles an opcode may consume. The cpu is a
+ * required parameter, because the number of opcodes is conditional upon
+ * the effective address of the instruction we're executing.
+ */
 int
 mos6502_cycles(mos6502 *cpu, vm_8bit opcode)
 {

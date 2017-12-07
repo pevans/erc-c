@@ -3,6 +3,9 @@
 #include "log.h"
 #include "vm_screen.h"
 
+/*
+ * Return a new screen context. We also set the color to black.
+ */
 vm_screen_context *
 vm_screen_new_context()
 {
@@ -18,12 +21,18 @@ vm_screen_new_context()
     return context;
 }
 
+/*
+ * Free the contents of a screen context.
+ */
 void
 vm_screen_free_context(vm_screen_context *context)
 {
     free(context);
 }
 
+/*
+ * Set the color of a screen context to a given RGBA value.
+ */
 void
 vm_screen_set_color(vm_screen_context *context,
                     int red,
@@ -37,6 +46,10 @@ vm_screen_set_color(vm_screen_context *context,
     context->color_alpha = alpha;
 }
 
+/*
+ * Draw a rectangle on the screen at a given x/y position, with a given
+ * set of x/y dimensions, with a given screen context.
+ */
 void
 vm_screen_draw_rect(vm_screen_context *context,
                     int xpos,

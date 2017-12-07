@@ -1,6 +1,3 @@
-#ifndef _MOS6502_ENUMS_H_
-#define _MOS6502_ENUMS_H_
-
 /*
  * mos6502.enums.h
  *   Enums and other symbols for use with the mos 6502
@@ -11,6 +8,14 @@
  * adding them to the global namespace throughout the application.
  */
 
+#ifndef _MOS6502_ENUMS_H_
+#define _MOS6502_ENUMS_H_
+
+/*
+ * This defines all of the flags that are possible within the status (P)
+ * register. Note that there is intentionally _no_ definition for the
+ * 6th bit.
+ */
 enum status_flags {
     CARRY = 1,
     ZERO = 2,
@@ -21,6 +26,12 @@ enum status_flags {
     NEGATIVE = 128,
 };
 
+/*
+ * Here we define the various address modes that are possible. These do
+ * not map to any significant numbers that are documented for the 6502
+ * processor; the position of these symbols don't really matter, and are
+ * generally (except for `NOA`, no address mode) in alphabetical order.
+ */
 enum addr_mode {
     NOA,    // no address mode
     ACC,    // accumulator
@@ -38,6 +49,12 @@ enum addr_mode {
     ZPY,    // zero page y-index
 };
 
+/*
+ * These define the various instructions as enum symbols; again, like
+ * for address modes, the values of these enums are not actually
+ * significant to the 6502 processor, and are only useful to we, the
+ * programmers.
+ */
 enum instruction {
     ADC,    // ADd with Carry
     AND,    // bitwise AND
