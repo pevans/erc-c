@@ -10,11 +10,43 @@
  */
 #define MOS6502_MEMSIZE     65536
 
+/*
+ * This is a small macro to make it a bit simpler to set bytes ahead of
+ * the PC register position; useful in testing.
+ */
 #define SET_PC_BYTE(cpu, off, byte) \
     vm_segment_set(cpu->memory, cpu->PC + off, byte)
 
+/*
+ * This macro is used to define new instruction handler functions.
+ */
 #define DEFINE_INST(inst) \
     void mos6502_handle_##inst (mos6502 *cpu, vm_8bit oper)
+
+/*
+ * In some address mode resolution, we must factor the carry bit into
+ * the arithmetic we perform. In all those cases, if the carry bit is
+ * set, we must only add 1 to the addition. The carry variable is,
+ * therefore, the literal value we are adding, rather than a boolean
+ * signifier.
+ */
+#define CARRY_BIT() \
+    vm_8bit carry = 0; \
+    if (cpu->P & CARRY) carry = 1
+
+/*
+ * A uniform way of declaring resolve functions for address modes, which
+ * is useful in the event that we need to change the function signature.
+ */
+#define DECL_ADDR_MODE(x) \
+    extern vm_8bit mos6502_resolve_##x (mos6502 *)
+
+/*
+ * Similarly, a uniform way of declaring instruction handler functions,
+ * for the same reasons.
+ */
+#define DECL_INST(x) \
+    extern void mos6502_handle_##x (mos6502 *, vm_8bit)
 
 typedef struct {
     /*
@@ -97,31 +129,6 @@ extern vm_8bit mos6502_read_byte(mos6502 *);
  */
 extern int mos6502_addr_mode(vm_8bit);
 extern mos6502_address_resolver mos6502_get_address_resolver(vm_8bit);
-
-/*
- * In some address mode resolution, we must factor the carry bit into
- * the arithmetic we perform. In all those cases, if the carry bit is
- * set, we must only add 1 to the addition. The carry variable is,
- * therefore, the literal value we are adding, rather than a boolean
- * signifier.
- */
-#define CARRY_BIT() \
-    vm_8bit carry = 0; \
-    if (cpu->P & CARRY) carry = 1
-
-/*
- * A uniform way of declaring resolve functions for address modes, which
- * is useful in the event that we need to change the function signature.
- */
-#define DECL_ADDR_MODE(x) \
-    extern vm_8bit mos6502_resolve_##x (mos6502 *)
-
-/*
- * Similarly, a uniform way of declaring instruction handler functions,
- * for the same reasons.
- */
-#define DECL_INST(x) \
-    extern void mos6502_handle_##x (mos6502 *, vm_8bit)
 
 /*
  * All of our address modes
