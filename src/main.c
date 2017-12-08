@@ -42,6 +42,15 @@ init(int argc, char **argv)
 static void
 finish()
 {
+    // Close any file sources we had opened
+    for (int i = 1; i <= OPTION_MAX_DISKS; i++) {
+        FILE *stream = option_get_input(i);
+
+        if (stream != NULL) {
+            fclose(stream);
+        }
+    }
+
     log_close();
 }
 
