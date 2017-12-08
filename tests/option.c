@@ -16,7 +16,7 @@ teardown()
 {
     FILE *stream;
 
-    for (int i = 1; i < OPTION_MAX_DISKS; i++) {
+    for (int i = 1; i <= OPTION_MAX_DISKS; i++) {
         stream = option_get_input(i);
 
         if (stream 
