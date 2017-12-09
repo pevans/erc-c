@@ -15,6 +15,7 @@
 DEFINE_INST(and)
 {
     cpu->A &= oper;
+    mos6502_modify_status(cpu, NEGATIVE | ZERO, cpu->A);
 }
 
 /*
@@ -42,6 +43,8 @@ DEFINE_INST(asl)
     } else {
         cpu->A = oper;
     }
+
+    mos6502_modify_status(cpu, NEGATIVE | CARRY | ZERO, oper);
 }
 
 /*
@@ -75,6 +78,7 @@ DEFINE_INST(bit)
 DEFINE_INST(eor)
 {
     cpu->A ^= oper;
+    mos6502_modify_status(cpu, NEGATIVE | ZERO, cpu->A);
 }
 
 /*
@@ -98,6 +102,9 @@ DEFINE_INST(lsr)
     } else {
         cpu->A = oper;
     }
+
+    // NEGATIVE is intentionally not included here.
+    mos6502_modify_status(cpu, CARRY | ZERO, oper);
 }
 
 /*
@@ -107,6 +114,7 @@ DEFINE_INST(lsr)
 DEFINE_INST(ora)
 {
     cpu->A |= oper;
+    mos6502_modify_status(cpu, NEGATIVE | ZERO, cpu->A);
 }
 
 /*
@@ -133,6 +141,8 @@ DEFINE_INST(rol)
     } else {
         cpu->A = oper;
     }
+
+    mos6502_modify_status(cpu, NEGATIVE | CARRY | ZERO, oper);
 }
 
 /*
@@ -158,4 +168,6 @@ DEFINE_INST(ror)
     } else {
         cpu->A = oper;
     }
+
+    mos6502_modify_status(cpu, NEGATIVE | CARRY | ZERO, oper);
 }

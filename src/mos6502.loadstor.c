@@ -58,6 +58,7 @@ DEFINE_INST(php)
 DEFINE_INST(pla)
 {
     cpu->A = mos6502_pop_stack(cpu);
+    mos6502_modify_status(cpu, NEGATIVE | ZERO, cpu->A);
 }
 
 /*
