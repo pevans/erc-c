@@ -8,10 +8,14 @@ TestSuite(mos6502_exec, .init = setup, .fini = teardown);
 
 Test(mos6502_exec, brk)
 {
+    vm_8bit orig_P = cpu->P;
+
     cpu->PC = 123;
     mos6502_handle_brk(cpu, 0);
     cr_assert_eq(cpu->PC, 125);
     cr_assert_eq(cpu->P & INTERRUPT, INTERRUPT);
+
+    cr_assert_eq(mos6502_pop_stack(cpu), orig_P);
     cr_assert_eq(mos6502_pop_stack(cpu), 123);
 }
 

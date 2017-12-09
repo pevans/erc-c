@@ -14,9 +14,9 @@
  */
 DEFINE_INST(brk)
 {
-    cpu->P |= INTERRUPT;
     mos6502_push_stack(cpu, cpu->PC);
     mos6502_push_stack(cpu, cpu->P);
+    cpu->P |= INTERRUPT;
     cpu->PC += 2;
 }
 
