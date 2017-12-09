@@ -58,7 +58,7 @@ vm_segment_free(vm_segment *segment)
  * bounds-checking here will _crash_ the program if we are
  * out-of-bounds.
  */
-void
+int
 vm_segment_set(vm_segment *segment, size_t index, vm_8bit value)
 {
     // Some bounds checking.
@@ -68,13 +68,11 @@ vm_segment_set(vm_segment *segment, size_t index, vm_8bit value)
             index,
             segment->size);
 
-        // We prefer to exit in this scenario, rather than try to
-        // "handle" it with an overflow, because we would rather a crash
-        // over ill-defined behavior.
-        exit(1);
+        return ERR_OOB;
     }
 
     segment->memory[index] = value;
+    return OK;
 }
 
 /*
@@ -102,7 +100,7 @@ vm_segment_get(vm_segment *segment, size_t index)
  * Copy a set of bytes from `src` (at `src_index`) to `dest` (at
  * `dest_index`), such that the range is `length` bytes long.
  */
-void
+int
 vm_segment_copy(vm_segment *dest, 
             vm_segment *src, 
             size_t dest_index, 
@@ -116,7 +114,7 @@ vm_segment_copy(vm_segment *dest,
             length,
             src->size);
 
-        exit(1);
+        return ERR_OOB;
     }
 
     if (dest_index + length >= dest->size) {
@@ -126,10 +124,12 @@ vm_segment_copy(vm_segment *dest,
             length,
             dest->size);
 
-        exit(1);
+        return ERR_OOB;
     }
 
     memcpy(dest->memory + dest_index, 
            src->memory + src_index, 
            length * sizeof(src->memory[src_index]));
+
+    return OK;
 }

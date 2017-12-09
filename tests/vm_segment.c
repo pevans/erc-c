@@ -23,7 +23,7 @@ Test(vm_segment, set) {
     segment = vm_segment_create(length);
     cr_assert_neq(segment, NULL);
 
-    vm_segment_set(segment, index, value);
+    cr_assert_eq(vm_segment_set(segment, index, value), OK);
 
     cr_assert_eq(segment->memory[index], value);
     vm_segment_free(segment);
@@ -56,7 +56,7 @@ Test(vm_segment, copy) {
     vm_segment_set(src, 2, 0xBE);
     vm_segment_set(src, 3, 0xEF);
 
-    vm_segment_copy(dest, src, 8, 0, 4);
+    cr_assert_eq(vm_segment_copy(dest, src, 8, 0, 4), OK);
 
     cr_assert_eq(vm_segment_get(dest, 8), 0xDE);
     cr_assert_eq(vm_segment_get(dest, 9), 0xAD);

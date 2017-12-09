@@ -5,6 +5,12 @@
 
 #define LOG_FILENAME "/tmp/emp.log"
 
+enum log_errcode {
+    OK = 1,
+    ERR_OOM,            // out of memory
+    ERR_OOB,            // out of bounds
+};
+
 extern void log_write(int, const char *, ...);
 extern void log_close();
 extern void log_open(FILE *);

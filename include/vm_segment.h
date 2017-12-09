@@ -2,6 +2,7 @@
 #define _VM_SEGMENT_H_
 
 #include "vm_bits.h"
+#include "log.h"
 
 /*
  * The bounds check is just some inline code to try and cut down on the
@@ -22,10 +23,10 @@ typedef struct {
 	vm_8bit *memory;
 } vm_segment;
 
-extern void vm_segment_copy(vm_segment *, vm_segment *, size_t, size_t, size_t);
+extern int vm_segment_copy(vm_segment *, vm_segment *, size_t, size_t, size_t);
 extern vm_segment *vm_segment_create(size_t);
 extern void vm_segment_free(vm_segment *);
 extern vm_8bit vm_segment_get(vm_segment *, size_t);
-extern void vm_segment_set(vm_segment *, size_t, vm_8bit);
+extern int vm_segment_set(vm_segment *, size_t, vm_8bit);
 
 #endif
