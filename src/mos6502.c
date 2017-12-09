@@ -1,23 +1,9 @@
 /*
- * Ideas:
+ * mos6502.c
  *
- * The mos6502 code would _just_ emulate said chip. It would not be a
- * technical part of the computer, and it would in other words be
- * decoupled from the notion of a commadore, apple ii, etc.
- *
- * What you need to do in order to emulate the chip is be able to know
- * about _memory_, and know about _registers_. Things like disk drives,
- * screens, etc. are sort of beyond its knowledge. But memory and
- * registers must be _local_ to the chip's workings; it must be able to
- * directly modify those, as well as share memory/registers/etc. with
- * other parts of a platform.
- *
- * Observations:
- *   - there can only be one chip at a given time; therefore we can get
- *   away with some kind of singleton to represent the chip
- *   - registers and memory need to be available to the chip, but the
- *   chip should not know about the larger platform; we should have
- *   pointers to all of that in the chip structure
+ * These functions are kind of the "top-level", if you will, for the MOS
+ * 6502 processor. You can create the processor struct, operate on the
+ * stack, etc.
  */
 
 #include <stdio.h>

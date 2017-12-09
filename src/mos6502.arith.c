@@ -1,5 +1,8 @@
 /*
- * mos6502.inst.c
+ * mos6502.arith.c
+ *
+ * We define here the logic for arithmetic instructions for the MOS 6502
+ * processor.
  */
 
 #include "mos6502.h"

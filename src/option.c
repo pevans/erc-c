@@ -1,5 +1,9 @@
 /*
- * options.c
+ * option.c
+ * 
+ * This file contains the functions which support our CLI options; you
+ * are both able to parse options and retrieve information from that
+ * option parsing.
  */
 
 #include <errno.h>

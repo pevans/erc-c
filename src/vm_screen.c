@@ -1,3 +1,11 @@
+/*
+ * vm_screen.c
+ *
+ * Functions here support drawing to the virtual machine's "screen";
+ * exactly how that is done is an abstraction to the rest of the
+ * program, which only knows to call the functions here.
+ */
+
 #include <stdlib.h>
 
 #include "log.h"

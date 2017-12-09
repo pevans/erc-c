@@ -1,3 +1,11 @@
+/*
+ * main.c
+ *
+ * Here we define the main entry point for the program; we also define a
+ * couple of functions to run when we start (init) and finish
+ * (...finish).
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

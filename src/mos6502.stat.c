@@ -1,5 +1,8 @@
 /*
  * mos6502.stat.c
+ *
+ * The "stat", here, is short for status; these instructions all
+ * directly modify the status (P) register.
  */
 
 #include "mos6502.h"

@@ -1,5 +1,8 @@
 /*
  * mos6502.loadstor.c
+ *
+ * These are all the instructions which load and store values into
+ * various registers and places in memory.
  */
 
 #include "mos6502.h"

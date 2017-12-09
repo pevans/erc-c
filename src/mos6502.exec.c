@@ -1,5 +1,8 @@
 /*
  * mos6502.exec.c
+ *
+ * These instructions concern program execution; things like JMP, JSR,
+ * BRK, and so forth.
  */
 
 #include "mos6502.h"

@@ -1,5 +1,8 @@
 /*
  * apple2.c
+ *
+ * Here we have support for the apple2 machine. I suspect that we will
+ * need to break this file up into components in the future...
  */
 
 #include "apple2.h"

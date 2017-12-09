@@ -1,5 +1,8 @@
 /*
  * mos6502.bits.c
+ *
+ * The code here is used to implement instructions which operate
+ * specifically on bits of values.
  */
 
 #include "mos6502.h"

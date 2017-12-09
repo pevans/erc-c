@@ -1,21 +1,10 @@
 /*
  * vm_segment.c
- *   memory segments for our virtual machine
  *
- * Memory segments can be used for almost any kind of storage we can
- * imagine. The most obvious use would be for system memory, but others
- * would include physical disk media (floppy disks, hard drives).
- *
- * You may note that we assume memory segments are organized into 8bit
- * values (the `vm_8bit` type). It's certainly possible to create memory
- * segments which are organized into arbitrary boundaries; 2, 3, 4
- * bytes, you know, go nuts!
- *
- * To do so, however, we would be adding a fair bit of complexity, and
- * (at the moment of this writing at least) I am not convinced there is
- * a good use-case for doing so. Your bog-standard computer of _today_
- * is still using memory organized into bytes. Your hard drive is also
- * using bytes. Etc.
+ * The functions here allow you to allocate generic blocks of memory (or
+ * "segments") for use anywhere else in the software. They can be used
+ * to represent machine memory, removable media (like floppy disks),
+ * etc.
  */
 
 #include <stdio.h>

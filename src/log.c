@@ -1,3 +1,9 @@
+/*
+ * log.c
+ *
+ * The functions here support our logging mechanism.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>

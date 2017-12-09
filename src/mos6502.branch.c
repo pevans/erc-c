@@ -1,5 +1,8 @@
 /*
  * mos6502.branch.c
+ *
+ * This is all the logic we use for branch instructions, which are used
+ * for conditional expressions.
  */
 
 #include "mos6502.h"
