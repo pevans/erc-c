@@ -57,7 +57,7 @@ Test(mos6502_exec, rti)
 Test(mos6502_exec, rts)
 {
     mos6502_push_stack(cpu, 333);
-    mos6502_handle_rti(cpu, 0);
+    mos6502_handle_rts(cpu, 0);
 
     cr_assert_eq(cpu->PC, 333);
 }
