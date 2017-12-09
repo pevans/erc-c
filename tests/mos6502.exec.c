@@ -47,6 +47,8 @@ Test(mos6502_exec, nop)
 Test(mos6502_exec, rti)
 {
     mos6502_push_stack(cpu, 222);
+    mos6502_push_stack(cpu, cpu->P);
+
     mos6502_handle_rti(cpu, 0);
 
     cr_assert_eq(cpu->PC, 222);
