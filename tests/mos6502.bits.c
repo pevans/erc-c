@@ -76,7 +76,7 @@ Test(mos6502_bits, lsr)
     cpu->last_addr = 123;
     mos6502_handle_lsr(cpu, 22);
     cr_assert_eq(vm_segment_get(cpu->memory, 123), 11);
-    cr_assert_eq(cpu->P & CARRY, 0);
+    cr_assert_eq(cpu->P & CARRY, CARRY);
 }
 
 Test(mos6502_bits, ora)
