@@ -2,12 +2,26 @@
 
 #include "vm_segment.h"
 
+static vm_segment *segment;
+static int length = 128;
+
+static void
+setup()
+{
+    segment = vm_segment_create(length);
+}
+
+static void
+teardown()
+{
+    vm_segment_free(segment);
+}
+
+TestSuite(vm_segment, .init = setup, .fini = teardown);
+
 Test(vm_segment, create) {
-    vm_segment *segment;
-    int length = 128;
     int i;
 
-    segment = vm_segment_create(length);
     cr_assert_neq(segment, NULL);
     cr_assert_eq(segment->size, length);
 
@@ -18,43 +32,27 @@ Test(vm_segment, create) {
         cr_assert_eq(segment->read_table[i], NULL);
         cr_assert_eq(segment->write_table[i], NULL);
     }
-
-    vm_segment_free(segment);
 }
 
 Test(vm_segment, set) {
-    vm_segment *segment;
-    int length = 128;
     int index = 0;
     vm_8bit value = 123;
-
-    segment = vm_segment_create(length);
-    cr_assert_neq(segment, NULL);
 
     cr_assert_eq(vm_segment_set(segment, index, value), OK);
 
     cr_assert_eq(segment->memory[index], value);
-    vm_segment_free(segment);
 }
 
 Test(vm_segment, get) {
-    vm_segment *segment;
-    int length = 128;
     int index = 0;
     vm_8bit value = 123;
 
-    segment = vm_segment_create(length);
-    cr_assert_neq(segment, NULL);
-
     segment->memory[index] = value;
     cr_assert_eq(vm_segment_get(segment, index), value);
-
-    vm_segment_free(segment);
 }
 
 Test(vm_segment, copy) {
     vm_segment *src, *dest;
-    int length = 128;
 
     src = vm_segment_create(length);
     dest = vm_segment_create(length);
