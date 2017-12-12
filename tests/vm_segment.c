@@ -93,3 +93,40 @@ Test(vm_segment, write_map)
 
     cr_assert_eq(segment->write_table[123], (vm_segment_write_fn)456);
 }
+
+static vm_8bit
+read_fn(vm_segment *segment, size_t addr)
+{
+    return 222;
+}
+
+Test(vm_segment, use_read_map)
+{
+    size_t addr = 123;
+
+    vm_segment_set(segment, addr, 111);
+    cr_assert_eq(vm_segment_get(segment, addr), 111);
+    vm_segment_read_map(segment, addr, read_fn);
+    cr_assert_eq(vm_segment_get(segment, addr), 222);
+    vm_segment_read_map(segment, addr, NULL);
+    cr_assert_eq(vm_segment_get(segment, addr), 111);
+}
+
+void
+write_fn(vm_segment *segment, size_t addr, vm_8bit value)
+{
+    segment->memory[addr+1] = value;
+}
+
+Test(vm_segment, use_write_map)
+{
+    size_t addr = 123;
+
+    vm_segment_set(segment, addr, 111);
+    cr_assert_eq(vm_segment_get(segment, addr), 111);
+    cr_assert_neq(vm_segment_get(segment, addr + 1), 111);
+    vm_segment_write_map(segment, addr, write_fn);
+    vm_segment_set(segment, addr, 111);
+    cr_assert_eq(vm_segment_get(segment, addr), 111);
+    cr_assert_eq(vm_segment_get(segment, addr + 1), 111);
+}
