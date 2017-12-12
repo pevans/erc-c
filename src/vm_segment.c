@@ -95,6 +95,12 @@ vm_segment_set(vm_segment *segment, size_t index, vm_8bit value)
         return ERR_OOB;
     }
 
+    // Check if we have a write mapper
+    if (segment->write_table[index]) {
+        segment->write_table[index](segment, index, value);
+        return OK;
+    }
+
     segment->memory[index] = value;
     return OK;
 }
@@ -115,6 +121,11 @@ vm_segment_get(vm_segment *segment, size_t index)
 
         // See vm_segment_set() for a justification of this behavior.
         exit(1);
+    }
+
+    // We may have a read mapper for this address
+    if (segment->read_table[index]) {
+        return segment->read_table[index](segment, index);
     }
 
     return segment->memory[index];
