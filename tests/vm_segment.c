@@ -72,3 +72,24 @@ Test(vm_segment, copy) {
     vm_segment_free(src);
     vm_segment_free(dest);
 }
+
+Test(vm_segment, read_map)
+{
+    // We use some trickery here; I don't want to go to the trouble of
+    // defining a function for this test, so I am just passing in an
+    // arbitrary pointer to junk. As long as the garbage-in, garbage-out
+    // principle holds, we're golden.
+    cr_assert_eq(vm_segment_read_map(segment, 123, (vm_segment_read_fn)456), OK);
+    cr_assert_eq(vm_segment_read_map(segment, 321, (vm_segment_read_fn)456), ERR_OOB);
+
+    cr_assert_eq(segment->read_table[123], (vm_segment_read_fn)456);
+}
+
+Test(vm_segment, write_map)
+{
+    // See the read_map test for more details on the following trickery
+    cr_assert_eq(vm_segment_write_map(segment, 123, (vm_segment_write_fn)456), OK);
+    cr_assert_eq(vm_segment_write_map(segment, 321, (vm_segment_write_fn)456), ERR_OOB);
+
+    cr_assert_eq(segment->write_table[123], (vm_segment_write_fn)456);
+}

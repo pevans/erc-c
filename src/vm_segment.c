@@ -157,3 +157,29 @@ vm_segment_copy(vm_segment *dest,
 
     return OK;
 }
+
+int
+vm_segment_read_map(vm_segment *segment, 
+                    size_t addr, 
+                    vm_segment_read_fn fn)
+{
+    if (addr >= segment->size) {
+        return ERR_OOB;
+    }
+
+    segment->read_table[addr] = fn;
+    return OK;
+}
+
+int
+vm_segment_write_map(vm_segment *segment,
+                     size_t addr,
+                     vm_segment_write_fn fn)
+{
+    if (addr >= segment->size) {
+        return ERR_OOB;
+    }
+
+    segment->write_table[addr] = fn;
+    return OK;
+}
