@@ -38,6 +38,28 @@ vm_segment_create(size_t size)
         return NULL;
     }
 
+    segment->read_table = malloc(sizeof(vm_segment_read_fn) * size);
+    if (segment->read_table == NULL) {
+        log_critical("Couldn't allocate enough space for segment read_table");
+        return NULL;
+    }
+
+    segment->write_table = malloc(sizeof(vm_segment_write_fn) * size);
+    if (segment->write_table == NULL) {
+        log_critical("Couldn't allocate enough space for segment write_table");
+        return NULL;
+    }
+
+    /*
+     * Let's NULL-out the read and write tables. If we don't do so, they
+     * may have some bits of garbage in it, and could cause the
+     * read/write mapper code to attempt to a run a function with
+     * garbage. We could have undefined garbage! We can only properly
+     * work with defined garbage.
+     */
+    memset(segment->read_table, (int)NULL, sizeof(vm_segment_read_fn));
+    memset(segment->write_table, (int)NULL, sizeof(vm_segment_write_fn));
+
     segment->size = size;
 
     return segment;
