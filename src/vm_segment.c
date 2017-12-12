@@ -38,9 +38,9 @@ vm_segment_create(size_t size)
         return NULL;
     }
 
-    // We should NULL out memory and make explicit that any new segment
+    // We should zero out memory and make explicit that any new segment
     // begins life in that state.
-    memset(segment->memory, (int)NULL, sizeof(vm_8bit));
+    memset(segment->memory, 0, sizeof(vm_8bit));
 
     segment->read_table = malloc(sizeof(vm_segment_read_fn) * size);
     if (segment->read_table == NULL) {
