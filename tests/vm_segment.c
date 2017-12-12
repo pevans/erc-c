@@ -5,11 +5,19 @@
 Test(vm_segment, create) {
     vm_segment *segment;
     int length = 128;
+    int i;
 
     segment = vm_segment_create(length);
     cr_assert_neq(segment, NULL);
-
     cr_assert_eq(segment->size, length);
+
+    // Test that the memory chunk itself, plus the read and write
+    // tables, are all zeroed out.
+    for (i = 0; i < segment->size; i++) {
+        cr_assert_eq(segment->memory[i], 0);
+        cr_assert_eq(segment->read_table[i], NULL);
+        cr_assert_eq(segment->write_table[i], NULL);
+    }
 
     vm_segment_free(segment);
 }
