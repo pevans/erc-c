@@ -54,13 +54,11 @@ vm_segment_create(size_t size)
         return NULL;
     }
 
-    /*
-     * Let's NULL-out the read and write tables. If we don't do so, they
-     * may have some bits of garbage in it, and could cause the
-     * read/write mapper code to attempt to a run a function with
-     * garbage. We could have undefined garbage! We can only properly
-     * work with defined garbage.
-     */
+    // Let's NULL-out the read and write tables. If we don't do so, they
+    // may have some bits of garbage in it, and could cause the
+    // read/write mapper code to attempt to a run a function with
+    // garbage. We could have undefined garbage! We can only properly
+    // work with defined garbage.
     memset(segment->read_table, (int)NULL, sizeof(vm_segment_read_fn));
     memset(segment->write_table, (int)NULL, sizeof(vm_segment_write_fn));
 
