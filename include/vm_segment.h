@@ -5,13 +5,32 @@
 #include "log.h"
 
 /*
+ * Here we make a forward declaration of the vm_segment. (We also
+ * typedef that struct as `vm_segment`, so we don't have to say `struct
+ * vm_segment` everywhere.)
+ */
+struct vm_segment;
+typedef struct vm_segment vm_segment;
+
+/*
+ * The above forward declaration allows us to define the types for the
+ * read and write function signatures that we intend to use in the
+ * _definition_ of the vm_segment struct. 
+ *
+ * C is fun! Don't let anyone tell you otherwise.
+ */
+typedef vm_8bit (*vm_segment_read_fn)(vm_segment *, size_t);
+typedef void (*vm_segment_write_fn)(vm_segment *, size_t, vm_8bit);
+
+/*
  * The bounds check is just some inline code to try and cut down on the
  * cost of it.
  */
 #define vm_segment_bounds_check(segment, index) \
 	(index == index % segment->size)
 
-typedef struct {
+struct vm_segment {
+
     /*
      * The size of our memory segment. This is used for bounds checking.
      */
@@ -21,7 +40,18 @@ typedef struct {
      * This is the actual chunk of memory we allocate.
      */
 	vm_8bit *memory;
-} vm_segment;
+
+    /*
+     * These are memory maps; if we have defined a non-NULL entry for a
+     * given address in read_table, then that is a function we will use
+     * to return the value for that address. Likewise, if we have a
+     * non-NULL entry in write_table, we will use that to "set" the
+     * value. As you may guess, these should conventionally be the
+     * exact size indicated by the size field.
+     */
+    vm_segment_read_fn *read_table;
+    vm_segment_write_fn *write_table;
+};
 
 extern int vm_segment_copy(vm_segment *, vm_segment *, size_t, size_t, size_t);
 extern vm_segment *vm_segment_create(size_t);
