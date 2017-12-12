@@ -171,6 +171,10 @@ vm_segment_copy(vm_segment *dest,
     return OK;
 }
 
+/*
+ * Set the read mapper for a given address. We'll use this function
+ * instead of the normal logic on a get for that address.
+ */
 int
 vm_segment_read_map(vm_segment *segment, 
                     size_t addr, 
@@ -184,6 +188,10 @@ vm_segment_read_map(vm_segment *segment,
     return OK;
 }
 
+/*
+ * Here we set the map function for a given address to use on writes,
+ * which is to say, when we use the `vm_segment_set()` function.
+ */
 int
 vm_segment_write_map(vm_segment *segment,
                      size_t addr,
