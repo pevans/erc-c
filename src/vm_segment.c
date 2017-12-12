@@ -122,7 +122,9 @@ vm_segment_get(vm_segment *segment, size_t index)
 
 /*
  * Copy a set of bytes from `src` (at `src_index`) to `dest` (at
- * `dest_index`), such that the range is `length` bytes long.
+ * `dest_index`), such that the range is `length` bytes long. Note that
+ * this function presently bypasses our mapper function code... we may
+ * need to implement such in the future.
  */
 int
 vm_segment_copy(vm_segment *dest, 
