@@ -119,3 +119,17 @@ Test(apple2dd, insert)
     cr_assert_eq(apple2dd_insert(drive, stream), ERR_BADFILE);
     fclose(stream);
 }
+
+Test(apple2dd, shift)
+{
+    apple2dd_shift(drive, 5);
+    cr_assert_eq(drive->sector_pos, 5);
+
+    // Push it beyond the sector boundary; see if the track position
+    // updates as it should.
+    apple2dd_shift(drive, MAX_SECTOR_POS + 3);
+    cr_assert_eq(drive->track_pos, 2);
+
+    // this should be the mod of sector_pos and MAX_SECTOR_POS
+    cr_assert_eq(drive->sector_pos, 7);
+}
