@@ -4,7 +4,7 @@
 /*
  * These are the possible modes a drive can be in.
  */
-enum apple2_disk_drive_mode {
+enum apple2dd_mode {
     DD_READ,
     DD_WRITE,
 };
@@ -25,6 +25,21 @@ typedef struct {
      * would be at most 70 track positions that we can iterate to.
      */
     int track_pos;
+
+    /*
+     * This is a weirder one, because while DOS cares about sectors, we
+     * don't really. We just need to know how to find the right position
+     * to work with in the disk image.
+     *
+     * Each track has 16 sectors, and each sector has 256 bytes. We can
+     * then say that each track is 4k (4,096) bytes large. So while our
+     * track_pos can tell us which 4k chunk we're in, the sector_pos has
+     * to tell us where we are _within_ the track. Again -- we don't
+     * care about the sector number, really. So the sector_pos field is
+     * tracking the byte offset from the beginning of the track, such
+     * that 0 ≤ sector_pos < 4096.
+     */
+    int sector_pos;
 
     /*
      * The data field is where the actual byte data for the image is
@@ -57,13 +72,13 @@ typedef struct {
      * that you can enable or disable on the drive.
      */
     bool write_protect;
-} apple2_disk_drive;
+} apple2dd;
 
-extern apple2_disk_drive *apple2_disk_drive_create();
-extern void apple2_disk_drive_free(apple2_disk_drive *);
-extern void apple2_disk_drive_step(apple2_disk_drive *, int);
-extern void apple2_disk_drive_set_mode(apple2_disk_drive *, int);
-extern void apple2_disk_drive_turn_on(apple2_disk_drive *, bool);
-extern void apple2_disk_drive_write_protect(apple2_disk_drive *, bool);
+extern apple2dd *apple2dd_create();
+extern void apple2dd_free(apple2dd *);
+extern void apple2dd_step(apple2dd *, int);
+extern void apple2dd_set_mode(apple2dd *, int);
+extern void apple2dd_turn_on(apple2dd *, bool);
+extern void apple2dd_write_protect(apple2dd *, bool);
 
 #endif
