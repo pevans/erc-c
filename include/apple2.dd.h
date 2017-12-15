@@ -2,6 +2,8 @@
 #define _APPLE2_DISK_DRIVE_H
 
 #include <stdbool.h>
+#include <stdio.h>
+#include <sys/stat.h>
 
 #include "vm_bits.h"
 #include "vm_segment.h"
@@ -86,5 +88,8 @@ extern void apple2dd_set_mode(apple2dd *, int);
 extern void apple2dd_turn_on(apple2dd *, bool);
 extern void apple2dd_write_protect(apple2dd *, bool);
 extern int apple2dd_position(apple2dd *);
+extern void apple2dd_eject(apple2dd *);
+extern int apple2dd_insert(apple2dd *, FILE *);
+extern void apple2dd_shift(apple2dd *, int);
 
 #endif
