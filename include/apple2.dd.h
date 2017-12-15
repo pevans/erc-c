@@ -1,6 +1,11 @@
 #ifndef _APPLE2_DISK_DRIVE_H
 #define _APPLE2_DISK_DRIVE_H
 
+#include <stdbool.h>
+
+#include "vm_bits.h"
+#include "vm_segment.h"
+
 /*
  * These are the possible modes a drive can be in.
  */
