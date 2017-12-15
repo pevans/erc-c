@@ -2,7 +2,7 @@
  * apple2.disk_drive.c
  */
 
-#include "apple2.disk_drive.h"
+#include "apple2.dd.h"
 
 /*
  * This is the length of a typical disk that is formatted in either DOS
