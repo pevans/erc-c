@@ -92,3 +92,30 @@ Test(apple2dd, position)
 
     // FIXME: we need some dummy data for the drive...
 }
+
+Test(apple2dd, eject)
+{
+    drive->data = vm_segment_create(1000);
+    apple2dd_eject(drive);
+    cr_assert_eq(drive->data, NULL);
+}
+
+Test(apple2dd, insert)
+{
+    FILE *stream;
+
+    // In a successful drive open, we would also reset the track and
+    // sector pos.
+    drive->track_pos = 123;
+    drive->sector_pos = 33;
+
+    stream = fopen("../data/zero.img", "r");
+    cr_assert_eq(apple2dd_insert(drive, stream), OK);
+    cr_assert_eq(drive->track_pos, 0);
+    cr_assert_eq(drive->sector_pos, 0);
+    fclose(stream);
+
+    stream = fopen("../data/bad.img", "r");
+    cr_assert_eq(apple2dd_insert(drive, stream), ERR_BADFILE);
+    fclose(stream);
+}
