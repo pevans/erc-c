@@ -93,9 +93,18 @@ apple2dd_write_protect(apple2dd *drive, bool protect)
     drive->write_protect = protect;
 }
 
-static int
-position(apple2dd *drive)
+int
+apple2dd_position(apple2dd *drive)
 {
+    // Special case: they didn't load any image data into the "drive".
+    // Return zero.
+    if (drive->data == NULL) {
+        return 0;
+    }
+
+    // This is a normative DOS 3.3 / ProDOS disk. (Except ProDOS is
+    // separated into 512 byte blocks which _shouldn't_ matter for our
+    // purposes but let's not talk about that here do-de-doo.)
     if (drive->data->size == _140K_) {
         int track_offset;
 
@@ -109,7 +118,7 @@ position(apple2dd *drive)
 vm_8bit
 apple2dd_read_byte(apple2dd *drive)
 {
-    vm_8bit byte = vm_segment_get(drive->data, position(drive));
+    vm_8bit byte = vm_segment_get(drive->data, apple2dd_position(drive));
 
     // We may have read the very last byte in a sector; if so let's
     // adjust the track_pos by two half tracks and reset the sector pos.
@@ -125,7 +134,7 @@ apple2dd_read_byte(apple2dd *drive)
 void
 apple2dd_write(apple2dd *drive, vm_8bit byte)
 {
-    vm_segment_set(drive->data, position(drive), byte);
+    vm_segment_set(drive->data, apple2dd_position(drive), byte);
 
     drive->sector_pos++;
     if (drive->sector_pos > MAX_SECTOR_POS) {
