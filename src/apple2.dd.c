@@ -18,12 +18,6 @@
  */
 #define _240K_ 245760
 
-/*
- * This is the last _accessible_ sector position within a track (you can
- * have 0 - 4095).
- */
-#define MAX_SECTOR_POS 4095
-
 apple2dd *
 apple2dd_create()
 {
@@ -160,9 +154,9 @@ apple2dd_shift(apple2dd *drive, int pos)
 {
     drive->sector_pos += pos;
 
-    if (drive->sector_pos > MAX_SECTOR_POS) {
+    while (drive->sector_pos > MAX_SECTOR_POS) {
         // We need to reset the sector pos to zero, because...
-        drive->sector_pos = 0;
+        drive->sector_pos -= (MAX_SECTOR_POS + 1);
         
         // We also need to move to the next track, so let's adjust by
         // two half-tracks.
