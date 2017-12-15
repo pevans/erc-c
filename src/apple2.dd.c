@@ -66,8 +66,8 @@ apple2dd_step(apple2dd *drive, int steps)
 
     if (drive->track_pos > MAX_DRIVE_STEPS) {
         drive->track_pos = MAX_DRIVE_STEPS;
-    } else if (drive->track_pos < -MAX_DRIVE_STEPS) {
-        drive->track_pos = -MAX_DRIVE_STEPS;
+    } else if (drive->track_pos < 0) {
+        drive->track_pos = 0;
     }
 }
 
