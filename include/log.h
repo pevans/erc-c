@@ -2,6 +2,8 @@
 #define _LOG_H_
 
 #include <stdio.h>
+#include <string.h>
+#include <errno.h>
 
 #define LOG_FILENAME "/tmp/emp.log"
 
@@ -9,6 +11,7 @@ enum log_errcode {
     OK = 1,
     ERR_OOM,            // out of memory
     ERR_OOB,            // out of bounds
+    ERR_BADFILE,
 };
 
 extern void log_write(int, const char *, ...);
