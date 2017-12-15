@@ -59,6 +59,46 @@ apple2dd_free(apple2dd *drive)
     free(drive);
 }
 
+int
+apple2dd_insert(apple2dd *drive, FILE *stream)
+{
+    struct stat finfo;
+
+    if (stream == NULL) {
+        log_critical("File stream is null");
+        return ERR_BADFILE;
+    }
+
+    // How large is this data set? Let's get the stat info.
+    if (fstat(fileno(stream), &finfo)) {
+        log_critical("Couldn't inspect file stream: %s", strerror(errno));
+        return ERR_BADFILE;
+    }
+
+    if (finfo.st_size != _140K_) {
+        log_critical("Unexpected file format (file size = %d)", finfo.st_size);
+        return ERR_BADFILE;
+    }
+
+    // If we have any data, get rid of it. We'll start fresh here.
+    apple2dd_eject(drive);
+
+    drive->data = vm_segment_create(finfo.st_size);
+    drive->track_pos = 0;
+    drive->sector_pos = 0;
+
+    return OK;
+}
+
+void
+apple2dd_eject(apple2dd *drive)
+{
+    if (drive->data) {
+        vm_segment_free(drive->data);
+        drive->data = NULL;
+    }
+}
+
 void
 apple2dd_step(apple2dd *drive, int steps)
 {
@@ -115,18 +155,26 @@ apple2dd_position(apple2dd *drive)
     return 0;
 }
 
+void
+apple2dd_shift(apple2dd *drive, int pos)
+{
+    drive->sector_pos += pos;
+
+    if (drive->sector_pos > MAX_SECTOR_POS) {
+        // We need to reset the sector pos to zero, because...
+        drive->sector_pos = 0;
+        
+        // We also need to move to the next track, so let's adjust by
+        // two half-tracks.
+        apple2dd_step(drive, 2);
+    }
+}
+
 vm_8bit
 apple2dd_read_byte(apple2dd *drive)
 {
     vm_8bit byte = vm_segment_get(drive->data, apple2dd_position(drive));
-
-    // We may have read the very last byte in a sector; if so let's
-    // adjust the track_pos by two half tracks and reset the sector pos.
-    drive->sector_pos++;
-    if (drive->sector_pos > MAX_SECTOR_POS) {
-        drive->track_pos += 2;
-        drive->sector_pos = 0;
-    }
+    apple2dd_shift(drive, 1);
 
     return byte;
 }
@@ -135,10 +183,5 @@ void
 apple2dd_write(apple2dd *drive, vm_8bit byte)
 {
     vm_segment_set(drive->data, apple2dd_position(drive), byte);
-
-    drive->sector_pos++;
-    if (drive->sector_pos > MAX_SECTOR_POS) {
-        drive->track_pos += 2;
-        drive->sector_pos = 0;
-    }
+    apple2dd_shift(drive, 1);
 }
