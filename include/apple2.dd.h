@@ -18,6 +18,12 @@ enum apple2dd_mode {
 
 #define MAX_DRIVE_STEPS 70
 
+/*
+ * This is the last _accessible_ sector position within a track (you can
+ * have 0 - 4095).
+ */
+#define MAX_SECTOR_POS 4095
+
 typedef struct {
     /*
      * Disk II drives allow the stepper to move in half-tracks, so we
