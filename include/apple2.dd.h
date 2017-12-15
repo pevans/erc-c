@@ -85,5 +85,6 @@ extern void apple2dd_step(apple2dd *, int);
 extern void apple2dd_set_mode(apple2dd *, int);
 extern void apple2dd_turn_on(apple2dd *, bool);
 extern void apple2dd_write_protect(apple2dd *, bool);
+extern int apple2dd_position(apple2dd *);
 
 #endif
