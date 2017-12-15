@@ -62,6 +62,12 @@ log_write(int level, const char *fmt, ...)
 {
     va_list ap;
 
+    // Oh. Well, we can't write something if we have no log stream,
+    // right?
+    if (log_stream == NULL) {
+        return;
+    }
+
     va_start(ap, fmt);
     vfprintf(log_stream, fmt, ap);
     fprintf(log_stream, "\n");
