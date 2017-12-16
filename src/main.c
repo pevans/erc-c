@@ -11,6 +11,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "apple2.h"
 #include "log.h"
 #include "option.h"
 
@@ -69,12 +70,23 @@ finish()
 int
 main(int argc, char **argv)
 {
+    apple2 *mach;
+    int err;
+
     init(argc, argv);
 
     // When we exit, we want to wrap up a few loose ends. This syscall
     // will ensure that `finish()` runs whether we return from main
     // successfully or if we run `exit()` from elsewhere in the program.
     atexit(finish);
+
+    mach = apple2_create();
+    err = apple2_boot(mach);
+
+    if (err != OK) {
+        fprintf(stderr, "Bootup failed!\n");
+        exit(1);
+    }
 
     // ha ha ha ha #nervous #laughter
     printf("Hello, world\n");

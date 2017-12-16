@@ -6,6 +6,7 @@
  */
 
 #include "apple2.h"
+#include "option.h"
 #include "vm_segment.h"
 
 /*
@@ -35,7 +36,10 @@ apple2_create()
 
     mach->cpu = mos6502_create();
     mach->memory = mach->cpu->memory;
-    
+
+    mach->drive1 = apple2dd_create();
+    mach->drive2 = apple2dd_create();
+
     return mach;
 }
 
@@ -95,4 +99,32 @@ void
 apple2_release_key(apple2 *mach)
 {
     vm_segment_set(mach->memory, ANY_KEY_DOWN, 0);
+}
+
+int
+apple2_boot(apple2 *mach)
+{
+    FILE *stream;
+    int err;
+
+    // Do we have any disks?
+    stream = option_get_input(1);
+    if (stream) {
+        err = apple2dd_insert(mach->drive1, stream);
+        if (err != OK) {
+            log_critical("Unable to insert disk1 into drive");
+            return err;
+        }
+    }
+
+    stream = option_get_input(2);
+    if (stream) {
+        err = apple2dd_insert(mach->drive2, stream);
+        if (err != OK) {
+            log_critical("Unable to insert disk2 into drive");
+            return err;
+        }
+    }
+
+    return OK;
 }
