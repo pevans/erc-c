@@ -133,3 +133,33 @@ Test(apple2dd, shift)
     // this should be the mod of sector_pos and MAX_SECTOR_POS
     cr_assert_eq(drive->sector_pos, 7);
 }
+
+Test(apple2dd, read_byte)
+{
+    drive->data = vm_segment_create(_140K_);
+    vm_segment_set(drive->data, 0, 123);
+    vm_segment_set(drive->data, 1, 234);
+
+    cr_assert_eq(apple2dd_read_byte(drive), 123);
+    cr_assert_eq(drive->track_pos, 0);
+    cr_assert_eq(drive->sector_pos, 1);
+
+    cr_assert_eq(apple2dd_read_byte(drive), 234);
+    cr_assert_eq(drive->track_pos, 0);
+    cr_assert_eq(drive->sector_pos, 2);
+}
+
+Test(apple2dd, write_byte)
+{
+    drive->data = vm_segment_create(_140K_);
+
+    apple2dd_write_byte(drive, 123);
+    cr_assert_eq(vm_segment_get(drive->data, 0), 123);
+    cr_assert_eq(drive->track_pos, 0);
+    cr_assert_eq(drive->sector_pos, 1);
+
+    apple2dd_write_byte(drive, 234);
+    cr_assert_eq(vm_segment_get(drive->data, 1), 234);
+    cr_assert_eq(drive->track_pos, 0);
+    cr_assert_eq(drive->sector_pos, 2);
+}
