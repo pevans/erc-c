@@ -16,6 +16,20 @@ enum apple2dd_mode {
     DD_WRITE,
 };
 
+/*
+ * This is the length of a typical disk that is formatted in either DOS
+ * 3.3 or ProDOS.
+ */
+#define _140K_ 143360
+
+/*
+ * And this is the length of a disk that has been formatted as a nibble
+ * file (*.NIB). This is not an Apple thing, exactly; it's more of an
+ * emulator thing, that emulators had used to try and get around copy
+ * protection in emulation. It does complicate disk drive operation!
+ */
+#define _240K_ 245760
+
 #define MAX_DRIVE_STEPS 70
 
 /*
@@ -97,5 +111,7 @@ extern int apple2dd_position(apple2dd *);
 extern void apple2dd_eject(apple2dd *);
 extern int apple2dd_insert(apple2dd *, FILE *);
 extern void apple2dd_shift(apple2dd *, int);
+extern vm_8bit apple2dd_read_byte(apple2dd *);
+extern void apple2dd_write_byte(apple2dd *, vm_8bit);
 
 #endif
