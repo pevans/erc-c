@@ -40,7 +40,7 @@ vm_segment_create(size_t size)
 
     // We should zero out memory and make explicit that any new segment
     // begins life in that state.
-    memset(segment->memory, 0, sizeof(vm_8bit));
+    memset(segment->memory, 0, sizeof(vm_8bit) * size);
 
     segment->read_table = malloc(sizeof(vm_segment_read_fn) * size);
     if (segment->read_table == NULL) {
@@ -59,8 +59,8 @@ vm_segment_create(size_t size)
     // read/write mapper code to attempt to a run a function with
     // garbage. We could have undefined garbage! We can only properly
     // work with defined garbage.
-    memset(segment->read_table, (int)NULL, sizeof(vm_segment_read_fn));
-    memset(segment->write_table, (int)NULL, sizeof(vm_segment_write_fn));
+    memset(segment->read_table, (int)NULL, sizeof(vm_segment_read_fn) * size);
+    memset(segment->write_table, (int)NULL, sizeof(vm_segment_write_fn) * size);
 
     segment->size = size;
 
