@@ -151,7 +151,7 @@ apple2dd_shift(apple2dd *drive, int pos)
 }
 
 vm_8bit
-apple2dd_read_byte(apple2dd *drive)
+apple2dd_read(apple2dd *drive)
 {
     vm_8bit byte = vm_segment_get(drive->data, apple2dd_position(drive));
     apple2dd_shift(drive, 1);
@@ -160,7 +160,7 @@ apple2dd_read_byte(apple2dd *drive)
 }
 
 void
-apple2dd_write_byte(apple2dd *drive, vm_8bit byte)
+apple2dd_write(apple2dd *drive, vm_8bit byte)
 {
     vm_segment_set(drive->data, apple2dd_position(drive), byte);
     apple2dd_shift(drive, 1);
