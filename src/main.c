@@ -76,7 +76,7 @@ int
 main(int argc, char **argv)
 {
     apple2 *mach;
-    vm_screen_context *context;
+    vm_screen *screen;
     int err;
 
     init(argc, argv);
@@ -94,19 +94,19 @@ main(int argc, char **argv)
         exit(1);
     }
 
-    context = vm_screen_new_context();
-    if (context == NULL) {
-        fprintf(stderr, "Screen context failed!\n");
+    screen = vm_screen_create();
+    if (screen == NULL) {
+        fprintf(stderr, "Screen creation failed!\n");
         exit(1);
     }
 
-    if (!vm_screen_add_window(context)) {
+    if (!vm_screen_add_window(screen)) {
         fprintf(stderr, "Window creation failed!\n");
         exit(1);
     }
 
-    while (vm_screen_active(context)) {
-        vm_screen_refresh(context);
+    while (vm_screen_active(screen)) {
+        vm_screen_refresh(screen);
     }
 
     // ha ha ha ha #nervous #laughter
