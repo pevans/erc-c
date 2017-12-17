@@ -5,6 +5,14 @@ project(erc)
 
 include(sources.cmake)
 
+if(APPLE)
+	set(opengl_library /System/Library/Frameworks/OpenGL.framework)
+endif()
+
+if(NOT opengl_library)
+	message(FATAL_ERROR "This CMake file is not yet educated as to where OpenGL resides on your platform. Sorry!")
+endif()
+
 foreach(src ${erc_sources})
 	string(CONCAT relsrc src/ ${src})
 	list(APPEND sources ${relsrc})
@@ -19,4 +27,4 @@ link_directories(/usr/local/lib)
 add_executable(erc ${sources} src/main.c)
 
 # Graphics
-target_link_libraries(erc glfw)
+target_link_libraries(erc ${opengl_library} glfw)

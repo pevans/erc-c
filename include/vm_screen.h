@@ -27,6 +27,8 @@ typedef struct {
 extern int vm_screen_add_window(vm_screen_context *);
 extern int vm_screen_init();
 extern void vm_screen_finish();
+extern void vm_screen_refresh(vm_screen_context *);
+extern bool vm_screen_active(vm_screen_context *);
 extern void vm_screen_draw_rect(vm_screen_context *, int, int, int, int);
 extern void vm_screen_free_context(vm_screen_context *);
 extern vm_screen_context *vm_screen_new_context();

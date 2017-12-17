@@ -4,6 +4,14 @@ project(erc-test)
 
 set(CMAKE_BUILD_TYPE Debug)
 
+if(APPLE)
+	set(opengl_library /System/Library/Frameworks/OpenGL.framework)
+endif()
+
+if(NOT opengl_library)
+	message(FATAL_ERROR "This CMake file is not yet educated as to where OpenGL resides on your platform. Sorry!")
+endif()
+
 include_directories(../include /usr/local/include)
 
 link_directories(/usr/local/lib)
@@ -25,4 +33,4 @@ add_executable(erc-test ${sources} ${test_sources})
 target_link_libraries(erc-test criterion)
 
 # Graphics
-target_link_libraries(erc-test glfw)
+target_link_libraries(erc-test ${opengl_library} glfw)

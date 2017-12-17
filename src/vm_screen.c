@@ -74,6 +74,16 @@ vm_screen_active(vm_screen_context *context)
     return !glfwWindowShouldClose(context->window);
 }
 
+void
+vm_screen_refresh(vm_screen_context *context)
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glfwSwapBuffers(context->window);
+
+    glfwPollEvents();
+}
+
 /*
  * Set the color of a screen context to a given RGBA value.
  */

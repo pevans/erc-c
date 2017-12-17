@@ -105,7 +105,8 @@ main(int argc, char **argv)
         exit(1);
     }
 
-    for (;;) {
+    while (vm_screen_active(context)) {
+        vm_screen_refresh(context);
     }
 
     // ha ha ha ha #nervous #laughter
