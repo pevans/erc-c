@@ -14,6 +14,7 @@
 #include "apple2.h"
 #include "log.h"
 #include "option.h"
+#include "vm_screen.h"
 
 /*
  * This function will establish the base environment that we want to use
@@ -43,6 +44,8 @@ init(int argc, char **argv)
 
     // We're literally using stdout in this heavy phase of development.
     log_open(stdout);
+
+    vm_screen_init();
 }
 
 /*
@@ -61,6 +64,8 @@ finish()
     }
 
     log_close();
+
+    vm_screen_finish();
 }
 
 /*
@@ -71,6 +76,7 @@ int
 main(int argc, char **argv)
 {
     apple2 *mach;
+    vm_screen_context *context;
     int err;
 
     init(argc, argv);
@@ -86,6 +92,20 @@ main(int argc, char **argv)
     if (err != OK) {
         fprintf(stderr, "Bootup failed!\n");
         exit(1);
+    }
+
+    context = vm_screen_new_context();
+    if (context == NULL) {
+        fprintf(stderr, "Screen context failed!\n");
+        exit(1);
+    }
+
+    if (!vm_screen_add_window(context)) {
+        fprintf(stderr, "Window creation failed!\n");
+        exit(1);
+    }
+
+    for (;;) {
     }
 
     // ha ha ha ha #nervous #laughter

@@ -17,3 +17,6 @@ link_directories(/usr/local/lib)
 
 # our bullshit
 add_executable(erc ${sources} src/main.c)
+
+# Graphics
+target_link_libraries(erc glfw)

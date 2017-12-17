@@ -23,3 +23,6 @@ add_executable(erc-test ${sources} ${test_sources})
 
 # Our unit-testing library
 target_link_libraries(erc-test criterion)
+
+# Graphics
+target_link_libraries(erc-test glfw)

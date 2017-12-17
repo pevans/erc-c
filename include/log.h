@@ -12,6 +12,7 @@ enum log_errcode {
     ERR_OOM,            // out of memory
     ERR_OOB,            // out of bounds
     ERR_BADFILE,
+    ERR_GFXINIT,        // couldn't initialize graphics
 };
 
 extern void log_write(int, const char *, ...);
