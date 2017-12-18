@@ -69,6 +69,13 @@ vm_screen_add_window(vm_screen *screen)
         return ERR_GFXINIT;
     }
 
+    // We plan to draw onto a surface that is xcoords x ycoords in area,
+    // regardless of the actual size of the window.
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+    SDL_RenderSetLogicalSize(screen->render, 
+                             screen->xcoords, 
+                             screen->ycoords);
+
     vm_screen_set_color(screen, 0, 0, 0, 0);
     SDL_RenderClear(screen->render);
 
@@ -129,13 +136,12 @@ vm_screen_draw_rect(vm_screen *screen,
                     int xsize,
                     int ysize)
 {
-    // We need to scale the position and sizes, since the presumption is
-    // that we are plotting based on the literal x and y coordinates in
-    // the screen.
-    screen->rect.x = xpos * screen->scale;
-    screen->rect.y = ypos * screen->scale;
-    screen->rect.w = xsize * screen->scale;
-    screen->rect.h = ysize * screen->scale;
+    // The renderer will take care of translating the positions and
+    // sizes into whatever the window is really at.
+    screen->rect.x = xpos;
+    screen->rect.y = ypos;
+    screen->rect.w = xsize;
+    screen->rect.h = ysize;
 
     SDL_RenderFillRect(screen->render, &screen->rect);
 }
