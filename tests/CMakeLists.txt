@@ -11,14 +11,15 @@ if(CMAKE_C_FLAGS MATCHES "--analyze")
 endif()
 
 if(APPLE)
-	set(opengl_library /System/Library/Frameworks/OpenGL.framework)
+	set(sdl_library /Library/Frameworks/SDL2.framework)
+	set(sdl_headers /Library/Frameworks/SDL2.framework/Headers)
 endif()
 
-if(NOT opengl_library)
-	message(FATAL_ERROR "This CMake file is not yet educated as to where OpenGL resides on your platform. Sorry!")
+if(NOT sdl_library)
+	message(FATAL_ERROR "This CMake file is not yet educated as to where SDL2 resides on your platform. Sorry!")
 endif()
 
-include_directories(../include /usr/local/include)
+include_directories(../include /usr/local/include ${sdl_headers})
 
 link_directories(/usr/local/lib)
 
@@ -39,4 +40,4 @@ add_executable(erc-test ${sources} ${test_sources})
 target_link_libraries(erc-test criterion)
 
 # Graphics
-target_link_libraries(erc-test)
+target_link_libraries(erc-test ${sdl_library})
