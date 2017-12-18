@@ -27,4 +27,4 @@ link_directories(/usr/local/lib)
 add_executable(erc ${sources} src/main.c)
 
 # Graphics
-target_link_libraries(erc ${opengl_library} glfw)
+target_link_libraries(erc ${opengl_library} glfw GLEW)

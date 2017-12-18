@@ -1,8 +1,12 @@
 #ifndef _VM_SCREEN_H_
 #define _VM_SCREEN_H_
 
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <stdbool.h>
+
+#define VM_SCREEN_DEFWIDTH 800
+#define VM_SCREEN_DEFHEIGHT 600
 
 /*
  * If you just want to plot a single pixel, you can use this macro to

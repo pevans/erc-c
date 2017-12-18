@@ -6,10 +6,24 @@
  * program, which only knows to call the functions here.
  */
 
+#include <stdbool.h>
 #include <stdlib.h>
 
 #include "log.h"
 #include "vm_screen.h"
+
+static bool init_glew = false;
+
+static void
+glew_init()
+{
+    if (!init_glew) {
+        glewExperimental = GL_TRUE;
+        glewInit();
+
+        init_glew = true;
+    }
+}
 
 int
 vm_screen_init()
@@ -17,6 +31,13 @@ vm_screen_init()
     if (!glfwInit()) {
         return ERR_GFXINIT;
     }
+
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+
+    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
     return OK;
 }
@@ -48,13 +69,20 @@ vm_screen_create()
 int
 vm_screen_add_window(vm_screen *screen)
 {
-    screen->window = glfwCreateWindow(320, 240, "erc", NULL, NULL);
+    screen->window = glfwCreateWindow(VM_SCREEN_DEFWIDTH, 
+                                      VM_SCREEN_DEFHEIGHT,
+                                      "erc", NULL, NULL);
+
     if (screen->window == NULL) {
         log_critical("Could not create a window");
         return ERR_GFXINIT;
     }
 
     glfwMakeContextCurrent(screen->window);
+
+    // glew can only be initialized _after_ the window is built; if you
+    // do so beforehand, you will be rudely presented with a segfault.
+    glew_init();
 
     return OK;
 }
