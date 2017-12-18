@@ -12,8 +12,15 @@
 #include "log.h"
 #include "vm_screen.h"
 
+/*
+ * Something to help us remember if we've already initialized glew or
+ * not.
+ */
 static bool init_glew = false;
 
+/*
+ * Initialize the glew library, if it is needed -- it may not be.
+ */
 static void
 glew_init()
 {
