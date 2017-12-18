@@ -45,7 +45,10 @@ init(int argc, char **argv)
     // We're literally using stdout in this heavy phase of development.
     log_open(stdout);
 
-    vm_screen_init();
+    if (vm_screen_init() != OK) {
+        fprintf(stderr, "Couldn't initialize video\n");
+        exit(1);
+    }
 }
 
 /*
@@ -94,7 +97,7 @@ main(int argc, char **argv)
         exit(1);
     }
 
-    screen = vm_screen_create();
+    screen = vm_screen_create(320, 240, 2);
     if (screen == NULL) {
         fprintf(stderr, "Screen creation failed!\n");
         exit(1);
@@ -106,6 +109,8 @@ main(int argc, char **argv)
     }
 
     while (vm_screen_active(screen)) {
+        vm_screen_set_color(screen, 255, 0, 0, 255);
+        vm_screen_draw_rect(screen, 50, 50, 20, 20);
         vm_screen_refresh(screen);
     }
 

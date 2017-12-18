@@ -2,6 +2,7 @@
 #define _VM_SCREEN_H_
 
 #include <stdbool.h>
+#include <SDL.h>
 
 #define VM_SCREEN_DEFWIDTH 800
 #define VM_SCREEN_DEFHEIGHT 600
@@ -15,13 +16,14 @@
     vm_screen_draw_rect(screen, xpos, ypos, 1, 1)
 
 typedef struct {
-    /*
-     * These form the components of an RGBA composite color. 
-     */
-    int color_red;
-    int color_green;
-    int color_blue;
-    int color_alpha;
+    SDL_Window *window;
+    SDL_Renderer *render;
+    SDL_Rect rect;
+
+    int xcoords;
+    int ycoords;
+
+    int scale;
 } vm_screen;
 
 extern int vm_screen_add_window(vm_screen *);
@@ -32,6 +34,6 @@ extern bool vm_screen_active(vm_screen *);
 extern void vm_screen_draw_rect(vm_screen *, int, int, int, int);
 extern void vm_screen_free(vm_screen *);
 extern vm_screen *vm_screen_create();
-extern void vm_screen_set_color(vm_screen *, int, int, int, int);
+extern void vm_screen_set_color(vm_screen *, uint8_t, uint8_t, uint8_t, uint8_t);
 
 #endif

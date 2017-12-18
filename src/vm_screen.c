@@ -15,19 +15,25 @@
 int
 vm_screen_init()
 {
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+        log_critical("Could not initialize video: %s", SDL_GetError());
+        return ERR_GFXINIT;
+    }
+
     return OK;
 }
 
 void
 vm_screen_finish()
 {
+    SDL_Quit();
 }
 
 /*
  * Return a new screen. We also set the color to black.
  */
 vm_screen *
-vm_screen_create()
+vm_screen_create(int xcoords, int ycoords, int scale)
 {
     vm_screen *screen;
 
@@ -37,13 +43,35 @@ vm_screen_create()
         exit(1);
     }
 
-    vm_screen_set_color(screen, 0, 0, 0, 0);
+    screen->xcoords = xcoords;
+    screen->ycoords = ycoords;
+    screen->scale = scale;
+
+    screen->window = NULL;
+    screen->render = NULL;
+    screen->rect.x = 0;
+    screen->rect.y = 0;
+    screen->rect.w = 0;
+    screen->rect.h = 0;
+
     return screen;
 }
 
 int
 vm_screen_add_window(vm_screen *screen)
 {
+    SDL_CreateWindowAndRenderer(screen->xcoords * screen->scale,
+                                screen->ycoords * screen->scale,
+                                0, &screen->window, &screen->render);
+
+    if (screen->window == NULL || screen->render == NULL) {
+        log_critical("Could not create window: %s", SDL_GetError());
+        return ERR_GFXINIT;
+    }
+
+    vm_screen_set_color(screen, 0, 0, 0, 0);
+    SDL_RenderClear(screen->render);
+
     return OK;
 }
 
@@ -53,18 +81,28 @@ vm_screen_add_window(vm_screen *screen)
 void
 vm_screen_free(vm_screen *screen)
 {
+    SDL_DestroyRenderer(screen->render);
+    SDL_DestroyWindow(screen->window);
     free(screen);
 }
 
 bool
 vm_screen_active(vm_screen *screen)
 {
+    static int counter = 5;
+
+    if (counter--) {
+        return true;
+    }
+
     return false;
 }
 
 void
 vm_screen_refresh(vm_screen *screen)
 {
+    SDL_RenderPresent(screen->render);
+    SDL_Delay(2000);
 }
 
 /*
@@ -72,15 +110,12 @@ vm_screen_refresh(vm_screen *screen)
  */
 void
 vm_screen_set_color(vm_screen *screen,
-                    int red,
-                    int green,
-                    int blue,
-                    int alpha)
+                    uint8_t red,
+                    uint8_t green,
+                    uint8_t blue,
+                    uint8_t alpha)
 {
-    screen->color_red = red;
-    screen->color_green = green;
-    screen->color_blue = blue;
-    screen->color_alpha = alpha;
+    SDL_SetRenderDrawColor(screen->render, red, green, blue, alpha);
 }
 
 /*
@@ -94,5 +129,13 @@ vm_screen_draw_rect(vm_screen *screen,
                     int xsize,
                     int ysize)
 {
-    // FIXME: NOOP
+    // We need to scale the position and sizes, since the presumption is
+    // that we are plotting based on the literal x and y coordinates in
+    // the screen.
+    screen->rect.x = xpos * screen->scale;
+    screen->rect.y = ypos * screen->scale;
+    screen->rect.w = xsize * screen->scale;
+    screen->rect.h = ysize * screen->scale;
+
+    SDL_RenderFillRect(screen->render, &screen->rect);
 }

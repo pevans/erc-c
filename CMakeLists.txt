@@ -6,11 +6,12 @@ project(erc)
 include(sources.cmake)
 
 if(APPLE)
-	set(opengl_library /System/Library/Frameworks/OpenGL.framework)
+	set(sdl_library /Library/Frameworks/SDL2.framework)
+	set(sdl_headers /Library/Frameworks/SDL2.framework/Headers)
 endif()
 
-if(NOT opengl_library)
-	message(FATAL_ERROR "This CMake file is not yet educated as to where OpenGL resides on your platform. Sorry!")
+if(NOT sdl_library)
+	message(FATAL_ERROR "This CMake file is not yet educated as to where SDL2 resides on your platform. Sorry!")
 endif()
 
 foreach(src ${erc_sources})
@@ -19,7 +20,7 @@ foreach(src ${erc_sources})
 endforeach(src)
 
 # our header files
-include_directories(include /usr/local/include)
+include_directories(include /usr/local/include ${sdl_headers})
 
 link_directories(/usr/local/lib)
 
@@ -27,4 +28,4 @@ link_directories(/usr/local/lib)
 add_executable(erc ${sources} src/main.c)
 
 # Graphics
-target_link_libraries(erc)
+target_link_libraries(erc ${sdl_library})
