@@ -12,47 +12,15 @@
 #include "log.h"
 #include "vm_screen.h"
 
-/*
- * Something to help us remember if we've already initialized glew or
- * not.
- */
-static bool init_glew = false;
-
-/*
- * Initialize the glew library, if it is needed -- it may not be.
- */
-static void
-glew_init()
-{
-    if (!init_glew) {
-        glewExperimental = GL_TRUE;
-        glewInit();
-
-        init_glew = true;
-    }
-}
-
 int
 vm_screen_init()
 {
-    if (!glfwInit()) {
-        return ERR_GFXINIT;
-    }
-
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-
-    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-
     return OK;
 }
 
 void
 vm_screen_finish()
 {
-    glfwTerminate();
 }
 
 /*
@@ -76,21 +44,6 @@ vm_screen_create()
 int
 vm_screen_add_window(vm_screen *screen)
 {
-    screen->window = glfwCreateWindow(VM_SCREEN_DEFWIDTH, 
-                                      VM_SCREEN_DEFHEIGHT,
-                                      "erc", NULL, NULL);
-
-    if (screen->window == NULL) {
-        log_critical("Could not create a window");
-        return ERR_GFXINIT;
-    }
-
-    glfwMakeContextCurrent(screen->window);
-
-    // glew can only be initialized _after_ the window is built; if you
-    // do so beforehand, you will be rudely presented with a segfault.
-    glew_init();
-
     return OK;
 }
 
@@ -106,17 +59,12 @@ vm_screen_free(vm_screen *screen)
 bool
 vm_screen_active(vm_screen *screen)
 {
-    return !glfwWindowShouldClose(screen->window);
+    return false;
 }
 
 void
 vm_screen_refresh(vm_screen *screen)
 {
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    glfwSwapBuffers(screen->window);
-
-    glfwPollEvents();
 }
 
 /*

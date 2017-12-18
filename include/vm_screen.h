@@ -1,8 +1,6 @@
 #ifndef _VM_SCREEN_H_
 #define _VM_SCREEN_H_
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
 #include <stdbool.h>
 
 #define VM_SCREEN_DEFWIDTH 800
@@ -17,8 +15,6 @@
     vm_screen_draw_rect(screen, xpos, ypos, 1, 1)
 
 typedef struct {
-    GLFWwindow *window;
-
     /*
      * These form the components of an RGBA composite color. 
      */

@@ -33,4 +33,4 @@ add_executable(erc-test ${sources} ${test_sources})
 target_link_libraries(erc-test criterion)
 
 # Graphics
-target_link_libraries(erc-test ${opengl_library} glfw)
+target_link_libraries(erc-test)
