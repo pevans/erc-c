@@ -4,6 +4,12 @@ project(erc-test)
 
 set(CMAKE_BUILD_TYPE Debug)
 
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --analyze")
+
+if(CMAKE_C_FLAGS MATCHES "--analyze")
+	set(CMAKE_C_LINK_EXECUTABLE "echo 'Will not execute binary when running static analysis'")
+endif()
+
 if(APPLE)
 	set(opengl_library /System/Library/Frameworks/OpenGL.framework)
 endif()
