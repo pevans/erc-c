@@ -102,9 +102,6 @@ glyphmap = {
         "zu": "Z",
         }
 
-# recurse through fonts/machines
-# each subdir from there is the designation 
-
 def build_font(name, path, gridfiles):
     img = Image.new("RGB", (112, 64))
     pix = img.load()
