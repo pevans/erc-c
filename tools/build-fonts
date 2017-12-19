@@ -110,7 +110,7 @@ def build_font(name, path, gridfiles):
             glyphname = gridfile.split('.')[0]
             glyphchar = name_to_char(glyphname)
             render(glyph_coords(glyphchar), glyphchar, openf.read(), pix)
-    img.save('./fonts/' + name + '.png')
+    img.save('./fonts/' + name + '.bmp')
 
 def name_to_char(name):
     if not glyphmap[name]:
