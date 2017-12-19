@@ -1,0 +1,162 @@
+#!/usr/bin/env python2
+
+import os
+from PIL import Image
+
+glyphmap = {
+        "ampersand": "&",
+        "apostrophe": "'",
+        "asterisk": "*",
+        "at": "@",
+        "backslash": "\\",
+        "bar": "|",
+        "blank": " ",
+        "caret": "^",
+        "colon": ":",
+        "comma": ",",
+        "dollar": "$",
+        "emark": "!",
+        "equal": "=",
+        "grave": "`",
+        "hyphen": "-",
+        "langle": "<",
+        "lbrace": "{",
+        "lbracket": "[",
+        "lparen": "(",
+        "percent": "%",
+        "perfcurs": 10,
+        "period": ".",
+        "plus": "+",
+        "pound": "#",
+        "qmark": "?",
+        "quote": '"',
+        "rangle": ">",
+        "rbrace": "}",
+        "rbracket": "]", 
+        "rparen": ")",
+        "semicolon": ";",
+        "slash": "/",
+        "tilde": "~",
+        "underscore": "_",
+        "0": "0",
+        "1": "1",
+        "2": "2",
+        "3": "3",
+        "4": "4",
+        "5": "5",
+        "6": "6",
+        "7": "7",
+        "8": "8",
+        "9": "9",
+        "al": "a",
+        "bl": "b",
+        "cl": "c",
+        "dl": "d",
+        "el": "e",
+        "fl": "f",
+        "gl": "g",
+        "hl": "h",
+        "il": "i",
+        "jl": "j",
+        "kl": "k",
+        "ll": "l",
+        "ml": "m",
+        "nl": "n",
+        "ol": "o",
+        "pl": "p",
+        "ql": "q",
+        "rl": "r",
+        "sl": "s",
+        "tl": "t",
+        "ul": "u",
+        "vl": "v",
+        "wl": "w",
+        "xl": "x",
+        "yl": "y",
+        "zl": "z",
+        "au": "A",
+        "bu": "B",
+        "cu": "C",
+        "du": "D",
+        "eu": "E",
+        "fu": "F",
+        "gu": "G",
+        "hu": "H",
+        "iu": "I",
+        "ju": "J",
+        "ku": "K",
+        "lu": "L",
+        "mu": "M",
+        "nu": "N",
+        "ou": "O",
+        "pu": "P",
+        "qu": "Q",
+        "ru": "R",
+        "su": "S",
+        "tu": "T",
+        "uu": "U",
+        "vu": "V",
+        "wu": "W",
+        "xu": "X",
+        "yu": "Y",
+        "zu": "Z",
+        }
+
+# recurse through fonts/machines
+# each subdir from there is the designation 
+
+def build_font(name, path, gridfiles):
+    img = Image.new("RGB", (112, 64))
+    pix = img.load()
+    for gridfile in gridfiles:
+        with open(os.path.join(path, gridfile)) as openf:
+            glyphname = gridfile.split('.')[0]
+            glyphchar = name_to_char(glyphname)
+            render(glyph_coords(glyphchar), glyphchar, openf.read(), pix)
+    img.save('./fonts/' + name + '.png')
+
+def name_to_char(name):
+    if not glyphmap[name]:
+        raise Exception('unknown glyph')
+    return glyphmap[name]
+
+
+# Return the row and column that a character should be saved in our bitmap
+# font.
+def glyph_coords(ch):
+    if type(ch) == int:
+        code = ch
+    else:
+        code = ord(ch)
+
+    row = (code & 0xf0) >> 4
+    col = code & 0x0f
+    return (row, col)
+
+def render_row(offset, row, line, pix):
+    row_offset, col_offset = offset
+    row_offset = row_offset * 8
+    col_offset = col_offset * 7
+    col = 0
+    for c in line[1:]:
+        if c == 'o':
+            pix[col_offset + col, row_offset + row] = (255, 255, 255)
+        col = col + 1
+
+def render(offset, ch, grid, pix):
+    row, col = glyph_coords(ch)
+    lines = grid.split("\n")
+    render_row(offset, 0, lines[1], pix)
+    render_row(offset, 1, lines[2], pix)
+    render_row(offset, 2, lines[3], pix)
+    render_row(offset, 3, lines[4], pix)
+    render_row(offset, 4, lines[5], pix)
+    render_row(offset, 5, lines[6], pix)
+    render_row(offset, 6, lines[7], pix)
+    render_row(offset, 7, lines[8], pix)
+
+for root, subdirs, subfiles in os.walk('./fonts'):
+    if subdirs == []:
+        fontname = root.replace('./fonts/', '')
+        fontname = fontname.replace('/', '-')
+        build_font(fontname, root, subfiles)
