@@ -103,7 +103,10 @@ main(int argc, char **argv)
         exit(1);
     }
 
-    if (!vm_screen_add_window(screen, 640, 480)) {
+    err = vm_screen_add_window(screen, 
+                               option_get_width(), 
+                               option_get_height());
+    if (err != OK) {
         fprintf(stderr, "Window creation failed!\n");
         exit(1);
     }
