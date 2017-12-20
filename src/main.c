@@ -97,13 +97,13 @@ main(int argc, char **argv)
         exit(1);
     }
 
-    screen = vm_screen_create(320, 240, 2);
+    screen = vm_screen_create();
     if (screen == NULL) {
         fprintf(stderr, "Screen creation failed!\n");
         exit(1);
     }
 
-    if (!vm_screen_add_window(screen)) {
+    if (!vm_screen_add_window(screen, 640, 480)) {
         fprintf(stderr, "Window creation failed!\n");
         exit(1);
     }

@@ -33,7 +33,7 @@ vm_screen_finish()
  * Return a new screen. We also set the color to black.
  */
 vm_screen *
-vm_screen_create(int xcoords, int ycoords, int scale)
+vm_screen_create()
 {
     vm_screen *screen;
 
@@ -43,9 +43,8 @@ vm_screen_create(int xcoords, int ycoords, int scale)
         exit(1);
     }
 
-    screen->xcoords = xcoords;
-    screen->ycoords = ycoords;
-    screen->scale = scale;
+    screen->xcoords = 0;
+    screen->ycoords = 0;
 
     screen->window = NULL;
     screen->render = NULL;
@@ -57,12 +56,26 @@ vm_screen_create(int xcoords, int ycoords, int scale)
     return screen;
 }
 
-int
-vm_screen_add_window(vm_screen *screen)
+void
+vm_screen_set_logical_coords(vm_screen *screen, int xcoords, int ycoords)
 {
-    SDL_CreateWindowAndRenderer(screen->xcoords * screen->scale,
-                                screen->ycoords * screen->scale,
-                                0, &screen->window, &screen->render);
+    screen->xcoords = xcoords;
+    screen->ycoords = ycoords;
+
+    // We allow you to set the x and y coordinates in absence of a
+    // screen renderer, but it's kind of pointless without one.
+    if (screen->render) {
+        SDL_RenderSetLogicalSize(screen->render, 
+                                 screen->xcoords, 
+                                 screen->ycoords);
+    }
+}
+
+int
+vm_screen_add_window(vm_screen *screen, int width, int height)
+{
+    SDL_CreateWindowAndRenderer(
+        width, height, 0, &screen->window, &screen->render);
 
     if (screen->window == NULL || screen->render == NULL) {
         log_critical("Could not create window: %s", SDL_GetError());
@@ -72,14 +85,29 @@ vm_screen_add_window(vm_screen *screen)
     // We plan to draw onto a surface that is xcoords x ycoords in area,
     // regardless of the actual size of the window.
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
-    SDL_RenderSetLogicalSize(screen->render, 
-                             screen->xcoords, 
-                             screen->ycoords);
+
+    // We default to a logical coordinate system of exactly the given
+    // width and height. For emulated systems like the Apple II, this
+    // will not be correct, and the underlying machine system will rerun
+    // the set_logical_coords function with different values.
+    vm_screen_set_logical_coords(screen, width, height);
 
     vm_screen_set_color(screen, 0, 0, 0, 0);
     SDL_RenderClear(screen->render);
 
     return OK;
+}
+
+int
+vm_screen_xcoords(vm_screen *screen)
+{
+    return screen->xcoords;
+}
+
+int
+vm_screen_ycoords(vm_screen *screen)
+{
+    return screen->ycoords;
 }
 
 /*

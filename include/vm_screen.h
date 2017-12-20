@@ -22,11 +22,12 @@ typedef struct {
 
     int xcoords;
     int ycoords;
-
-    int scale;
 } vm_screen;
 
-extern int vm_screen_add_window(vm_screen *);
+extern int vm_screen_add_window(vm_screen *, int, int);
+extern void vm_screen_set_logical_coords(vm_screen *, int, int);
+extern int vm_screen_xcoords(vm_screen *);
+extern int vm_screen_ycoords(vm_screen *);
 extern int vm_screen_init();
 extern void vm_screen_finish();
 extern void vm_screen_refresh(vm_screen *);
