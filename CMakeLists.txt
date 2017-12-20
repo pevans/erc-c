@@ -32,6 +32,8 @@ include_directories(include /usr/local/include ${sdl_headers})
 
 link_directories(/usr/local/lib)
 
+add_definitions(-DINSTALL_PATH="../")
+
 # our bullshit
 add_executable(erc ${sources} src/main.c)
 

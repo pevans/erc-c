@@ -11,6 +11,7 @@ set(erc_sources
 	mos6502.loadstor.c
 	mos6502.stat.c
 	option.c
+	vm_bitfont.c
 	vm_screen.c
 	vm_segment.c
 	)

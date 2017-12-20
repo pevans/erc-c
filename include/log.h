@@ -13,6 +13,7 @@ enum log_errcode {
     ERR_OOB,            // out of bounds
     ERR_BADFILE,
     ERR_GFXINIT,        // couldn't initialize graphics
+    ERR_GFXOP,          // we couldn't execute a specific graphic operation
 };
 
 extern void log_write(int, const char *, ...);

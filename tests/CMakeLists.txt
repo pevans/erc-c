@@ -36,6 +36,8 @@ endforeach(src)
 # make any particular effort to include it in add_executable().
 file(GLOB test_sources "*.c")
 
+add_definitions(-DINSTALL_PATH="../../")
+
 add_executable(erc-test ${sources} ${test_sources})
 
 # Our unit-testing library
