@@ -12,6 +12,7 @@ enum log_errcode {
     ERR_OOM,            // out of memory
     ERR_OOB,            // out of bounds
     ERR_BADFILE,
+    ERR_BADOPT,         // bad option (e.g. from getopt)
     ERR_GFXINIT,        // couldn't initialize graphics
     ERR_GFXOP,          // we couldn't execute a specific graphic operation
 };

@@ -15,5 +15,8 @@ extern void option_print_help();
 extern int option_read_file(int, const char *);
 extern void option_set_error(const char *);
 extern void option_set_input(int, FILE *);
+extern int option_set_size(const char *);
+extern int option_get_width();
+extern int option_get_height();
 
 #endif

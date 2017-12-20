@@ -12,6 +12,7 @@
 #include <unistd.h>
 
 #include "option.h"
+#include "log.h"
 
 /*
  * These are the file inputs we may have to the system. What their
@@ -33,14 +34,21 @@ static FILE *input2 = NULL;
 static char error_buffer[ERRBUF_SIZE] = "";
 
 /*
+ * The default width and height of the window
+ */
+static int width = 640;
+static int height = 480;
+
+/*
  * These are all of the options we allow in our long-form options. It's
  * a bit faster to identify them by integer symbols than to do string
  * comparisons.
  */
 enum options {
-    HELP,
     DISK1,
     DISK2,
+    HELP,
+    SIZE,
 };
 
 /*
@@ -50,6 +58,7 @@ static struct option long_options[] = {
     { "disk1", 1, NULL, DISK1 },
     { "disk2", 1, NULL, DISK2 },
     { "help", 0, NULL, HELP },
+    { "size", 1, NULL, SIZE },
 };
 
 /*
@@ -113,6 +122,12 @@ option_parse(int argc, char **argv)
                 
                 // The help option should terminate normal execution
                 return 0;
+
+            case SIZE:
+                if (option_set_size(optarg) != OK) {
+                    return 0;
+                }
+                break;
         }
 
         // We seem to have a request to load a file, so let's do so.
@@ -201,5 +216,34 @@ option_print_help()
     fprintf(stderr, "\
   --disk1=FILE                Load FILE into disk drive 1\n\
   --disk2=FILE                Load FILE into disk drive 2\n\
-  --help                      Print this help message\n");
+  --help                      Print this help message\n\
+  --size=WIDTHxHEIGHT         Use WIDTH and HEIGHT for window size\n\
+                              (only 640x480 and 800x600 are supported)\n");
+}
+
+int
+option_set_size(const char *size)
+{
+    if (strcmp(size, "640x480") == 0) {
+        return OK;
+    } else if (strcmp(size, "800x600") == 0) {
+        width = 800;
+        height = 600;
+        return OK;
+    }
+
+    snprintf(error_buffer, ERRBUF_SIZE, "Ignoring bad window size: %s", size);
+    return ERR_BADOPT;
+}
+
+int
+option_get_width()
+{
+    return width;
+}
+
+int
+option_get_height()
+{
+    return height;
 }
