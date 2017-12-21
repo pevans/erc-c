@@ -58,6 +58,9 @@ apple2_create(int width, int height)
         return NULL;
     }
 
+    // We default to lo-res mode.
+    apple2_set_video(mach, VIDEO_LORES);
+
     return mach;
 }
 
