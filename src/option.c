@@ -34,9 +34,11 @@ static FILE *input2 = NULL;
 static char error_buffer[ERRBUF_SIZE] = "";
 
 /*
- * The default width and height of the window
+ * The default width and height of the window. This is "roughly"
+ * 640x480, but because the Apple II has a 4.375:3 aspect ratio, we had
+ * to bump up the width to a number that respects that ratio.
  */
-static int width = 640;
+static int width = 700;
 static int height = 480;
 
 /*
@@ -218,16 +220,16 @@ option_print_help()
   --disk2=FILE                Load FILE into disk drive 2\n\
   --help                      Print this help message\n\
   --size=WIDTHxHEIGHT         Use WIDTH and HEIGHT for window size\n\
-                              (only 640x480 and 800x600 are supported)\n");
+                              (only 700x480 and 875x600 are supported)\n");
 }
 
 int
 option_set_size(const char *size)
 {
-    if (strcmp(size, "640x480") == 0) {
+    if (strcmp(size, "700x480") == 0) {
         return OK;
-    } else if (strcmp(size, "800x600") == 0) {
-        width = 800;
+    } else if (strcmp(size, "875x600") == 0) {
+        width = 875;
         height = 600;
         return OK;
     }
