@@ -156,3 +156,28 @@ apple2_boot(apple2 *mach)
 
     return OK;
 }
+
+void
+apple2_set_video(apple2 *mach, int mode)
+{
+    int width, height;
+
+    mach->video_mode = mode;
+
+    // In the traditional video modes that Apple II first came in, you
+    // would have a maximum width of 280 pixels. (In lo-res, you have
+    // fewer pixels, but that is something we have to handle in our
+    // drawing functions rather than by changing the logical size.)
+    width = 280;
+    height = 192;
+
+    // In double video modes, the width is effectively doubled, but the
+    // height is untouched.
+    if (mach->video_mode == VIDEO_DOUBLE_LORES ||
+        mach->video_mode == VIDEO_DOUBLE_HIRES
+       ) {
+        width = 560;
+    }
+
+    vm_screen_set_logical_coords(mach->screen, width, height);
+}

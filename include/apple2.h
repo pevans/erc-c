@@ -5,6 +5,13 @@
 #include "mos6502.h"
 #include "vm_screen.h"
 
+enum video_modes {
+    VIDEO_LORES,
+    VIDEO_HIRES,
+    VIDEO_DOUBLE_LORES,
+    VIDEO_DOUBLE_HIRES,
+};
+
 typedef struct {
     /*
      * The apple 2 hardware used an MOS-6502 processor.
@@ -24,6 +31,13 @@ typedef struct {
     vm_screen *screen;
 
     /*
+     * This is the mode in which we must interpret graphics. This will
+     * tell us not only if we're in lo- or hi-res, but also if we are in
+     * single or double view mode.
+     */
+    int video_mode;
+
+    /*
      * Our two disk drives.
      */
     apple2dd *drive1;
@@ -37,5 +51,6 @@ extern void apple2_clear_strobe(apple2 *);
 extern void apple2_release_key(apple2 *);
 extern int apple2_boot(apple2 *);
 extern void apple2_run_loop(apple2 *);
+extern void apple2_set_video(apple2 *, int);
 
 #endif
