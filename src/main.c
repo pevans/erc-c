@@ -89,33 +89,24 @@ main(int argc, char **argv)
     // successfully or if we run `exit()` from elsewhere in the program.
     atexit(finish);
 
-    mach = apple2_create();
-    err = apple2_boot(mach);
+    // Let's build the basic machine, using the width and height
+    // indicated by the user.
+    mach = apple2_create(option_get_width(),
+                         option_get_height());
 
+    // Ok, it's time to boot this up!
+    err = apple2_boot(mach);
     if (err != OK) {
         fprintf(stderr, "Bootup failed!\n");
         exit(1);
     }
 
-    screen = vm_screen_create();
-    if (screen == NULL) {
-        fprintf(stderr, "Screen creation failed!\n");
-        exit(1);
-    }
+    // This will run for as long as we want to hang out in the emulated
+    // machine.
+    apple2_run_loop(mach);
 
-    err = vm_screen_add_window(screen, 
-                               option_get_width(), 
-                               option_get_height());
-    if (err != OK) {
-        fprintf(stderr, "Window creation failed!\n");
-        exit(1);
-    }
-
-    while (vm_screen_active(screen)) {
-        vm_screen_set_color(screen, 255, 0, 0, 255);
-        vm_screen_draw_rect(screen, 50, 50, 20, 20);
-        vm_screen_refresh(screen);
-    }
+    // We're all done, so let's tear everything down.
+    apple2_free(mach);
 
     // ha ha ha ha #nervous #laughter
     printf("Hello, world\n");

@@ -25,9 +25,10 @@
  * Create the basic apple2 structure.
  */
 apple2 *
-apple2_create()
+apple2_create(int width, int height)
 {
     apple2 *mach;
+    int err;
 
     mach = malloc(sizeof(apple2));
     if (mach == NULL) {
@@ -37,10 +38,37 @@ apple2_create()
     mach->cpu = mos6502_create();
     mach->memory = mach->cpu->memory;
 
+    // Our two drives -- we create both of them, even if we intend to
+    // use only one.
     mach->drive1 = apple2dd_create();
     mach->drive2 = apple2dd_create();
 
+    // Let's build our screen abstraction!
+    mach->screen = vm_screen_create();
+    if (mach->screen == NULL) {
+        log_critical("Screen creation failed!\n");
+        return NULL;
+    }
+
+    // We still need to add a window, since we want to render some
+    // graphics.
+    err = vm_screen_add_window(mach->screen, width, height);
+    if (err != OK) {
+        log_critical("Window creation failed!\n");
+        return NULL;
+    }
+
     return mach;
+}
+
+void
+apple2_run_loop(apple2 *mach)
+{
+    while (vm_screen_active(mach->screen)) {
+        vm_screen_set_color(mach->screen, 255, 0, 0, 255);
+        vm_screen_draw_rect(mach->screen, 50, 50, 20, 20);
+        vm_screen_refresh(mach->screen);
+    }
 }
 
 /*
