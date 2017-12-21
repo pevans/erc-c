@@ -58,10 +58,22 @@ apple2_create(int width, int height)
         return NULL;
     }
 
+    // Default to full color
+    apple2_set_color(mach, COLOR_FULL);
+
     // We default to lo-res mode.
     apple2_set_video(mach, VIDEO_LORES);
 
     return mach;
+}
+
+void
+apple2_set_color(apple2 *mach, int mode)
+{
+    mach->color_mode = mode;
+    
+    // FIXME: doing this should force us to redraw everything in the
+    // correct color interpretation
 }
 
 void

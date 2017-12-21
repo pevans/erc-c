@@ -6,10 +6,19 @@
 #include "vm_screen.h"
 
 enum video_modes {
+    VIDEO_40COL_TEXT,
     VIDEO_LORES,
     VIDEO_HIRES,
+    VIDEO_80COL_TEXT,
     VIDEO_DOUBLE_LORES,
     VIDEO_DOUBLE_HIRES,
+};
+
+enum color_modes {
+    COLOR_GREEN,
+    COLOR_AMBER,
+    COLOR_GRAY,
+    COLOR_FULL,
 };
 
 typedef struct {
@@ -36,6 +45,14 @@ typedef struct {
      * single or double view mode.
      */
     int video_mode;
+
+    /*
+     * This is the color mode we want to emulate. You can have a few
+     * different styles of monochromatic displays: green, amber, and
+     * light gray on black; you can also emulate a full color display,
+     * in which text mode tends to look like light gray.
+     */
+    int color_mode;
 
     /*
      * Our two disk drives.
