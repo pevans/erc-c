@@ -76,7 +76,7 @@ apple2_draw_text(apple2 *mach, vm_16bit addr)
     ch = (char)vm_segment_get(mach->memory, addr);
 
     // Let's firstly blank out that space on screen.
-    //vm_bitfont_render(mach->sysfont, mach->screen, &dest, ' ');
+    vm_bitfont_render(mach->sysfont, mach->screen, &dest, ' ');
 
     // Now show the goddamned thing
     vm_bitfont_render(mach->sysfont, mach->screen, &dest, ch);
