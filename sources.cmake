@@ -1,6 +1,7 @@
 set(erc_sources
 	apple2.c
 	apple2.dd.c
+	apple2.draw.c
 	log.c
 	mos6502.c
 	mos6502.addr.c

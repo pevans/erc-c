@@ -6,6 +6,7 @@
  */
 
 #include "apple2.h"
+#include "apple2.draw.h"
 #include "option.h"
 #include "vm_segment.h"
 
@@ -86,21 +87,10 @@ apple2_set_color(apple2 *mach, int mode)
     // correct color interpretation
 }
 
-#define SHOW(ch) \
-    vm_bitfont_render(mach->sysfont, mach->screen, &area, ch); \
-    area.x += 7
-
 void
 apple2_run_loop(apple2 *mach)
 {
-    SDL_Rect area;
-
-
     while (vm_screen_active(mach->screen)) {
-        area.x = 50;
-        area.y = 50;
-        SHOW('H'); SHOW('e'); SHOW('l'); SHOW('l'); SHOW('o'); SHOW(' ');
-        SHOW('w'); SHOW('o'); SHOW('r'); SHOW('l'); SHOW('d'); SHOW('!');
         vm_screen_refresh(mach->screen);
     }
 }
