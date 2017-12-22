@@ -64,6 +64,16 @@ apple2_create(int width, int height)
     // We default to lo-res mode.
     apple2_set_video(mach, VIDEO_LORES);
 
+    // Let's install our bitmap font.
+    mach->sysfont = vm_bitfont_create(mach->screen,
+                                      "apple2-system",
+                                      7, 8,         // 7 pixels wide, 8 pixels tall
+                                      0x7f);        // 7-bit values only
+    if (mach->sysfont == NULL) {
+        log_critical("Could not initialize apple2: bad font");
+        return NULL;
+    }
+
     return mach;
 }
 
@@ -80,8 +90,6 @@ void
 apple2_run_loop(apple2 *mach)
 {
     while (vm_screen_active(mach->screen)) {
-        vm_screen_set_color(mach->screen, 255, 0, 0, 255);
-        vm_screen_draw_rect(mach->screen, 50, 50, 20, 20);
         vm_screen_refresh(mach->screen);
     }
 }

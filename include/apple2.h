@@ -3,6 +3,7 @@
 
 #include "apple2.dd.h"
 #include "mos6502.h"
+#include "vm_bitfont.h"
 #include "vm_screen.h"
 
 enum video_modes {
@@ -40,6 +41,12 @@ typedef struct {
     vm_screen *screen;
 
     /*
+     * This is the system font (the only font the Apple II knows about,
+     * really); anywhere we render text, we have to use this font.
+     */
+    vm_bitfont *sysfont;
+
+    /*
      * This is the mode in which we must interpret graphics. This will
      * tell us not only if we're in lo- or hi-res, but also if we are in
      * single or double view mode.
@@ -68,6 +75,7 @@ extern void apple2_clear_strobe(apple2 *);
 extern void apple2_release_key(apple2 *);
 extern int apple2_boot(apple2 *);
 extern void apple2_run_loop(apple2 *);
+extern void apple2_set_color(apple2 *, int);
 extern void apple2_set_video(apple2 *, int);
 
 #endif
