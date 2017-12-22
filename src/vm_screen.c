@@ -84,7 +84,7 @@ vm_screen_add_window(vm_screen *screen, int width, int height)
 
     // We plan to draw onto a surface that is xcoords x ycoords in area,
     // regardless of the actual size of the window.
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 
     // We default to a logical coordinate system of exactly the given
     // width and height. For emulated systems like the Apple II, this

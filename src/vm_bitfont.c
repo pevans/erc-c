@@ -98,10 +98,17 @@ vm_bitfont_render(vm_bitfont *font,
     src.w = font->width;
     src.h = font->height;
 
+    // The source and destination width/height must match. This might be
+    // a faulty assumption down the road; for now, it holds.
+    dest->w = src.w;
+    dest->h = src.h;
+
     // Get the spot in the bitmap where the glyph is found
     vm_bitfont_offset(font, ch, &src.x, &src.y);
 
-    if (SDL_RenderCopy(screen->render, font->texture, dest, &src) < 0) {
+    log_critical("src.x = %d, src.y = %d", src.x, src.y);
+
+    if (SDL_RenderCopy(screen->render, font->texture, &src, dest) < 0) {
         log_critical("Failed to render glyph: %s", SDL_GetError());
         return ERR_GFXOP;
     }
