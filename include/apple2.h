@@ -22,6 +22,25 @@ enum color_modes {
     COLOR_FULL,
 };
 
+enum lores_colors {
+    LORES_BLACK,
+    LORES_MAGENTA,
+    LORES_DARKBLUE,
+    LORES_PURPLE,
+    LORES_DARKGREEN,
+    LORES_GRAY1,
+    LORES_MEDBLUE,
+    LORES_LIGHTBLUE,
+    LORES_BROWN,
+    LORES_ORANGE,
+    LORES_GRAY2,
+    LORES_PINK,
+    LORES_LIGHTGREEN,
+    LORES_YELLOW,
+    LORES_AQUAMARINE,
+    LORES_WHITE,
+};
+
 typedef struct {
     /*
      * The apple 2 hardware used an MOS-6502 processor.
@@ -77,5 +96,6 @@ extern int apple2_boot(apple2 *);
 extern void apple2_run_loop(apple2 *);
 extern void apple2_set_color(apple2 *, int);
 extern void apple2_set_video(apple2 *, int);
+extern bool apple2_is_double_video(apple2 *);
 
 #endif

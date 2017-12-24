@@ -8,7 +8,7 @@ static apple2 *mach;
 void
 setup()
 {
-    mach = apple2_create();
+    mach = apple2_create(700, 480);
 }
 
 void

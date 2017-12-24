@@ -205,3 +205,12 @@ apple2_set_video(apple2 *mach, int mode)
 
     vm_screen_set_logical_coords(mach->screen, width, height);
 }
+
+bool
+apple2_is_double_video(apple2 *mach)
+{
+    return 
+        mach->video_mode == VIDEO_DOUBLE_HIRES ||
+        mach->video_mode == VIDEO_DOUBLE_LORES ||
+        mach->video_mode == VIDEO_80COL_TEXT;
+}
