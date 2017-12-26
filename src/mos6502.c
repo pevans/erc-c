@@ -42,6 +42,7 @@ static int instructions[] = {
     BEQ, SBC, NOP, NOP, NOP, SBC, INC, NOP, SED, SBC, NOP, NOP, NOP, SBC, INC, NOP, // Fx
 };
 
+/*
 static char *instruction_strings[] = {
     "ADC",
     "AND",
@@ -100,6 +101,7 @@ static char *instruction_strings[] = {
     "TXS",
     "TYA",
 };
+*/
 
 /*
  * A small convenience for defining instruction handlers below.
