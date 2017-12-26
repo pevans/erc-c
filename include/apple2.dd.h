@@ -102,16 +102,16 @@ typedef struct {
 } apple2dd;
 
 extern apple2dd *apple2dd_create();
-extern void apple2dd_free(apple2dd *);
-extern void apple2dd_step(apple2dd *, int);
-extern void apple2dd_set_mode(apple2dd *, int);
-extern void apple2dd_turn_on(apple2dd *, bool);
-extern void apple2dd_write_protect(apple2dd *, bool);
-extern int apple2dd_position(apple2dd *);
-extern void apple2dd_eject(apple2dd *);
 extern int apple2dd_insert(apple2dd *, FILE *);
-extern void apple2dd_shift(apple2dd *, int);
+extern int apple2dd_position(apple2dd *);
 extern vm_8bit apple2dd_read(apple2dd *);
+extern void apple2dd_eject(apple2dd *);
+extern void apple2dd_free(apple2dd *);
+extern void apple2dd_set_mode(apple2dd *, int);
+extern void apple2dd_shift(apple2dd *, int);
+extern void apple2dd_step(apple2dd *, int);
+extern void apple2dd_turn_on(apple2dd *, bool);
 extern void apple2dd_write(apple2dd *, vm_8bit);
+extern void apple2dd_write_protect(apple2dd *, bool);
 
 #endif

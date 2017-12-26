@@ -29,16 +29,6 @@ apple2dd_create()
     return drive;
 }
 
-void
-apple2dd_free(apple2dd *drive)
-{
-    if (drive->data) {
-        vm_segment_free(drive->data);
-    }
-
-    free(drive);
-}
-
 int
 apple2dd_insert(apple2dd *drive, FILE *stream)
 {
@@ -70,49 +60,6 @@ apple2dd_insert(apple2dd *drive, FILE *stream)
     return OK;
 }
 
-void
-apple2dd_eject(apple2dd *drive)
-{
-    if (drive->data) {
-        vm_segment_free(drive->data);
-        drive->data = NULL;
-    }
-}
-
-void
-apple2dd_step(apple2dd *drive, int steps)
-{
-    drive->track_pos += steps;
-
-    if (drive->track_pos > MAX_DRIVE_STEPS) {
-        drive->track_pos = MAX_DRIVE_STEPS;
-    } else if (drive->track_pos < 0) {
-        drive->track_pos = 0;
-    }
-}
-
-void
-apple2dd_set_mode(apple2dd *drive, int mode)
-{
-    if (mode != DD_READ && mode != DD_WRITE) {
-        return;
-    }
-
-    drive->mode = mode;
-}
-
-void
-apple2dd_turn_on(apple2dd *drive, bool online)
-{
-    drive->online = online;
-}
-
-void
-apple2dd_write_protect(apple2dd *drive, bool protect)
-{
-    drive->write_protect = protect;
-}
-
 int
 apple2dd_position(apple2dd *drive)
 {
@@ -135,6 +82,44 @@ apple2dd_position(apple2dd *drive)
     return 0;
 }
 
+vm_8bit
+apple2dd_read(apple2dd *drive)
+{
+    vm_8bit byte = vm_segment_get(drive->data, apple2dd_position(drive));
+    apple2dd_shift(drive, 1);
+
+    return byte;
+}
+
+void
+apple2dd_eject(apple2dd *drive)
+{
+    if (drive->data) {
+        vm_segment_free(drive->data);
+        drive->data = NULL;
+    }
+}
+
+void
+apple2dd_free(apple2dd *drive)
+{
+    if (drive->data) {
+        vm_segment_free(drive->data);
+    }
+
+    free(drive);
+}
+
+void
+apple2dd_set_mode(apple2dd *drive, int mode)
+{
+    if (mode != DD_READ && mode != DD_WRITE) {
+        return;
+    }
+
+    drive->mode = mode;
+}
+
 void
 apple2dd_shift(apple2dd *drive, int pos)
 {
@@ -150,13 +135,22 @@ apple2dd_shift(apple2dd *drive, int pos)
     }
 }
 
-vm_8bit
-apple2dd_read(apple2dd *drive)
+void
+apple2dd_step(apple2dd *drive, int steps)
 {
-    vm_8bit byte = vm_segment_get(drive->data, apple2dd_position(drive));
-    apple2dd_shift(drive, 1);
+    drive->track_pos += steps;
 
-    return byte;
+    if (drive->track_pos > MAX_DRIVE_STEPS) {
+        drive->track_pos = MAX_DRIVE_STEPS;
+    } else if (drive->track_pos < 0) {
+        drive->track_pos = 0;
+    }
+}
+
+void
+apple2dd_turn_on(apple2dd *drive, bool online)
+{
+    drive->online = online;
 }
 
 void
@@ -164,4 +158,10 @@ apple2dd_write(apple2dd *drive, vm_8bit byte)
 {
     vm_segment_set(drive->data, apple2dd_position(drive), byte);
     apple2dd_shift(drive, 1);
+}
+
+void
+apple2dd_write_protect(apple2dd *drive, bool protect)
+{
+    drive->write_protect = protect;
 }
