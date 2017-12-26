@@ -78,6 +78,11 @@ apple2_create(int width, int height)
     return mach;
 }
 
+/*
+ * Return true if we are in a state that the apple2 would consider
+ * double resolution. (In practice, this refers to horizontal screen
+ * density; vertical screen density per-pixel is unchanged.)
+ */
 bool
 apple2_is_double_video(apple2 *mach)
 {
@@ -87,6 +92,10 @@ apple2_is_double_video(apple2 *mach)
         mach->video_mode == VIDEO_80COL_TEXT;
 }
 
+/*
+ * Try to "boot" the apple2 machine. Look for input sources indicated in
+ * the option system and load those into our disk drives.
+ */
 int
 apple2_boot(apple2 *mach)
 {
@@ -143,6 +152,10 @@ apple2_free(apple2 *mach)
     free(mach);
 }
 
+/*
+ * Emulate the notion of a pressed key in the apple2 with a given
+ * character.
+ */
 void
 apple2_press_key(apple2 *mach, vm_8bit ch)
 {
@@ -173,6 +186,12 @@ apple2_release_key(apple2 *mach)
     vm_segment_set(mach->memory, ANY_KEY_DOWN, 0);
 }
 
+/*
+ * The run loop is the function that essentially waits for user input
+ * and continues to present the apple2 abstraction for you to use. At
+ * some point the user will indicate they are done, whereby
+ * vm_screen_active() will no longer be true and we exit.
+ */
 void
 apple2_run_loop(apple2 *mach)
 {
@@ -181,6 +200,10 @@ apple2_run_loop(apple2 *mach)
     }
 }
 
+/*
+ * Set the color mode of the apple2, which is to say if we are emulating
+ * a monochromatic display, or full color, or just black-and-white.
+ */
 void
 apple2_set_color(apple2 *mach, int mode)
 {
@@ -190,6 +213,10 @@ apple2_set_color(apple2 *mach, int mode)
     // correct color interpretation
 }
 
+/*
+ * Set the video mode of the display. This would be the type of
+ * resolution (text by which number of columns, lo-res, hi-res, etc.)
+ */
 void
 apple2_set_video(apple2 *mach, int mode)
 {
