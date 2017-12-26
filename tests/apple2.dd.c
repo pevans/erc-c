@@ -28,78 +28,6 @@ Test(apple2dd, create)
     cr_assert_eq(drive->mode, DD_READ);
 }
 
-Test(apple2dd, step)
-{
-    // Does step work at all?
-    apple2dd_step(drive, 5);
-    cr_assert_eq(drive->track_pos, 5);
-    apple2dd_step(drive, 3);
-    cr_assert_eq(drive->track_pos, 8);
-    apple2dd_step(drive, -2);
-    cr_assert_eq(drive->track_pos, 6);
-
-    // Do we handle going over the maximum track position properly?
-    apple2dd_step(drive, 100);
-    cr_assert_eq(drive->track_pos, MAX_DRIVE_STEPS);
-
-    // Do we handle going to the 0 track properly if we get a radically
-    // high number of negative track shifts?
-    apple2dd_step(drive, -1000);
-    cr_assert_eq(drive->track_pos, 0);
-}
-
-Test(apple2dd, set_mode)
-{
-    apple2dd_set_mode(drive, DD_WRITE);
-    cr_assert_eq(drive->mode, DD_WRITE);
-    apple2dd_set_mode(drive, DD_READ);
-    cr_assert_eq(drive->mode, DD_READ);
-
-    // let's try shenanigans
-    apple2dd_set_mode(drive, 111111111);
-    cr_assert_eq(drive->mode, DD_READ);
-}
-
-Test(apple2dd, turn_on)
-{
-    apple2dd_turn_on(drive, true);
-    cr_assert(drive->online);
-    apple2dd_turn_on(drive, false);
-    cr_assert(!drive->online);
-
-    // I mean, ok
-    apple2dd_turn_on(drive, 1111333);
-    cr_assert(drive->online);
-}
-
-Test(apple2dd, write_protect)
-{
-    apple2dd_write_protect(drive, true);
-    cr_assert(drive->write_protect);
-    apple2dd_write_protect(drive, false);
-    cr_assert(!drive->write_protect);
-    apple2dd_write_protect(drive, 2222);
-    cr_assert(drive->write_protect);
-}
-
-Test(apple2dd, position)
-{
-    // Without any data, the drive should return a null position
-    // regardless of track position
-    drive->track_pos = 3;
-    drive->sector_pos = 44;
-    cr_assert_eq(apple2dd_position(drive), 0);
-
-    // FIXME: we need some dummy data for the drive...
-}
-
-Test(apple2dd, eject)
-{
-    drive->data = vm_segment_create(1000);
-    apple2dd_eject(drive);
-    cr_assert_eq(drive->data, NULL);
-}
-
 Test(apple2dd, insert)
 {
     FILE *stream;
@@ -120,18 +48,15 @@ Test(apple2dd, insert)
     fclose(stream);
 }
 
-Test(apple2dd, shift)
+Test(apple2dd, position)
 {
-    apple2dd_shift(drive, 5);
-    cr_assert_eq(drive->sector_pos, 5);
+    // Without any data, the drive should return a null position
+    // regardless of track position
+    drive->track_pos = 3;
+    drive->sector_pos = 44;
+    cr_assert_eq(apple2dd_position(drive), 0);
 
-    // Push it beyond the sector boundary; see if the track position
-    // updates as it should.
-    apple2dd_shift(drive, MAX_SECTOR_POS + 3);
-    cr_assert_eq(drive->track_pos, 2);
-
-    // this should be the mod of sector_pos and MAX_SECTOR_POS
-    cr_assert_eq(drive->sector_pos, 7);
+    // FIXME: we need some dummy data for the drive...
 }
 
 Test(apple2dd, read)
@@ -149,6 +74,71 @@ Test(apple2dd, read)
     cr_assert_eq(drive->sector_pos, 2);
 }
 
+Test(apple2dd, eject)
+{
+    drive->data = vm_segment_create(1000);
+    apple2dd_eject(drive);
+    cr_assert_eq(drive->data, NULL);
+}
+
+Test(apple2dd, set_mode)
+{
+    apple2dd_set_mode(drive, DD_WRITE);
+    cr_assert_eq(drive->mode, DD_WRITE);
+    apple2dd_set_mode(drive, DD_READ);
+    cr_assert_eq(drive->mode, DD_READ);
+
+    // let's try shenanigans
+    apple2dd_set_mode(drive, 111111111);
+    cr_assert_eq(drive->mode, DD_READ);
+}
+
+Test(apple2dd, shift)
+{
+    apple2dd_shift(drive, 5);
+    cr_assert_eq(drive->sector_pos, 5);
+
+    // Push it beyond the sector boundary; see if the track position
+    // updates as it should.
+    apple2dd_shift(drive, MAX_SECTOR_POS + 3);
+    cr_assert_eq(drive->track_pos, 2);
+
+    // this should be the mod of sector_pos and MAX_SECTOR_POS
+    cr_assert_eq(drive->sector_pos, 7);
+}
+
+Test(apple2dd, step)
+{
+    // Does step work at all?
+    apple2dd_step(drive, 5);
+    cr_assert_eq(drive->track_pos, 5);
+    apple2dd_step(drive, 3);
+    cr_assert_eq(drive->track_pos, 8);
+    apple2dd_step(drive, -2);
+    cr_assert_eq(drive->track_pos, 6);
+
+    // Do we handle going over the maximum track position properly?
+    apple2dd_step(drive, 100);
+    cr_assert_eq(drive->track_pos, MAX_DRIVE_STEPS);
+
+    // Do we handle going to the 0 track properly if we get a radically
+    // high number of negative track shifts?
+    apple2dd_step(drive, -1000);
+    cr_assert_eq(drive->track_pos, 0);
+}
+
+Test(apple2dd, turn_on)
+{
+    apple2dd_turn_on(drive, true);
+    cr_assert(drive->online);
+    apple2dd_turn_on(drive, false);
+    cr_assert(!drive->online);
+
+    // I mean, ok
+    apple2dd_turn_on(drive, 1111333);
+    cr_assert(drive->online);
+}
+
 Test(apple2dd, write)
 {
     drive->data = vm_segment_create(_140K_);
@@ -162,4 +152,14 @@ Test(apple2dd, write)
     cr_assert_eq(vm_segment_get(drive->data, 1), 234);
     cr_assert_eq(drive->track_pos, 0);
     cr_assert_eq(drive->sector_pos, 2);
+}
+
+Test(apple2dd, write_protect)
+{
+    apple2dd_write_protect(drive, true);
+    cr_assert(drive->write_protect);
+    apple2dd_write_protect(drive, false);
+    cr_assert(!drive->write_protect);
+    apple2dd_write_protect(drive, 2222);
+    cr_assert(drive->write_protect);
 }
