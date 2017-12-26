@@ -4,6 +4,8 @@ project(erc-test)
 
 set(CMAKE_BUILD_TYPE Debug)
 
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DHEADLESS")
+
 if(DEFINED ENV{STATIC_ANALYSIS})
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --analyze")
 endif()

@@ -74,6 +74,7 @@ vm_screen_set_logical_coords(vm_screen *screen, int xcoords, int ycoords)
 int
 vm_screen_add_window(vm_screen *screen, int width, int height)
 {
+#ifndef HEADLESS
     SDL_CreateWindowAndRenderer(
         width, height, 0, &screen->window, &screen->render);
 
@@ -81,6 +82,7 @@ vm_screen_add_window(vm_screen *screen, int width, int height)
         log_critical("Could not create window: %s", SDL_GetError());
         return ERR_GFXINIT;
     }
+#endif
 
     // We plan to draw onto a surface that is xcoords x ycoords in area,
     // regardless of the actual size of the window.
@@ -150,7 +152,9 @@ vm_screen_set_color(vm_screen *screen,
                     uint8_t blue,
                     uint8_t alpha)
 {
-    SDL_SetRenderDrawColor(screen->render, red, green, blue, alpha);
+    if (screen->render) {
+        SDL_SetRenderDrawColor(screen->render, red, green, blue, alpha);
+    }
 }
 
 /*
