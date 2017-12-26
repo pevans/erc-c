@@ -18,6 +18,19 @@
 static FILE *log_stream = NULL;
 
 /*
+ * Close the file stream we opened (or were given) in `log_open()`.
+ * Nota bene: if you passed stdout into log_open(), this will actually
+ * _close_ the stdout stream (!).
+ */
+void
+log_close()
+{
+    if (log_stream != NULL) {
+        fclose(log_stream);
+    }
+}
+
+/*
  * This function will assign the log_stream variable to either a given
  * file stream, or if none given, to the default location (which is a
  * filename defined by the `LOG_FILENAME` macro).
@@ -36,19 +49,6 @@ log_open(FILE *stream)
     if (log_stream == NULL) {
         perror("Couldn't open log file (" LOG_FILENAME ")");
         exit(1);
-    }
-}
-
-/*
- * Close the file stream we opened (or were given) in `log_open()`.
- * Nota bene: if you passed stdout into log_open(), this will actually
- * _close_ the stdout stream (!).
- */
-void
-log_close()
-{
-    if (log_stream != NULL) {
-        fclose(log_stream);
     }
 }
 

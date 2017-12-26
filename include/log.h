@@ -17,9 +17,9 @@ enum log_errcode {
     ERR_GFXOP,          // we couldn't execute a specific graphic operation
 };
 
-extern void log_write(int, const char *, ...);
 extern void log_close();
 extern void log_open(FILE *);
+extern void log_write(int, const char *, ...);
 
 /*
  * Here we have a couple of convenience macros that abstracts the log
