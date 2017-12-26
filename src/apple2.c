@@ -78,21 +78,55 @@ apple2_create(int width, int height)
     return mach;
 }
 
-void
-apple2_set_color(apple2 *mach, int mode)
+bool
+apple2_is_double_video(apple2 *mach)
 {
-    mach->color_mode = mode;
-    
-    // FIXME: doing this should force us to redraw everything in the
-    // correct color interpretation
+    return 
+        mach->video_mode == VIDEO_DOUBLE_HIRES ||
+        mach->video_mode == VIDEO_DOUBLE_LORES ||
+        mach->video_mode == VIDEO_80COL_TEXT;
 }
 
-void
-apple2_run_loop(apple2 *mach)
+int
+apple2_boot(apple2 *mach)
 {
-    while (vm_screen_active(mach->screen)) {
-        vm_screen_refresh(mach->screen);
+    FILE *stream;
+    int err;
+
+    // Do we have any disks?
+    stream = option_get_input(1);
+    if (stream) {
+        err = apple2dd_insert(mach->drive1, stream);
+        if (err != OK) {
+            log_critical("Unable to insert disk1 into drive");
+            return err;
+        }
     }
+
+    stream = option_get_input(2);
+    if (stream) {
+        err = apple2dd_insert(mach->drive2, stream);
+        if (err != OK) {
+            log_critical("Unable to insert disk2 into drive");
+            return err;
+        }
+    }
+
+    return OK;
+}
+
+/*
+ * This function will clear the 8th bit, which is the "strobe" bit, from
+ * the position in memory where the value of the last key that was
+ * pressed is held.
+ */
+void
+apple2_clear_strobe(apple2 *mach)
+{
+    vm_8bit ch;
+
+    ch = vm_segment_get(mach->memory, LAST_KEY);
+    vm_segment_set(mach->memory, LAST_KEY, ch & 0x7F);
 }
 
 /*
@@ -131,20 +165,6 @@ apple2_press_key(apple2 *mach, vm_8bit ch)
 }
 
 /*
- * This function will clear the 8th bit, which is the "strobe" bit, from
- * the position in memory where the value of the last key that was
- * pressed is held.
- */
-void
-apple2_clear_strobe(apple2 *mach)
-{
-    vm_8bit ch;
-
-    ch = vm_segment_get(mach->memory, LAST_KEY);
-    vm_segment_set(mach->memory, LAST_KEY, ch & 0x7F);
-}
-
-/*
  * This function will clear the value of the any-key-down switch/flag.
  */
 void
@@ -153,32 +173,21 @@ apple2_release_key(apple2 *mach)
     vm_segment_set(mach->memory, ANY_KEY_DOWN, 0);
 }
 
-int
-apple2_boot(apple2 *mach)
+void
+apple2_run_loop(apple2 *mach)
 {
-    FILE *stream;
-    int err;
-
-    // Do we have any disks?
-    stream = option_get_input(1);
-    if (stream) {
-        err = apple2dd_insert(mach->drive1, stream);
-        if (err != OK) {
-            log_critical("Unable to insert disk1 into drive");
-            return err;
-        }
+    while (vm_screen_active(mach->screen)) {
+        vm_screen_refresh(mach->screen);
     }
+}
 
-    stream = option_get_input(2);
-    if (stream) {
-        err = apple2dd_insert(mach->drive2, stream);
-        if (err != OK) {
-            log_critical("Unable to insert disk2 into drive");
-            return err;
-        }
-    }
-
-    return OK;
+void
+apple2_set_color(apple2 *mach, int mode)
+{
+    mach->color_mode = mode;
+    
+    // FIXME: doing this should force us to redraw everything in the
+    // correct color interpretation
 }
 
 void
@@ -204,13 +213,4 @@ apple2_set_video(apple2 *mach, int mode)
     }
 
     vm_screen_set_logical_coords(mach->screen, width, height);
-}
-
-bool
-apple2_is_double_video(apple2 *mach)
-{
-    return 
-        mach->video_mode == VIDEO_DOUBLE_HIRES ||
-        mach->video_mode == VIDEO_DOUBLE_LORES ||
-        mach->video_mode == VIDEO_80COL_TEXT;
 }
