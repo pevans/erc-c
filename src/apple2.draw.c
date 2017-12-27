@@ -72,7 +72,7 @@ apple2_draw_text(apple2 *mach, vm_16bit addr)
 {
     vm_8bit lsb, msb;
     vm_16bit page_base;
-    SDL_Rect dest;
+    vm_area dest;
     char ch;
 
     // The text display buffers are located at "Page 1" and "Page 2",
@@ -120,18 +120,18 @@ apple2_draw_text(apple2 *mach, vm_16bit addr)
 
     // The absolute column position will be the font width times the
     // lsb.
-    dest.x = lsb * mach->sysfont->width;
+    dest.xoff = lsb * mach->sysfont->width;
 
     // The absolute row position will be the font height times the msb
     // minus the page base (because the height is the same regardless of
     // what page we're in). So if we're msb $0400, then we're starting
     // on pixel row 0; but if we're msb $0480, then we are starting on
     // pixel row 8 (where the font height is 8); etc.
-    dest.y = ((addr & 0xff80) - page_base) * mach->sysfont->height;
+    dest.yoff = ((addr & 0xff80) - page_base) * mach->sysfont->height;
 
     // Our width and height must be that of the font.
-    dest.w = mach->sysfont->width;
-    dest.h = mach->sysfont->height;
+    dest.width = mach->sysfont->width;
+    dest.height = mach->sysfont->height;
 
     // And...lastly...what's in the address?
     ch = (char)vm_segment_get(mach->memory, addr);

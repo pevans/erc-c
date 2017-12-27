@@ -16,13 +16,37 @@
     vm_screen_draw_rect(screen, xpos, ypos, 1, 1)
 
 typedef struct {
+    int xoff;
+    int yoff;
+
+    int width;
+    int height;
+} vm_area;
+
+typedef struct {
     SDL_Window *window;
     SDL_Renderer *render;
-    SDL_Rect rect;
+    vm_area area;
 
     int xcoords;
     int ycoords;
 } vm_screen;
+
+#define SET_SDL_RECT(name, a) \
+    (name).x = (a).xoff; \
+    (name).y = (a).yoff; \
+    (name).w = (a).width; \
+    (name).h = (a).height
+
+#define MAKE_SDL_RECT(name, a) \
+    SDL_Rect name; \
+    SET_SDL_RECT(name, a)
+
+#define vm_area_set(a, x, y, w, h) \
+    (a)->xoff = x; \
+    (a)->yoff = y; \
+    (a)->width = w; \
+    (a)->height = h
 
 extern bool vm_screen_active(vm_screen *);
 extern int vm_screen_add_window(vm_screen *, int, int);

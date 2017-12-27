@@ -61,10 +61,7 @@ vm_screen_create()
 
     screen->window = NULL;
     screen->render = NULL;
-    screen->rect.x = 0;
-    screen->rect.y = 0;
-    screen->rect.w = 0;
-    screen->rect.h = 0;
+    vm_area_set(&screen->area, 0, 0, 0, 0);
 
     return screen;
 }
@@ -213,12 +210,14 @@ vm_screen_draw_rect(vm_screen *screen,
                     int xsize,
                     int ysize)
 {
+    SDL_Rect rect; 
+
     // The renderer will take care of translating the positions and
     // sizes into whatever the window is really at.
-    screen->rect.x = xpos;
-    screen->rect.y = ypos;
-    screen->rect.w = xsize;
-    screen->rect.h = ysize;
+    rect.x = xpos;
+    rect.y = ypos;
+    rect.w = xsize;
+    rect.h = ysize;
 
-    SDL_RenderFillRect(screen->render, &screen->rect);
+    SDL_RenderFillRect(screen->render, &rect);
 }
