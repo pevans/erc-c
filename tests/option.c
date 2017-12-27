@@ -97,3 +97,31 @@ Test(options, parse)
 
     cr_assert_eq(option_parse(argc, argv), 0);
 }
+
+/*
+ * The get_width and get_height tests also implicitly test the
+ * option_set_size() function (which is called by option_parse()).
+ */
+Test(options, get_width)
+{
+    int argc = 2;
+    char *argv[] = {
+        "prog_name",
+        "--size=875x600",
+    };
+
+    cr_assert_eq(option_parse(argc, argv), 1);
+    cr_assert_eq(option_get_width(), 875);
+}
+
+Test(options, get_height)
+{
+    int argc = 2;
+    char *argv[] = {
+        "prog_name",
+        "--size=875x600",
+    };
+
+    cr_assert_eq(option_parse(argc, argv), 1);
+    cr_assert_eq(option_get_height(), 600);
+}
