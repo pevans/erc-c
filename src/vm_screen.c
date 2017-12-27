@@ -61,7 +61,6 @@ vm_screen_create()
 
     screen->window = NULL;
     screen->render = NULL;
-    vm_area_set(&screen->area, 0, 0, 0, 0);
 
     return screen;
 }

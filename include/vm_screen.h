@@ -8,9 +8,21 @@
 #define VM_SCREEN_DEFHEIGHT 600
 
 typedef struct {
+    /*
+     * These are the x and y coordinate offsets in the logical dimension
+     * established in a vm_screen. An offset of (0, 0) would be in the
+     * top-left; (5, 5) would be 5 pixels down, and 5 pixels to the
+     * right, of that top-left corner.
+     */
     int xoff;
     int yoff;
 
+    /*
+     * These are the width and height of the area we're defining. A
+     * single pixel in the logical area would have a width and height of
+     * (1, 1); use larger numbers to indicate a larger square (if the
+     * two are equal) or rectangle (if unequal).
+     */
     int width;
     int height;
 } vm_area;
@@ -18,7 +30,6 @@ typedef struct {
 typedef struct {
     SDL_Window *window;
     SDL_Renderer *render;
-    vm_area area;
 
     int xcoords;
     int ycoords;

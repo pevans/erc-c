@@ -33,10 +33,6 @@ Test(vm_screen, create) {
 
     cr_assert_eq(screen->window, NULL);
     cr_assert_eq(screen->render, NULL);
-    cr_assert_eq(screen->area.xoff, 0);
-    cr_assert_eq(screen->area.yoff, 0);
-    cr_assert_eq(screen->area.width, 0);
-    cr_assert_eq(screen->area.height, 0);
     cr_assert_eq(screen->xcoords, 0);
     cr_assert_eq(screen->ycoords, 0);
 }
