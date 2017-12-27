@@ -223,6 +223,14 @@ option_print_help()
                               (only 700x480 and 875x600 are supported)\n");
 }
 
+/*
+ * Set the size of our window in visible width and height. The size
+ * string is expected to be in the form of WIDTHxHEIGHT, where WIDTH
+ * and HEIGHT are integers representing the window width and height
+ * respectively. Arbitrary values for width and height are not
+ * necessarily allowed; generally, we can only support values which
+ * respect the aspect ratio used by the machine we are emulating.
+ */
 int
 option_set_size(const char *size)
 {
@@ -238,12 +246,18 @@ option_set_size(const char *size)
     return ERR_BADOPT;
 }
 
+/*
+ * Return the window width we've been configured to use.
+ */
 int
 option_get_width()
 {
     return width;
 }
 
+/*
+ * Return the window height we want.
+ */
 int
 option_get_height()
 {
