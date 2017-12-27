@@ -67,13 +67,13 @@ vm_bitfont_free(vm_bitfont *font)
  * value.
  */
 void
-vm_bitfont_offset(vm_bitfont *font, char ch, int *xcoord, int *ycoord)
+vm_bitfont_offset(vm_bitfont *font, char ch, vm_area *area)
 {
     int row = (ch & 0xf0) >> 4;
     int col = ch & 0x0f;
 
-    *xcoord = col * font->width;
-    *ycoord = row * font->height;
+    area->xoff = col * font->width;
+    area->yoff = row * font->height;
 }
 
 /*
@@ -86,8 +86,7 @@ vm_bitfont_render(vm_bitfont *font,
                   vm_area *dest, 
                   char ch)
 {
-    SDL_Rect src_rect;
-    SDL_Rect dest_rect;
+    vm_area src;
 
     // Our bitmap font may not be able to support all 256 possible
     // values that a character can hold; the cmask will limit us to
@@ -96,17 +95,19 @@ vm_bitfont_render(vm_bitfont *font,
 
     // The width and height of the glyph are as indicated by the font
     // struct
-    src_rect.w = font->width;
-    src_rect.h = font->height;
-
-    // Bring the destination attributes into the SDL_Rect we need to
-    // pass into SDL_RenderCopy().
-    SET_SDL_RECT(dest_rect, *dest);
+    src.width = font->width;
+    src.height = font->height;
 
     // Get the spot in the bitmap where the glyph is found
-    vm_bitfont_offset(font, ch, &src_rect.x, &src_rect.y);
+    vm_bitfont_offset(font, ch, &src);
 
-    log_critical("src.x = %d, src.y = %d", src_rect.x, src_rect.y);
+    log_critical("src.xoff = %d, src.yoff = %d", src.xoff, src.yoff);
+
+    // Bring the destination attributes into the SDL_Rect we need to
+    // pass into SDL_RenderCopy(). Also bring in the src attributes
+    // we've built earlier.
+    MAKE_SDL_RECT(dest_rect, *dest);
+    MAKE_SDL_RECT(src_rect, src);
 
     if (SDL_RenderCopy(screen->render, font->texture, &src_rect, &dest_rect) < 0) {
         log_critical("Failed to render glyph: %s", SDL_GetError());

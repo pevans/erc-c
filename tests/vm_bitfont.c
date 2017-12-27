@@ -40,13 +40,12 @@ Test(vm_bitfont, create)
 Test(vm_bitfont, offset)
 {
     char ch = 'p';
-    int x = 0;
-    int y = 0;
+    vm_area area;
 
-    vm_bitfont_offset(font, ch, &x, &y);
+    vm_bitfont_offset(font, ch, &area);
     
-    cr_assert_eq(x, (ch & 0x0f) * font->width);
-    cr_assert_eq(y, (ch >> 4) * font->height);
+    cr_assert_eq(area.xoff, (ch & 0x0f) * font->width);
+    cr_assert_eq(area.yoff, (ch >> 4) * font->height);
 }
 
 /*
