@@ -45,13 +45,8 @@ typedef struct {
     SDL_Rect name; \
     SET_SDL_RECT(name, a)
 
-#define vm_area_set(a, x, y, w, h) \
-    (a)->xoff = x; \
-    (a)->yoff = y; \
-    (a)->width = w; \
-    (a)->height = h
-
 extern bool vm_screen_active(vm_screen *);
+extern void vm_area_set(vm_area *, int, int, int, int);
 extern int vm_screen_add_window(vm_screen *, int, int);
 extern int vm_screen_init();
 extern int vm_screen_xcoords(vm_screen *);

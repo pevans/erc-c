@@ -211,3 +211,12 @@ vm_screen_draw_rect(vm_screen *screen, vm_area *area)
 
     SDL_RenderFillRect(screen->render, &rect);
 }
+
+inline void
+vm_area_set(vm_area *area, int xoff, int yoff, int width, int height)
+{
+    area->xoff = xoff;
+    area->yoff = yoff;
+    area->width = width;
+    area->height = height;
+}
