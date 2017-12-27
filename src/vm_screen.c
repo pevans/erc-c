@@ -204,20 +204,11 @@ vm_screen_set_color(vm_screen *screen,
  * set of x/y dimensions, with a given screen.
  */
 void
-vm_screen_draw_rect(vm_screen *screen,
-                    int xpos,
-                    int ypos,
-                    int xsize,
-                    int ysize)
+vm_screen_draw_rect(vm_screen *screen, vm_area *area)
 {
-    SDL_Rect rect; 
-
     // The renderer will take care of translating the positions and
     // sizes into whatever the window is really at.
-    rect.x = xpos;
-    rect.y = ypos;
-    rect.w = xsize;
-    rect.h = ysize;
+    MAKE_SDL_RECT(rect, *area);
 
     SDL_RenderFillRect(screen->render, &rect);
 }

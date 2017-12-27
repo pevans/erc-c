@@ -42,7 +42,7 @@ apple2_draw_pixel_lores(apple2 *mach, vm_16bit addr)
 {
     vm_8bit color = vm_segment_get(mach->memory, addr);
     vm_8bit top, bottom;
-    SDL_Rect loc;
+    vm_area loc;
     int *colors;
 
     // The top color is the low order nibble, so we can blank out the
@@ -53,18 +53,23 @@ apple2_draw_pixel_lores(apple2 *mach, vm_16bit addr)
     bottom = color >> 4;
 
     // The next thing we need to consider is where we draw the pixel
-    loc.x = (addr & 0xff) * mach->sysfont->width;
-    loc.y = (addr >> 8) * mach->sysfont->height;
-    loc.w = mach->sysfont->width;
-    loc.h = mach->sysfont->height / 2;
+    loc.xoff = (addr & 0xff) * mach->sysfont->width;
+    loc.yoff = (addr >> 8) * mach->sysfont->height;
+    loc.width = mach->sysfont->width;
+    loc.height = mach->sysfont->height / 2;
 
     colors = lores_colors[top];
     vm_screen_set_color(mach->screen, colors[0], colors[1], colors[2], 255);
-    vm_screen_draw_rect(mach->screen, loc.x, loc.y, loc.w, loc.h); 
+    vm_screen_draw_rect(mach->screen, &loc); 
+
+    // The bottom pixel we need to draw now must be offset by the height
+    // of the pixel we just drew. (Remember, positive equals down in the
+    // y-axis.)
+    loc.yoff += loc.height;
 
     colors = lores_colors[bottom];
     vm_screen_set_color(mach->screen, colors[0], colors[1], colors[2], 255);
-    vm_screen_draw_rect(mach->screen, loc.x, loc.y + loc.h, loc.w, loc.h);
+    vm_screen_draw_rect(mach->screen, &loc);
 }
 
 void

@@ -7,14 +7,6 @@
 #define VM_SCREEN_DEFWIDTH 800
 #define VM_SCREEN_DEFHEIGHT 600
 
-/*
- * If you just want to plot a single pixel, you can use this macro to
- * abstract away the need to indicate the x/y dimensions (as those must
- * necessarily be 1x1).
- */
-#define vm_screen_draw_pixel(screen, xpos, ypos) \
-    vm_screen_draw_rect(screen, xpos, ypos, 1, 1)
-
 typedef struct {
     int xoff;
     int yoff;
@@ -54,7 +46,7 @@ extern int vm_screen_init();
 extern int vm_screen_xcoords(vm_screen *);
 extern int vm_screen_ycoords(vm_screen *);
 extern vm_screen *vm_screen_create();
-extern void vm_screen_draw_rect(vm_screen *, int, int, int, int);
+extern void vm_screen_draw_rect(vm_screen *, vm_area *);
 extern void vm_screen_finish();
 extern void vm_screen_free(vm_screen *);
 extern void vm_screen_refresh(vm_screen *);
