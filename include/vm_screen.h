@@ -4,9 +4,6 @@
 #include <stdbool.h>
 #include <SDL.h>
 
-#define VM_SCREEN_DEFWIDTH 800
-#define VM_SCREEN_DEFHEIGHT 600
-
 typedef struct {
     /*
      * These are the x and y coordinate offsets in the logical dimension
@@ -28,19 +25,45 @@ typedef struct {
 } vm_area;
 
 typedef struct {
+    /*
+     * This is the window in SDL that we're displaying. It's fine for a
+     * screen to be headless; that is, not to have a window. Screen
+     * functions which deal with SDL will simply not run that code if
+     * headless.
+     */
     SDL_Window *window;
+
+    /*
+     * In SDL, the renderer is comparable to the old SDL_Surface type
+     * (which is still there!). A renderer is a little more stateful; it
+     * contains its own color information to be used when rendering
+     * shapes, for example.
+     */
     SDL_Renderer *render;
 
+    /*
+     * These are the x and y coordinates of the window we're creating.
+     * FIXME: this should probably be renamed to width and height...
+     */
     int xcoords;
     int ycoords;
 } vm_screen;
 
+/*
+ * Set the contents of an SDL_Rect to the equivalent fields contained in
+ * a vm_area.
+ */
 #define SET_SDL_RECT(name, a) \
     (name).x = (a).xoff; \
     (name).y = (a).yoff; \
     (name).w = (a).width; \
     (name).h = (a).height
 
+/*
+ * Much like SET_SDL_RECT(), except this will (as a side-effect!)
+ * declare an SDL_Rect variable (`name`) and pass that into the SET
+ * macro.
+ */
 #define MAKE_SDL_RECT(name, a) \
     SDL_Rect name; \
     SET_SDL_RECT(name, a)
