@@ -239,9 +239,18 @@ Test(mos6502_dis, jump_label)
 
     mos6502_dis_jump_label(123, 0, IND);
     cr_assert_eq(mos6502_dis_is_jump_label(123), true);
-
     mos6502_dis_jump_unlabel(123);
     cr_assert_eq(mos6502_dis_is_jump_label(123), false);
+
+    // Testing forward relative
+    mos6502_dis_jump_label(123, 10, REL);
+    cr_assert_eq(mos6502_dis_is_jump_label(123 + 10), true);
+    mos6502_dis_jump_unlabel(123 + 10);
+
+    // Testing backward relative
+    mos6502_dis_jump_label(133, 1000, REL);
+    cr_assert_eq(mos6502_dis_is_jump_label(133 + 1000 - 256), true);
+    mos6502_dis_jump_unlabel(133 + 1000 - 256);
 }
 
 Test(mos6502_dis, label)
