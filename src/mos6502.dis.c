@@ -186,7 +186,7 @@ mos6502_dis_expected_bytes(int addr_mode)
  * of bytes consumed by scanning past the opcode and/or operand.
  */
 int
-mos6502_dis_scan(FILE *stream, vm_segment *segment, int address)
+mos6502_dis_opcode(FILE *stream, vm_segment *segment, int address)
 {
     vm_8bit opcode;
     vm_16bit operand;
@@ -240,13 +240,15 @@ mos6502_dis_scan(FILE *stream, vm_segment *segment, int address)
     // Print out the instruction code that our opcode represents.
     mos6502_dis_instruction(stream, mos6502_instruction(opcode));
 
-    // Let's "tab" over; each instruction code is 3 characters, so let's
-    // move over 5 spaces (4 spaces indent + 1, just to keep everything
-    // aligned by 4-character boundaries).
-    fprintf(stream, "     ");
+    if (expected) {
+        // Let's "tab" over; each instruction code is 3 characters, so let's
+        // move over 5 spaces (4 spaces indent + 1, just to keep everything
+        // aligned by 4-character boundaries).
+        fprintf(stream, "     ");
 
-    // Print out the operand given the proper address mode.
-    mos6502_dis_operand(stream, mos6502_addr_mode(opcode), operand);
+        // Print out the operand given the proper address mode.
+        mos6502_dis_operand(stream, mos6502_addr_mode(opcode), operand);
+    }
 
     // And let's terminate the line.
     fprintf(stream, "\n");
@@ -255,4 +257,12 @@ mos6502_dis_scan(FILE *stream, vm_segment *segment, int address)
     // to add one for the opcode to return the true number that this
     // opcode sequence would consume.
     return expected + 1;
+}
+
+void
+mos6502_dis_scan(FILE *stream, vm_segment *segment, int pos, int end)
+{
+    while (pos < end) {
+        pos += mos6502_dis_opcode(stream, segment, pos);
+    }
 }

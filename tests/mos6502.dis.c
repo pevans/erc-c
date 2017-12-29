@@ -164,7 +164,7 @@ Test(mos6502_dis, expected_bytes)
     TEST_BYTES(ZPY, 1);
 }
 
-Test(mos6502_dis, scan)
+Test(mos6502_dis, opcode)
 {
     vm_segment *segment;
     int bytes;
@@ -174,7 +174,28 @@ Test(mos6502_dis, scan)
     vm_segment_set(segment, 0, 0x29);   // AND (imm)
     vm_segment_set(segment, 1, 0x38);
 
-    bytes = mos6502_dis_scan(stream, segment, 0);
+    bytes = mos6502_dis_opcode(stream, segment, 0);
     assert_buf("    AND     #$38\n");
     cr_assert_eq(bytes, 2);
+}
+
+Test(mos6502_dis, scan)
+{
+    vm_segment *segment;
+
+    segment = vm_segment_create(1000);
+
+    vm_segment_set(segment, 0, 0x29);   // AND (imm)
+    vm_segment_set(segment, 1, 0x38);
+    vm_segment_set(segment, 2, 0x88);   // DEY (imp)
+    vm_segment_set(segment, 3, 0x6C);   // JMP (ind)
+    vm_segment_set(segment, 4, 0x12);
+    vm_segment_set(segment, 5, 0x34);
+
+    mos6502_dis_scan(stream, segment, 0, 6);
+
+    assert_buf("    AND     #$38\n"
+               "    DEY\n"
+               "    JMP     ($1234)\n"
+               );
 }

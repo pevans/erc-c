@@ -5,8 +5,9 @@
 #include "vm_segment.h"
 
 extern int mos6502_dis_expected_bytes(vm_8bit);
-extern int mos6502_dis_scan(FILE *, vm_segment *, int);
+extern int mos6502_dis_opcode(FILE *, vm_segment *, int);
 extern void mos6502_dis_instruction(FILE *, int);
 extern void mos6502_dis_operand(FILE *, int, vm_16bit);
+extern void mos6502_dis_scan(FILE *, vm_segment *, int, int);
 
 #endif
