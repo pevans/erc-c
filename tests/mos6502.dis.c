@@ -1,31 +1,39 @@
 #include <criterion/criterion.h>
-#include <criterion/redirect.h>
 #include <unistd.h>
 
 #include "mos6502.dis.h"
 #include "mos6502.enums.h"
 
-#define TMPFILE "/dev/null"
+/*
+ * BUFSIZ is the normal block-buffer size that a FILE stream would use
+ * (possibly amongst other things).
+ */
+static char buf[BUFSIZ];
 
-static char buf[256];
+/*
+ * This is the file stream we will be using to write our disassembly
+ * code into.
+ */
 static FILE *stream = NULL;
-static FILE *input = NULL;
 
 static void
 setup()
 {
-    stream = fopen(TMPFILE, "w");
+    // Ok, so...there's some...trickery going on here. As you might
+    // guess by the file path being /dev/null.
+    stream = fopen("/dev/null", "w");
     if (stream == NULL) {
         perror("Could not open temporary file for mos6502 disassembly tests");
     }
 
-    setvbuf(stream, buf, _IOFBF, 256);
-
-    input = fopen(TMPFILE, "r");
-    if (input == NULL) {
-        perror("Could not open temporary file for mos6502 disassembly tests");
-    }
-
+    // The C standard library allows us to set an arbitrary buffer for a
+    // file stream. It also allows us to fully buffer the file stream,
+    // which means nothing is written to file until an fflush() or an
+    // fclose() is called (or something else I can't think of). So we
+    // can use the FILE abstraction to write our disassembly results
+    // into, but use an underlying string buffer that we can easily
+    // check with Criterion. Uh, unless we blow out the buffer size...
+    // don't do that :D
     setvbuf(stream, buf, _IOFBF, 256);
 }
 
@@ -38,9 +46,20 @@ teardown()
 static void
 assert_buf(const char *str)
 {
+    // This will set the cursor position in the file back to the start
+    // of the file stream.
     rewind(stream);
+
+    // Our actual assertion. The downside to doing it this way is that
+    // when Criterion flags an assertion failure, it'll highlight _this_
+    // line in the file, not in the test. It might be worth macroifying
+    // this code.
     cr_assert_str_eq(buf, str);
-    memset(buf, 0, sizeof(buf));
+
+    // We're not sure what previous tests may have run, and where NUL
+    // characters were set therein, so to be safe we wipe out the full
+    // contents of the test buffer after every test.
+    memset(buf, 0, BUFSIZ);
 }
 
 TestSuite(mos6502_dis, .init = setup, .fini = teardown);
