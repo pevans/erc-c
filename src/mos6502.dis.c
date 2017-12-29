@@ -124,12 +124,8 @@ mos6502_dis_operand(FILE *stream, int addr_mode, vm_16bit value)
  * opcode maps to.
  */
 void
-mos6502_dis_instruction(FILE *stream, vm_8bit opcode)
+mos6502_dis_instruction(FILE *stream, int inst_code)
 {
-    int inst_code;
-
-    inst_code = mos6502_instruction(opcode);
-    
     // Arguably this could or should be done as fputs(), which is
     // presumably a simpler output method. But, since we use fprintf()
     // in other places, I think we should continue to do so. Further, we
@@ -183,4 +179,80 @@ mos6502_dis_expected_bytes(vm_8bit opcode)
     // I don't know how we got here, outside of foul magicks and cruel
     // trickery. Let's fearfully return zero!
     return 0;
+}
+
+/*
+ * Scan the segment (with a given address) and write the opcode at that
+ * point to the given file stream. This function will also write an
+ * operand to the file stream if one is warranted. We return the number
+ * of bytes consumed by scanning past the opcode and/or operand.
+ */
+int
+mos6502_dis_scan(FILE *stream, vm_segment *segment, int address)
+{
+    vm_8bit opcode;
+    vm_16bit operand;
+    int expected;
+
+    // The next byte is assumed to be the opcode we work with.
+    opcode = vm_segment_get(segment, address);
+
+    // And given that opcode, we need to see how many bytes large our
+    // operand will be.
+    expected = mos6502_dis_expected_bytes(opcode);
+
+    // The operand itself defaults to zero... in cases where this
+    // doesn't change, the instruction related to the opcode will
+    // probably not even use it.
+    operand = 0;
+
+    // And we need to skip ahead of the opcode.
+    address++;
+
+    switch (expected) {
+        case 2:
+            // If we have a two-byte operand, then the first byte is the
+            // MSB and our operand will need to shift it 8 positions to
+            // the left before it can be OR'd.
+            operand |= vm_segment_get(segment, address) << 8;
+            address++;
+
+            // Note we fall through here to the next case...
+
+        case 1:
+            // If it's a one-byte operand, then this byte should occupy
+            // the LSB space which simply requires we OR the byte
+            // directly in. If this is part of a two-byte operand, then
+            // the same logic still applies.
+            operand |= vm_segment_get(segment, address);
+            address++;
+
+            // And, in any other case (e.g. 0), we are done; we don't
+            // read anything, and we leave the operand as it is.
+        default:
+            break;
+    }
+
+    // Let's print out to the stream what we have so far. First, we
+    // indent by four spaces.
+    fprintf(stream, "    ");
+
+    // Print out the instruction code that our opcode represents.
+    mos6502_dis_instruction(stream, mos6502_instruction(opcode));
+
+    // Let's "tab" over; each instruction code is 3 characters, so let's
+    // move over 5 spaces (4 spaces indent + 1, just to keep everything
+    // aligned by 4-character boundaries).
+    fprintf(stream, "     ");
+
+    // Print out the operand given the proper address mode.
+    mos6502_dis_operand(stream, mos6502_addr_mode(opcode), operand);
+
+    // And let's terminate the line.
+    fprintf(stream, "\n");
+
+    // The expected number of bytes here is for the operand, but we need
+    // to add one for the opcode to return the true number that this
+    // opcode sequence would consume.
+    return expected + 1;
 }
