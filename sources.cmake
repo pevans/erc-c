@@ -8,6 +8,7 @@ set(erc_sources
 	mos6502.arith.c
 	mos6502.bits.c
 	mos6502.branch.c
+	mos6502.dis.c
 	mos6502.exec.c
 	mos6502.loadstor.c
 	mos6502.stat.c

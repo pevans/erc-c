@@ -144,10 +144,8 @@ mos6502_dis_instruction(FILE *stream, int inst_code)
  * zero).
  */
 int
-mos6502_dis_expected_bytes(vm_8bit opcode)
+mos6502_dis_expected_bytes(int addr_mode)
 {
-    int addr_mode = mos6502_addr_mode(opcode);
-
     switch (addr_mode) {
         // These are 16-bit operands, because they work with absolute
         // addresses in memory.
@@ -192,6 +190,7 @@ mos6502_dis_scan(FILE *stream, vm_segment *segment, int address)
 {
     vm_8bit opcode;
     vm_16bit operand;
+    int addr_mode;
     int expected;
 
     // The next byte is assumed to be the opcode we work with.
@@ -199,7 +198,8 @@ mos6502_dis_scan(FILE *stream, vm_segment *segment, int address)
 
     // And given that opcode, we need to see how many bytes large our
     // operand will be.
-    expected = mos6502_dis_expected_bytes(opcode);
+    addr_mode = mos6502_addr_mode(opcode);
+    expected = mos6502_dis_expected_bytes(addr_mode);
 
     // The operand itself defaults to zero... in cases where this
     // doesn't change, the instruction related to the opcode will
