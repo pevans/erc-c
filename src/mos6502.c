@@ -6,6 +6,7 @@
  * stack, etc.
  */
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -400,4 +401,25 @@ mos6502_read_byte(mos6502 *cpu)
     cpu->PC++;
 
     return byte;
+}
+
+/*
+ * Return true if the given instruction would require that we jump
+ * to somewhere else in the program.
+ */
+inline bool
+mos6502_would_jump(int inst_code)
+{
+    return 
+        inst_code == BCC ||
+        inst_code == BCS ||
+        inst_code == BEQ ||
+        inst_code == BMI ||
+        inst_code == BNE ||
+        inst_code == BPL ||
+        inst_code == BRK ||
+        inst_code == BVC ||
+        inst_code == BVS ||
+        inst_code == JMP ||
+        inst_code == JSR;
 }

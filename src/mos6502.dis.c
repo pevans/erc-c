@@ -4,8 +4,13 @@
  * Disassembly of the mos6502 machine code into an assembly notation.
  */
 
+#include <stdbool.h>
+
 #include "mos6502.h"
+#include "mos6502.dis.h"
 #include "mos6502.enums.h"
+
+static vm_8bit jump_table[MOS6502_MEMSIZE];
 
 static char *instruction_strings[] = {
     "ADC",
@@ -74,8 +79,10 @@ static char *instruction_strings[] = {
  * type.
  */
 void
-mos6502_dis_operand(FILE *stream, int addr_mode, vm_16bit value)
+mos6502_dis_operand(FILE *stream, int address, int addr_mode, vm_16bit value)
 {
+    int rel_address;
+
     switch (addr_mode) {
         case ACC:
             break;
@@ -94,7 +101,11 @@ mos6502_dis_operand(FILE *stream, int addr_mode, vm_16bit value)
         case IMP:
             break;
         case IND:
-            fprintf(stream, "($%04X)", value);
+            if (jump_table[value]) {
+                mos6502_dis_label(stream, value);
+            } else {
+                fprintf(stream, "($%04X)", value);
+            }
             break;
         case IDX:
             fprintf(stream, "($%02X,X)", value);
@@ -103,9 +114,12 @@ mos6502_dis_operand(FILE *stream, int addr_mode, vm_16bit value)
             fprintf(stream, "($%02X),Y", value);
             break;
         case REL:
-            // FIXME: we need some kind of table of jumps and branches
-            // we make, so that we can come up with some labels to use.
-            fprintf(stream, "(REL)");
+            rel_address = address + value;
+            if (value > 127) {
+                rel_address -= 256;
+            }
+
+            mos6502_dis_label(stream, rel_address);
             break;
         case ZPG:
             fprintf(stream, "$%02X", value);
@@ -191,6 +205,7 @@ mos6502_dis_opcode(FILE *stream, vm_segment *segment, int address)
     vm_8bit opcode;
     vm_16bit operand;
     int addr_mode;
+    int inst_code;
     int expected;
 
     // The next byte is assumed to be the opcode we work with.
@@ -200,6 +215,9 @@ mos6502_dis_opcode(FILE *stream, vm_segment *segment, int address)
     // operand will be.
     addr_mode = mos6502_addr_mode(opcode);
     expected = mos6502_dis_expected_bytes(addr_mode);
+
+    // The specific instruction we mean to execute
+    inst_code = mos6502_instruction(opcode);
 
     // The operand itself defaults to zero... in cases where this
     // doesn't change, the instruction related to the opcode will
@@ -233,25 +251,50 @@ mos6502_dis_opcode(FILE *stream, vm_segment *segment, int address)
             break;
     }
 
-    // Let's print out to the stream what we have so far. First, we
-    // indent by four spaces.
-    fprintf(stream, "    ");
-
-    // Print out the instruction code that our opcode represents.
-    mos6502_dis_instruction(stream, mos6502_instruction(opcode));
-
-    if (expected) {
-        // Let's "tab" over; each instruction code is 3 characters, so let's
-        // move over 5 spaces (4 spaces indent + 1, just to keep everything
-        // aligned by 4-character boundaries).
-        fprintf(stream, "     ");
-
-        // Print out the operand given the proper address mode.
-        mos6502_dis_operand(stream, mos6502_addr_mode(opcode), operand);
+    // If the stream is NULL, we're doing some kind of lookahead.
+    // Furthermore, if this is an instruction that would switch control
+    // to a different spot in the program, then let's label this in the
+    // jump table.
+    if (stream == NULL && mos6502_would_jump(inst_code)) {
+        mos6502_dis_jump_label(operand, address, addr_mode);
     }
 
-    // And let's terminate the line.
-    fprintf(stream, "\n");
+    // It's totally possible that we are not expected to print out the
+    // contents of our inspection of the opcode. (For example, we may
+    // just want to set the jump table in a lookahead operation.)
+    if (stream) {
+        // Hey! We might have a label at this position in the code. If
+        // so, let's print out the label.
+        if (jump_table[address]) {
+            // This will print out just the label itself.
+            mos6502_dis_label(stream, address);
+
+            // But to actually define the label, we need a colon to
+            // complete the notation. (We don't _need_ a newline, but it
+            // looks nicer to my arbitrary sensibilities. Don't @ me!)
+            fprintf(stream, ":\n");
+        }
+
+        // Let's print out to the stream what we have so far. First, we
+        // indent by four spaces.
+        fprintf(stream, "    ");
+
+        // Print out the instruction code that our opcode represents.
+        mos6502_dis_instruction(stream, inst_code);
+
+        if (expected) {
+            // Let's "tab" over; each instruction code is 3 characters, so let's
+            // move over 5 spaces (4 spaces indent + 1, just to keep everything
+            // aligned by 4-character boundaries).
+            fprintf(stream, "     ");
+
+            // Print out the operand given the proper address mode.
+            mos6502_dis_operand(stream, address, addr_mode, operand);
+        }
+
+        // And let's terminate the line.
+        fprintf(stream, "\n");
+    }
 
     // The expected number of bytes here is for the operand, but we need
     // to add one for the opcode to return the true number that this
@@ -265,4 +308,38 @@ mos6502_dis_scan(FILE *stream, vm_segment *segment, int pos, int end)
     while (pos < end) {
         pos += mos6502_dis_opcode(stream, segment, pos);
     }
+}
+
+void
+mos6502_dis_jump_label(vm_16bit operand, int address, int addr_mode)
+{
+    int jump_loc = operand;
+
+    if (addr_mode == REL) {
+        jump_loc = address + operand;
+
+        if (operand > 127) {
+            jump_loc -= 256;
+        }
+    }
+
+    jump_table[jump_loc] = 1;
+}
+
+inline void
+mos6502_dis_label(FILE *stream, int address)
+{
+    fprintf(stream, "ADDR_%d", address);
+}
+
+inline void
+mos6502_dis_jump_unlabel(int address)
+{
+    jump_table[address] = 0;
+}
+
+inline bool
+mos6502_dis_is_jump_label(int address)
+{
+    return jump_table[address] == 1;
 }

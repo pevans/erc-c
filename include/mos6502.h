@@ -1,6 +1,8 @@
 #ifndef _MOS6502_H_
 #define _MOS6502_H_
 
+#include <stdbool.h>
+
 #include "vm_bits.h"
 #include "vm_segment.h"
 
@@ -111,6 +113,7 @@ typedef vm_8bit (*mos6502_address_resolver)(mos6502 *);
  */
 typedef void (*mos6502_instruction_handler)(mos6502 *, vm_8bit);
 
+extern bool mos6502_would_jump(int);
 extern int mos6502_cycles(mos6502 *, vm_8bit);
 extern int mos6502_instruction(vm_8bit);
 extern mos6502 *mos6502_create();

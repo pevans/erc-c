@@ -66,37 +66,51 @@ TestSuite(mos6502_dis, .init = setup, .fini = teardown);
 
 Test(mos6502_dis, operand)
 {
-    mos6502_dis_operand(stream, ABS, 0x1234);
+    mos6502_dis_operand(stream, 0, ABS, 0x1234);
     assert_buf("$1234");
-    mos6502_dis_operand(stream, ABX, 0x1234);
+    mos6502_dis_operand(stream, 0, ABX, 0x1234);
     assert_buf("$1234,X");
-    mos6502_dis_operand(stream, ABY, 0x1234);
+    mos6502_dis_operand(stream, 0, ABY, 0x1234);
     assert_buf("$1234,Y");
-    mos6502_dis_operand(stream, IMM, 0x12);
+    mos6502_dis_operand(stream, 0, IMM, 0x12);
     assert_buf("#$12");
-    mos6502_dis_operand(stream, IND, 0x1234);
+
+    // For JMPs and JSRs (and BRKs), this should be a label and not a
+    // literal value. So we need to test both the literal and
+    // jump-labeled version.
+    mos6502_dis_operand(stream, 0, IND, 0x1234);
     assert_buf("($1234)");
-    mos6502_dis_operand(stream, IDX, 0x12);
+    mos6502_dis_jump_label(0x1234, 0, IND);
+    mos6502_dis_operand(stream, 0, IND, 0x1234);
+    assert_buf("ADDR_4660"); // = 0x1234
+
+    // Let's undo our label above...
+    mos6502_dis_jump_unlabel(0x1234);
+
+    mos6502_dis_operand(stream, 0, IDX, 0x12);
     assert_buf("($12,X)");
-    mos6502_dis_operand(stream, IDY, 0x34);
+    mos6502_dis_operand(stream, 0, IDY, 0x34);
     assert_buf("($34),Y");
-    mos6502_dis_operand(stream, ZPG, 0x34);
+    mos6502_dis_operand(stream, 0, ZPG, 0x34);
     assert_buf("$34");
-    mos6502_dis_operand(stream, ZPX, 0x34);
+    mos6502_dis_operand(stream, 0, ZPX, 0x34);
     assert_buf("$34,X");
-    mos6502_dis_operand(stream, ZPY, 0x34);
+    mos6502_dis_operand(stream, 0, ZPY, 0x34);
     assert_buf("$34,Y");
     
     // These should both end up printing nothing
-    mos6502_dis_operand(stream, ACC, 0);
+    mos6502_dis_operand(stream, 0, ACC, 0);
     assert_buf("");
-    mos6502_dis_operand(stream, IMP, 0);
+    mos6502_dis_operand(stream, 0, IMP, 0);
     assert_buf("");
 
-    // FIXME: this is intentionally "broken" until we can implement a
-    // jump table
-    mos6502_dis_operand(stream, REL, 0x34);
-    assert_buf("(REL)");
+    // Test a forward jump (operand < 128)
+    mos6502_dis_operand(stream, 500, REL, 52);
+    assert_buf("ADDR_552");
+
+    // Test a backward jump (operand >= 128)
+    mos6502_dis_operand(stream, 500, REL, 152);
+    assert_buf("ADDR_396");
 }
 
 Test(mos6502_dis, instruction)
@@ -217,4 +231,21 @@ Test(mos6502_dis, scan)
                "    DEY\n"
                "    JMP     ($1234)\n"
                );
+}
+
+Test(mos6502_dis, jump_label)
+{
+    cr_assert_eq(mos6502_dis_is_jump_label(123), false);
+
+    mos6502_dis_jump_label(123, 0, IND);
+    cr_assert_eq(mos6502_dis_is_jump_label(123), true);
+
+    mos6502_dis_jump_unlabel(123);
+    cr_assert_eq(mos6502_dis_is_jump_label(123), false);
+}
+
+Test(mos6502_dis, label)
+{
+    mos6502_dis_label(stream, 123);
+    assert_buf("ADDR_123");
 }
