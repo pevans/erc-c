@@ -11,7 +11,7 @@ extern void mos6502_dis_instruction(FILE *, int);
 extern void mos6502_dis_jump_label(vm_16bit, vm_segment *, int, int);
 extern void mos6502_dis_jump_unlabel(int);
 extern void mos6502_dis_label(FILE *, int);
-extern void mos6502_dis_operand(FILE *, int, int, vm_16bit);
+extern void mos6502_dis_operand(FILE *, vm_segment *, int, int, vm_16bit);
 extern void mos6502_dis_scan(FILE *, vm_segment *, int, int);
 
 #endif

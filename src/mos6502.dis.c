@@ -79,9 +79,14 @@ static char *instruction_strings[] = {
  * type.
  */
 void
-mos6502_dis_operand(FILE *stream, int address, int addr_mode, vm_16bit value)
+mos6502_dis_operand(FILE *stream, 
+                    vm_segment *segment, 
+                    int address, 
+                    int addr_mode, 
+                    vm_16bit value)
 {
     int rel_address;
+    int ind_address;
 
     switch (addr_mode) {
         case ACC:
@@ -101,8 +106,10 @@ mos6502_dis_operand(FILE *stream, int address, int addr_mode, vm_16bit value)
         case IMP:
             break;
         case IND:
-            if (jump_table[value]) {
-                mos6502_dis_label(stream, value);
+            ind_address = vm_segment_get(segment, value) << 8;
+            ind_address |= vm_segment_get(segment, value + 1);
+            if (jump_table[ind_address]) {
+                mos6502_dis_label(stream, ind_address);
             } else {
                 fprintf(stream, "($%04X)", value);
             }
@@ -289,7 +296,7 @@ mos6502_dis_opcode(FILE *stream, vm_segment *segment, int address)
             fprintf(stream, "     ");
 
             // Print out the operand given the proper address mode.
-            mos6502_dis_operand(stream, address, addr_mode, operand);
+            mos6502_dis_operand(stream, segment, address, addr_mode, operand);
         }
 
         // And let's terminate the line.

@@ -15,6 +15,8 @@ static char buf[BUFSIZ];
  * code into.
  */
 static FILE *stream = NULL;
+static vm_segment *segment = NULL;
+
 
 static void
 setup()
@@ -35,12 +37,15 @@ setup()
     // check with Criterion. Uh, unless we blow out the buffer size...
     // don't do that :D
     setvbuf(stream, buf, _IOFBF, 256);
+
+    segment = vm_segment_create(65536);
 }
 
 static void
 teardown()
 {
     fclose(stream);
+    vm_segment_free(segment);
 }
 
 static void
@@ -66,50 +71,53 @@ TestSuite(mos6502_dis, .init = setup, .fini = teardown);
 
 Test(mos6502_dis, operand)
 {
-    mos6502_dis_operand(stream, 0, ABS, 0x1234);
+    mos6502_dis_operand(stream, segment, 0, ABS, 0x1234);
     assert_buf("$1234");
-    mos6502_dis_operand(stream, 0, ABX, 0x1234);
+    mos6502_dis_operand(stream, segment, 0, ABX, 0x1234);
     assert_buf("$1234,X");
-    mos6502_dis_operand(stream, 0, ABY, 0x1234);
+    mos6502_dis_operand(stream, segment, 0, ABY, 0x1234);
     assert_buf("$1234,Y");
-    mos6502_dis_operand(stream, 0, IMM, 0x12);
+    mos6502_dis_operand(stream, segment, 0, IMM, 0x12);
     assert_buf("#$12");
+
+    vm_segment_set(segment, 0x1234, 0x33);
+    vm_segment_set(segment, 0x1235, 0x48);
 
     // For JMPs and JSRs (and BRKs), this should be a label and not a
     // literal value. So we need to test both the literal and
     // jump-labeled version.
-    mos6502_dis_operand(stream, 0, IND, 0x1234);
+    mos6502_dis_operand(stream, segment, 0, IND, 0x1234);
     assert_buf("($1234)");
-    mos6502_dis_jump_label(0x1234, 0, IND);
-    mos6502_dis_operand(stream, 0, IND, 0x1234);
-    assert_buf("ADDR_4660"); // = 0x1234
+    mos6502_dis_jump_label(0x1234, segment, 0, IND);
+    mos6502_dis_operand(stream, segment, 0, IND, 0x1234);
+    assert_buf("ADDR_13128"); // = 0x1234
 
     // Let's undo our label above...
     mos6502_dis_jump_unlabel(0x1234);
 
-    mos6502_dis_operand(stream, 0, IDX, 0x12);
+    mos6502_dis_operand(stream, segment, 0, IDX, 0x12);
     assert_buf("($12,X)");
-    mos6502_dis_operand(stream, 0, IDY, 0x34);
+    mos6502_dis_operand(stream, segment, 0, IDY, 0x34);
     assert_buf("($34),Y");
-    mos6502_dis_operand(stream, 0, ZPG, 0x34);
+    mos6502_dis_operand(stream, segment, 0, ZPG, 0x34);
     assert_buf("$34");
-    mos6502_dis_operand(stream, 0, ZPX, 0x34);
+    mos6502_dis_operand(stream, segment, 0, ZPX, 0x34);
     assert_buf("$34,X");
-    mos6502_dis_operand(stream, 0, ZPY, 0x34);
+    mos6502_dis_operand(stream, segment, 0, ZPY, 0x34);
     assert_buf("$34,Y");
     
     // These should both end up printing nothing
-    mos6502_dis_operand(stream, 0, ACC, 0);
+    mos6502_dis_operand(stream, segment, 0, ACC, 0);
     assert_buf("");
-    mos6502_dis_operand(stream, 0, IMP, 0);
+    mos6502_dis_operand(stream, segment, 0, IMP, 0);
     assert_buf("");
 
     // Test a forward jump (operand < 128)
-    mos6502_dis_operand(stream, 500, REL, 52);
+    mos6502_dis_operand(stream, segment, 500, REL, 52);
     assert_buf("ADDR_552");
 
     // Test a backward jump (operand >= 128)
-    mos6502_dis_operand(stream, 500, REL, 152);
+    mos6502_dis_operand(stream, segment, 500, REL, 152);
     assert_buf("ADDR_396");
 }
 
@@ -214,10 +222,6 @@ Test(mos6502_dis, opcode)
 
 Test(mos6502_dis, scan)
 {
-    vm_segment *segment;
-
-    segment = vm_segment_create(1000);
-
     vm_segment_set(segment, 0, 0x29);   // AND (imm)
     vm_segment_set(segment, 1, 0x38);
     vm_segment_set(segment, 2, 0x88);   // DEY (imp)
@@ -236,19 +240,22 @@ Test(mos6502_dis, scan)
 Test(mos6502_dis, jump_label)
 {
     cr_assert_eq(mos6502_dis_is_jump_label(123), false);
+    
+    vm_segment_set(segment, 123, 0);
+    vm_segment_set(segment, 124, 5);
 
-    mos6502_dis_jump_label(123, 0, IND);
-    cr_assert_eq(mos6502_dis_is_jump_label(123), true);
+    mos6502_dis_jump_label(123, segment, 0, IND);
+    cr_assert_eq(mos6502_dis_is_jump_label(5), true);
     mos6502_dis_jump_unlabel(123);
     cr_assert_eq(mos6502_dis_is_jump_label(123), false);
 
     // Testing forward relative
-    mos6502_dis_jump_label(123, 10, REL);
+    mos6502_dis_jump_label(123, segment, 10, REL);
     cr_assert_eq(mos6502_dis_is_jump_label(123 + 10), true);
     mos6502_dis_jump_unlabel(123 + 10);
 
     // Testing backward relative
-    mos6502_dis_jump_label(133, 1000, REL);
+    mos6502_dis_jump_label(133, segment, 1000, REL);
     cr_assert_eq(mos6502_dis_is_jump_label(133 + 1000 - 256), true);
     mos6502_dis_jump_unlabel(133 + 1000 - 256);
 }
