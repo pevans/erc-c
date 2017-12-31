@@ -57,6 +57,9 @@ apple2dd_insert(apple2dd *drive, FILE *stream)
     drive->track_pos = 0;
     drive->sector_pos = 0;
 
+    // FIXME: vm_segment code should be doing this
+    fread(drive->data->memory, sizeof(vm_8bit), finfo.st_size, stream);
+
     return OK;
 }
 
