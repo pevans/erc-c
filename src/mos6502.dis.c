@@ -256,7 +256,7 @@ mos6502_dis_opcode(FILE *stream, vm_segment *segment, int address)
     // to a different spot in the program, then let's label this in the
     // jump table.
     if (stream == NULL && mos6502_would_jump(inst_code)) {
-        mos6502_dis_jump_label(operand, address, addr_mode);
+        mos6502_dis_jump_label(operand, segment, address, addr_mode);
     }
 
     // It's totally possible that we are not expected to print out the
@@ -311,16 +311,38 @@ mos6502_dis_scan(FILE *stream, vm_segment *segment, int pos, int end)
 }
 
 void
-mos6502_dis_jump_label(vm_16bit operand, int address, int addr_mode)
+mos6502_dis_jump_label(vm_16bit operand, 
+                       vm_segment *segment, 
+                       int address, 
+                       int addr_mode)
 {
-    int jump_loc = operand;
+    int jump_loc;
 
-    if (addr_mode == REL) {
-        jump_loc = address + operand;
+    switch (addr_mode) {
+        // With indirect address mode, the address we want to jump to is
+        // not the literal operand, but a 16-bit address that is
+        // _pointed to_ by the address represented by the operand. Think
+        // of the operand as a kind of double pointer, or just re-watch
+        // Inception.
+        case IND:
+            jump_loc = vm_segment_get(segment, operand) << 8;
+            jump_loc |= vm_segment_get(segment, operand + 1);
+            break;
 
-        if (operand > 127) {
-            jump_loc -= 256;
-        }
+        // In relative address mode, the jump location will be a
+        // number -- well -- relative to the address. If the 8th bit
+        // of the operand is 1, then we treat the number as a
+        // negative; otherwise, positive or zero.
+        case REL:
+            jump_loc = address + operand;
+
+            if (operand > 127) {
+                jump_loc -= 256;
+            }
+            break;
+
+        default:
+            return;
     }
 
     jump_table[jump_loc] = 1;
