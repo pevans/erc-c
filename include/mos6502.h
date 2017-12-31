@@ -122,6 +122,7 @@ extern vm_16bit mos6502_pop_stack(mos6502 *);
 extern vm_8bit mos6502_next_byte(mos6502 *);
 extern vm_8bit mos6502_read_byte(mos6502 *);
 extern void mos6502_execute(mos6502 *, vm_8bit);
+extern void mos6502_flash_memory(mos6502 *, vm_segment *);
 extern void mos6502_free(mos6502 *);
 extern void mos6502_modify_status(mos6502 *, vm_8bit, vm_8bit);
 extern void mos6502_push_stack(mos6502 *, vm_16bit);

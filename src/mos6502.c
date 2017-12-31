@@ -423,3 +423,9 @@ mos6502_would_jump(int inst_code)
         inst_code == JMP ||
         inst_code == JSR;
 }
+
+void
+mos6502_flash_memory(mos6502 *cpu, vm_segment *segment)
+{
+    vm_segment_copy(cpu->memory, segment, 0, 0, cpu->memory->size - 1);
+}

@@ -7,6 +7,7 @@
 
 #include "apple2.h"
 #include "apple2.draw.h"
+#include "mos6502.dis.h"
 #include "option.h"
 #include "vm_segment.h"
 
@@ -121,6 +122,14 @@ apple2_boot(apple2 *mach)
         }
     }
 
+    if (option_flag(OPTION_FLASH)) {
+        mos6502_flash_memory(mach->cpu, mach->drive1->data);
+    }
+
+    if (option_flag(OPTION_DISASSEMBLE)) {
+        mos6502_dis_scan(mach->cpu, stdout, 0, mach->cpu->memory->size);
+    }
+
     return OK;
 }
 
@@ -195,6 +204,10 @@ apple2_release_key(apple2 *mach)
 void
 apple2_run_loop(apple2 *mach)
 {
+    if (option_flag(OPTION_DISASSEMBLE)) {
+        return;
+    }
+
     while (vm_screen_active(mach->screen)) {
         vm_screen_refresh(mach->screen);
     }

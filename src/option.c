@@ -41,6 +41,8 @@ static char error_buffer[ERRBUF_SIZE] = "";
 static int width = 700;
 static int height = 480;
 
+static int flags = 0;
+
 /*
  * These are all of the options we allow in our long-form options. It's
  * a bit faster to identify them by integer symbols than to do string
@@ -51,14 +53,18 @@ enum options {
     DISK2,
     HELP,
     SIZE,
+    FLASH,
+    DISASSEMBLE,
 };
 
 /*
  * Here are the options we support for program execution.
  */
 static struct option long_options[] = {
+    { "disassemble", 0, NULL, DISASSEMBLE },
     { "disk1", 1, NULL, DISK1 },
     { "disk2", 1, NULL, DISK2 },
+    { "flash", 0, NULL, FLASH },
     { "help", 0, NULL, HELP },
     { "size", 1, NULL, SIZE },
 };
@@ -111,12 +117,20 @@ option_parse(int argc, char **argv)
         opt = getopt_long_only(argc, argv, "", long_options, &index);
 
         switch (opt) {
+            case DISASSEMBLE:
+                flags |= OPTION_DISASSEMBLE;
+                break;
+
             case DISK1:
                 input_source = 1;
                 break;
 
             case DISK2:
                 input_source = 2;
+                break;
+
+            case FLASH:
+                flags |= OPTION_FLASH;
                 break;
 
             case HELP:
@@ -216,8 +230,10 @@ option_print_help()
     fprintf(stderr, "Usage: erc [options...]\n");
     fprintf(stderr, "Options:\n");
     fprintf(stderr, "\
+  --disassemble               Print assembly notation from CPU memory\n\
   --disk1=FILE                Load FILE into disk drive 1\n\
   --disk2=FILE                Load FILE into disk drive 2\n\
+  --flash                     Flash CPU memory with contents of drive 1\n\
   --help                      Print this help message\n\
   --size=WIDTHxHEIGHT         Use WIDTH and HEIGHT for window size\n\
                               (only 700x480 and 875x600 are supported)\n");
@@ -262,4 +278,10 @@ int
 option_get_height()
 {
     return height;
+}
+
+bool
+option_flag(int flag)
+{
+    return flags & flag;
 }
