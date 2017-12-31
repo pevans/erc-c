@@ -79,8 +79,8 @@ static char *instruction_strings[] = {
  * type.
  */
 void
-mos6502_dis_operand(FILE *stream, 
-                    vm_segment *segment, 
+mos6502_dis_operand(mos6502 *cpu,
+                    FILE *stream, 
                     int address, 
                     int addr_mode, 
                     vm_16bit value)
@@ -106,8 +106,8 @@ mos6502_dis_operand(FILE *stream,
         case IMP:
             break;
         case IND:
-            ind_address = vm_segment_get(segment, value) << 8;
-            ind_address |= vm_segment_get(segment, value + 1);
+            ind_address = vm_segment_get(cpu->memory, value) << 8;
+            ind_address |= vm_segment_get(cpu->memory, value + 1);
             if (jump_table[ind_address]) {
                 mos6502_dis_label(stream, ind_address);
             } else {
@@ -201,13 +201,13 @@ mos6502_dis_expected_bytes(int addr_mode)
 }
 
 /*
- * Scan the segment (with a given address) and write the opcode at that
+ * Scan memory (with a given address) and write the opcode at that
  * point to the given file stream. This function will also write an
  * operand to the file stream if one is warranted. We return the number
  * of bytes consumed by scanning past the opcode and/or operand.
  */
 int
-mos6502_dis_opcode(FILE *stream, vm_segment *segment, int address)
+mos6502_dis_opcode(mos6502 *cpu, FILE *stream, int address)
 {
     vm_8bit opcode;
     vm_16bit operand;
@@ -216,7 +216,7 @@ mos6502_dis_opcode(FILE *stream, vm_segment *segment, int address)
     int expected;
 
     // The next byte is assumed to be the opcode we work with.
-    opcode = vm_segment_get(segment, address);
+    opcode = vm_segment_get(cpu->memory, address);
 
     // And given that opcode, we need to see how many bytes large our
     // operand will be.
@@ -239,7 +239,7 @@ mos6502_dis_opcode(FILE *stream, vm_segment *segment, int address)
             // If we have a two-byte operand, then the first byte is the
             // MSB and our operand will need to shift it 8 positions to
             // the left before it can be OR'd.
-            operand |= vm_segment_get(segment, address) << 8;
+            operand |= vm_segment_get(cpu->memory, address) << 8;
             address++;
 
             // Note we fall through here to the next case...
@@ -249,7 +249,7 @@ mos6502_dis_opcode(FILE *stream, vm_segment *segment, int address)
             // the LSB space which simply requires we OR the byte
             // directly in. If this is part of a two-byte operand, then
             // the same logic still applies.
-            operand |= vm_segment_get(segment, address);
+            operand |= vm_segment_get(cpu->memory, address);
             address++;
 
             // And, in any other case (e.g. 0), we are done; we don't
@@ -263,7 +263,7 @@ mos6502_dis_opcode(FILE *stream, vm_segment *segment, int address)
     // to a different spot in the program, then let's label this in the
     // jump table.
     if (stream == NULL && mos6502_would_jump(inst_code)) {
-        mos6502_dis_jump_label(operand, segment, address, addr_mode);
+        mos6502_dis_jump_label(cpu, operand, address, addr_mode);
     }
 
     // It's totally possible that we are not expected to print out the
@@ -296,7 +296,7 @@ mos6502_dis_opcode(FILE *stream, vm_segment *segment, int address)
             fprintf(stream, "     ");
 
             // Print out the operand given the proper address mode.
-            mos6502_dis_operand(stream, segment, address, addr_mode, operand);
+            mos6502_dis_operand(cpu, stream, address, addr_mode, operand);
         }
 
         // And let's terminate the line.
@@ -310,16 +310,16 @@ mos6502_dis_opcode(FILE *stream, vm_segment *segment, int address)
 }
 
 void
-mos6502_dis_scan(FILE *stream, vm_segment *segment, int pos, int end)
+mos6502_dis_scan(mos6502 *cpu, FILE *stream, int pos, int end)
 {
     while (pos < end) {
-        pos += mos6502_dis_opcode(stream, segment, pos);
+        pos += mos6502_dis_opcode(cpu, stream, pos);
     }
 }
 
 void
-mos6502_dis_jump_label(vm_16bit operand, 
-                       vm_segment *segment, 
+mos6502_dis_jump_label(mos6502 *cpu, 
+                       vm_16bit operand, 
                        int address, 
                        int addr_mode)
 {
@@ -332,8 +332,8 @@ mos6502_dis_jump_label(vm_16bit operand,
         // of the operand as a kind of double pointer, or just re-watch
         // Inception.
         case IND:
-            jump_loc = vm_segment_get(segment, operand) << 8;
-            jump_loc |= vm_segment_get(segment, operand + 1);
+            jump_loc = vm_segment_get(cpu->memory, operand) << 8;
+            jump_loc |= vm_segment_get(cpu->memory, operand + 1);
             break;
 
         // In relative address mode, the jump location will be a
