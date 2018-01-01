@@ -75,7 +75,7 @@ apple2_draw_pixel_lores(apple2 *mach, vm_16bit addr)
 void
 apple2_draw_text(apple2 *mach, vm_16bit addr)
 {
-    vm_8bit lsb, msb;
+    vm_8bit lsb;
     vm_16bit page_base;
     vm_area dest;
     char ch;
@@ -101,7 +101,6 @@ apple2_draw_text(apple2 *mach, vm_16bit addr)
     // address indicates the place on the grid where text should go. We
     // don't care how it got there. Let's figure out that position
     // on-screen.
-    msb = (addr >> 8) & 0xff;   // row
     lsb = addr & 0xff;          // column
 
     // Regardless of which page we're rendering into, we can only use 40
