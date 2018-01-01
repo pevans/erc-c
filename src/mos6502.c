@@ -352,7 +352,7 @@ void
 mos6502_execute(mos6502 *cpu, vm_8bit opcode)
 {
     vm_8bit operand;
-    int cycles;
+    //int cycles;
     mos6502_address_resolver resolver;
     mos6502_instruction_handler handler;
 
@@ -380,7 +380,7 @@ mos6502_execute(mos6502 *cpu, vm_8bit opcode)
     // with the idea that certain instructions -- in certain address
     // modes -- were more expensive than others, and you want those
     // programs to feel faster or slower in relation to that.
-    cycles = mos6502_cycles(cpu, opcode);
+    //cycles = mos6502_cycles(cpu, opcode);
 
     // FIXME: actually emulate the cycles
 
