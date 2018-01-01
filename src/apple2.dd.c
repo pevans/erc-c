@@ -33,6 +33,7 @@ int
 apple2dd_insert(apple2dd *drive, FILE *stream)
 {
     struct stat finfo;
+    int err;
 
     if (stream == NULL) {
         log_critical("File stream is null");
@@ -57,8 +58,12 @@ apple2dd_insert(apple2dd *drive, FILE *stream)
     drive->track_pos = 0;
     drive->sector_pos = 0;
 
-    // FIXME: vm_segment code should be doing this
-    fread(drive->data->memory, sizeof(vm_8bit), finfo.st_size, stream);
+    // Read the data from the stream and write into the memory segment
+    err = vm_segment_fread(drive->data, stream, finfo.st_size);
+    if (err != OK) {
+        log_critical("Could not read data into disk drive");
+        return err;
+    }
 
     return OK;
 }
