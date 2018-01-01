@@ -37,7 +37,20 @@ apple2_create(int width, int height)
         return NULL;
     }
 
+    // Forward set these to NULL in case we fail to build the machine
+    // properly; that way, we won't try to free garbage data
+    mach->sysfont = NULL;
+    mach->screen = NULL;
+    mach->drive1 = NULL;
+    mach->drive2 = NULL;
+
     mach->cpu = mos6502_create();
+    if (mach->cpu == NULL) {
+        log_critical("Could not create CPU!");
+        apple2_free(mach);
+        return NULL;
+    }
+
     mach->memory = mach->cpu->memory;
 
     // Our two drives -- we create both of them, even if we intend to
@@ -45,10 +58,17 @@ apple2_create(int width, int height)
     mach->drive1 = apple2dd_create();
     mach->drive2 = apple2dd_create();
 
+    if (mach->drive1 == NULL || mach->drive2 == NULL) {
+        log_critical("Could not create disk drives!");
+        apple2_free(mach);
+        return NULL;
+    }
+
     // Let's build our screen abstraction!
     mach->screen = vm_screen_create();
     if (mach->screen == NULL) {
-        log_critical("Screen creation failed!\n");
+        log_critical("Screen creation failed!");
+        apple2_free(mach);
         return NULL;
     }
 
@@ -56,7 +76,8 @@ apple2_create(int width, int height)
     // graphics.
     err = vm_screen_add_window(mach->screen, width, height);
     if (err != OK) {
-        log_critical("Window creation failed!\n");
+        log_critical("Window creation failed!");
+        apple2_free(mach);
         return NULL;
     }
 
@@ -72,6 +93,7 @@ apple2_create(int width, int height)
                                       7, 8,         // 7 pixels wide, 8 pixels tall
                                       0x7f);        // 7-bit values only
     if (mach->sysfont == NULL) {
+        apple2_free(mach);
         log_critical("Could not initialize apple2: bad font");
         return NULL;
     }
@@ -153,7 +175,25 @@ apple2_clear_strobe(apple2 *mach)
 void
 apple2_free(apple2 *mach)
 {
-    mos6502_free(mach->cpu);
+    if (mach->cpu) {
+        mos6502_free(mach->cpu);
+    }
+
+    if (mach->sysfont) {
+        vm_bitfont_free(mach->sysfont);
+    }
+
+    if (mach->drive1) {
+        apple2dd_free(mach->drive1);
+    }
+
+    if (mach->drive2) {
+        apple2dd_free(mach->drive2);
+    }
+
+    if (mach->screen) {
+        vm_screen_free(mach->screen);
+    }
 
     // NOTE: we do _NOT_ want to clear the memory field of mach, as it's
     // co-owned with the cpu struct that we just freed above.

@@ -34,6 +34,7 @@ vm_segment_create(size_t size)
 
     segment->memory = malloc(sizeof(vm_8bit) * size);
     if (segment->memory == NULL) {
+        free(segment);
         log_critical("Couldn't allocate enough space for vm_segment");
         return NULL;
     }
@@ -45,12 +46,14 @@ vm_segment_create(size_t size)
     segment->read_table = malloc(sizeof(vm_segment_read_fn) * size);
     if (segment->read_table == NULL) {
         log_critical("Couldn't allocate enough space for segment read_table");
+        vm_segment_free(segment);
         return NULL;
     }
 
     segment->write_table = malloc(sizeof(vm_segment_write_fn) * size);
     if (segment->write_table == NULL) {
         log_critical("Couldn't allocate enough space for segment write_table");
+        vm_segment_free(segment);
         return NULL;
     }
 
