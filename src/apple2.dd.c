@@ -4,6 +4,11 @@
 
 #include "apple2.dd.h"
 
+/*
+ * Create a new disk drive. We do not create a memory segment for the
+ * drive right away, as the size of said data can be variable based on
+ * the disk format.
+ */
 apple2dd *
 apple2dd_create()
 {
@@ -29,6 +34,11 @@ apple2dd_create()
     return drive;
 }
 
+/*
+ * Insert a "disk" into the drive, such that a disk is delivered to us
+ * through a FILE stream. Return an error code if the disk format is
+ * something we cannot accept.
+ */
 int
 apple2dd_insert(apple2dd *drive, FILE *stream)
 {
@@ -68,6 +78,10 @@ apple2dd_insert(apple2dd *drive, FILE *stream)
     return OK;
 }
 
+/*
+ * Return the segment position that the drive is currently at, based
+ * upon track and sector position.
+ */
 int
 apple2dd_position(apple2dd *drive)
 {
@@ -90,6 +104,10 @@ apple2dd_position(apple2dd *drive)
     return 0;
 }
 
+/*
+ * Read a single byte from the disk drive, at its current position, and
+ * then shift the head by 1 byte.
+ */
 vm_8bit
 apple2dd_read(apple2dd *drive)
 {
@@ -99,6 +117,10 @@ apple2dd_read(apple2dd *drive)
     return byte;
 }
 
+/*
+ * Here we mean to "empty" the drive, essentially freeing the segment
+ * memory and resetting the head position.
+ */
 void
 apple2dd_eject(apple2dd *drive)
 {
@@ -106,8 +128,14 @@ apple2dd_eject(apple2dd *drive)
         vm_segment_free(drive->data);
         drive->data = NULL;
     }
+
+    drive->track_pos = 0;
+    drive->sector_pos = 0;
 }
 
+/*
+ * Free the memory taken up by the disk drive.
+ */
 void
 apple2dd_free(apple2dd *drive)
 {
@@ -118,6 +146,10 @@ apple2dd_free(apple2dd *drive)
     free(drive);
 }
 
+/*
+ * Set the disk drive mode, which is either read or write. (It can only
+ * be one or the other at a time.)
+ */
 void
 apple2dd_set_mode(apple2dd *drive, int mode)
 {
@@ -128,6 +160,11 @@ apple2dd_set_mode(apple2dd *drive, int mode)
     drive->mode = mode;
 }
 
+/*
+ * Shift the head position in the drive by the given positions, which is
+ * in bytes. Pos may be a negative number; if so, the head essentially
+ * moves further away from the center of the magnetic wafer.
+ */
 void
 apple2dd_shift(apple2dd *drive, int pos)
 {
@@ -143,6 +180,13 @@ apple2dd_shift(apple2dd *drive, int pos)
     }
 }
 
+/*
+ * When you step the drive, you are essentially moving the head in
+ * track positions. It's not really faster for _us_, but it's faster for
+ * a mechanical drive than a bunch of shifts if you know the data is far
+ * away track-wise. This function also safeguards (as the drive did!)
+ * against stepping too far out or too far in.
+ */
 void
 apple2dd_step(apple2dd *drive, int steps)
 {
@@ -155,12 +199,20 @@ apple2dd_step(apple2dd *drive, int steps)
     }
 }
 
+/*
+ * A really simple function to turn the drive "on".
+ */
 void
 apple2dd_turn_on(apple2dd *drive, bool online)
 {
     drive->online = online;
 }
 
+/*
+ * Write a byte to the disk in the drive. This is pretty similar to the
+ * read function in that, once we do what we need with the segment, we
+ * shift the drive position forward by one byte.
+ */
 void
 apple2dd_write(apple2dd *drive, vm_8bit byte)
 {
@@ -168,6 +220,12 @@ apple2dd_write(apple2dd *drive, vm_8bit byte)
     apple2dd_shift(drive, 1);
 }
 
+/*
+ * Set the write-protect status for the disk. Note that it was _disks_
+ * that were write-protected in the past, sometimes by taping over a
+ * chunk that was clipped out of the disk. So this function is somewhat
+ * similar to just taping over or removing that tape.
+ */
 void
 apple2dd_write_protect(apple2dd *drive, bool protect)
 {
