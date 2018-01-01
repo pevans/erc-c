@@ -4,6 +4,12 @@
 
 #include "apple2.h"
 
+/*
+ * These are the color codes for the lo-res colors that are available.
+ * Each pixel in lo-res indicates one color. These are colors I found
+ * somewhere online -- I'm not sure if they are exact matches, and are
+ * subject to change.
+ */
 static int lores_colors[][3] = {
     { 0x00, 0x00, 0x00 },   // black
     { 0xff, 0x28, 0x97 },   // magenta
@@ -23,6 +29,10 @@ static int lores_colors[][3] = {
     { 0xff, 0xff, 0xff },   // white
 };
 
+/*
+ * Draw a pixel on screen at the given address.
+ * FIXME: we do not draw anything D:
+ */
 void
 apple2_draw_pixel(apple2 *mach, vm_16bit addr)
 {
@@ -72,6 +82,9 @@ apple2_draw_pixel_lores(apple2 *mach, vm_16bit addr)
     vm_screen_draw_rect(mach->screen, &loc);
 }
 
+/*
+ * Draw the character indicated by the given address.
+ */
 void
 apple2_draw_text(apple2 *mach, vm_16bit addr)
 {
