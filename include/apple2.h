@@ -6,6 +6,21 @@
 #include "vm_bitfont.h"
 #include "vm_screen.h"
 
+/*
+ * The size of our block of ROM is 12k
+ */
+#define APPLE2_ROM_SIZE 0x3000
+
+/*
+ * Whereas the second bank of RAM is a mere 4k
+ */
+#define APPLE2_RAM2_SIZE 0x1000
+
+/*
+ * This is the base address (or offset) for all bank-switched memory
+ */
+#define APPLE2_BANK_OFFSET 0xD000
+
 enum video_modes {
     VIDEO_40COL_TEXT,
     VIDEO_LORES,
@@ -41,6 +56,17 @@ enum lores_colors {
     LORES_WHITE,
 };
 
+/*
+ * These are the potential memory modes we understand. You can only have
+ * one memory mode at a time.
+ */
+enum memory_mode {
+    MEMORY_BANK_ROM,        // the last 12k is system ROM
+    MEMORY_BANK_RAM1,       // the last 12k is system RAM
+    MEMORY_BANK_RAM2,       // the first 4k of the last 12k is a separate RAM
+                            // block from that in RAM1
+};
+
 typedef struct {
     /*
      * The apple 2 hardware used an MOS-6502 processor.
@@ -53,6 +79,21 @@ typedef struct {
      * delete function to do that.
      */
     vm_segment *memory;
+
+    /*
+     * The Apple II used a system of bank-switched memory to enable
+     * software to address a separate block of ROM.
+     */
+    vm_segment *rom;
+    
+    /*
+     * Additionally, the Apple II had a standalone block of RAM (with no
+     * good name for it, really, hence the regrettably vague "ram2") so
+     * that you technically could use 16k of RAM from a set of 12k
+     * addresses. The extra 4k lives a lonely life in the garage
+     * apartment.
+     */
+    vm_segment *ram2;
 
     /*
      * The screen wherein we shall render all of our graphics.
@@ -79,6 +120,13 @@ typedef struct {
      * in which text mode tends to look like light gray.
      */
     int color_mode;
+
+    /*
+     * This describes the behavior of our bank-switching scheme. We need
+     * our read/write mappers to know where writes into the
+     * bank-switched area of memory should target.
+     */
+    int memory_mode;
 
     /*
      * Our two disk drives.
