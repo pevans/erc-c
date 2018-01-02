@@ -7,6 +7,7 @@
 
 #include "apple2.h"
 #include "apple2.draw.h"
+#include "apple2.mem.h"
 #include "mos6502.dis.h"
 #include "option.h"
 #include "vm_segment.h"
@@ -55,6 +56,9 @@ apple2_create(int width, int height)
 
     // Our memory is that which is owned by the CPU.
     mach->memory = mach->cpu->memory;
+
+    // Set the read/write mappers for everything
+    apple2_mem_map(mach->memory);
 
     // Initliaze our system ROM and separate bank-switched block of RAM
     mach->rom = vm_segment_create(APPLE2_ROM_SIZE);
