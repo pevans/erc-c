@@ -95,7 +95,7 @@ Test(vm_segment, write_map)
 }
 
 static vm_8bit
-read_fn(vm_segment *segment, size_t addr)
+read_fn(vm_segment *segment, size_t addr, void *_mach)
 {
     return 222;
 }
@@ -113,7 +113,7 @@ Test(vm_segment, use_read_map)
 }
 
 void
-write_fn(vm_segment *segment, size_t addr, vm_8bit value)
+write_fn(vm_segment *segment, size_t addr, vm_8bit value, void *_mach)
 {
     segment->memory[addr+1] = value;
 }
