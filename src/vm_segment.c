@@ -15,6 +15,18 @@
 #include "vm_segment.h"
 
 /*
+ * This is sort of regrettable, but we need a machine pointer that we
+ * can pass into the read/write map functions (which will assume to have
+ * access to the machine architecture). The alternative is an update to
+ * a lot more of the codebase to add machine pointers -- void pointers
+ * at that -- which is even uglier.
+ *
+ * FIXME: we might consider a dependency injection container at some
+ * point.
+ */
+static void *map_mach = NULL;
+
+/*
  * Create a new segment, such that it contains a number of bytes indicated
  * by `size`. 
  */
@@ -100,7 +112,7 @@ vm_segment_set(vm_segment *segment, size_t index, vm_8bit value)
 
     // Check if we have a write mapper
     if (segment->write_table[index]) {
-        segment->write_table[index](segment, index, value);
+        segment->write_table[index](segment, index, value, map_mach);
         return OK;
     }
 
@@ -128,7 +140,7 @@ vm_segment_get(vm_segment *segment, size_t index)
 
     // We may have a read mapper for this address
     if (segment->read_table[index]) {
-        return segment->read_table[index](segment, index);
+        return segment->read_table[index](segment, index, map_mach);
     }
 
     return segment->memory[index];
@@ -228,4 +240,13 @@ vm_segment_fread(vm_segment *segment, FILE *stream, size_t len)
     }
 
     return OK;
+}
+
+/*
+ * Change the internal notion of the machine used by map functions
+ */
+void
+vm_segment_set_map_machine(void *mach)
+{
+    map_mach = mach;
 }
