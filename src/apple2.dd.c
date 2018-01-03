@@ -69,7 +69,7 @@ apple2dd_insert(apple2dd *drive, FILE *stream)
     drive->sector_pos = 0;
 
     // Read the data from the stream and write into the memory segment
-    err = vm_segment_fread(drive->data, stream, finfo.st_size);
+    err = vm_segment_fread(drive->data, stream, 0, finfo.st_size);
     if (err != OK) {
         log_critical("Could not read data into disk drive");
         return err;
