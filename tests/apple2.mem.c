@@ -10,12 +10,14 @@ setup()
 {
     mach = apple2_create(100, 100);
     apple2_mem_map(mach);
+    vm_segment_set_map_machine(mach);
 }
 
 static void
 teardown()
 {
     apple2_free(mach);
+    vm_segment_set_map_machine(NULL);
 }
 
 TestSuite(apple2_mem, .init = setup, .fini = teardown);
