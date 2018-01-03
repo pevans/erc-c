@@ -31,3 +31,11 @@ Test(apple2_mem, map)
         cr_assert_eq(mach->memory->write_table[addr], apple2_mem_write_bank);
     }
 }
+
+Test(apple2_mem, read_bank)
+{
+}
+
+Test(apple2_mem, write_bank)
+{
+}
