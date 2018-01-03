@@ -3,6 +3,7 @@
  */
 
 #include "apple2.h"
+#include "apple2.mem.h"
 
 /*
  * Return a byte of memory from a bank-switchable address. This may be
@@ -92,4 +93,53 @@ apple2_mem_map(apple2 *mach)
         vm_segment_read_map(mach->memory, addr, apple2_mem_read_bank);
         vm_segment_write_map(mach->memory, addr, apple2_mem_write_bank);
     }
+}
+
+/*
+ * Since we can't write into ROM normally, we need a separate function
+ * we can call which will do the writing for us.
+ */
+int
+apple2_mem_init_disk2_rom(apple2 *mach)
+{
+    FILE *stream;
+    int err;
+
+    stream = fopen("./disk2.rom", "r");
+    if (stream == NULL) {
+        log_critical("Could not read disk2.rom");
+        return ERR_BADFILE;
+    }
+
+    err = vm_segment_fread(mach->memory, stream,
+                           APPLE2_DISK2_ROM_OFFSET, APPLE2_DISK2_ROM_SIZE);
+    if (err != OK) {
+        fclose(stream);
+        log_critical("Could not read disk2.rom");
+        return ERR_BADFILE;
+    }
+
+    return OK;
+}
+
+int
+apple2_mem_init_sys_rom(apple2 *mach)
+{
+    FILE *stream;
+    int err;
+
+    stream = fopen("./apple2.rom", "r");
+    if (stream == NULL) {
+        log_critical("Could not read apple2.rom");
+        return ERR_BADFILE;
+    }
+
+    err = vm_segment_fread(mach->rom, stream, 0, APPLE2_ROM_SIZE);
+    if (err != OK) {
+        fclose(stream);
+        log_critical("Could not read apple2.rom");
+        return ERR_BADFILE;
+    }
+
+    return OK;
 }

@@ -6,21 +6,6 @@
 #include "vm_bitfont.h"
 #include "vm_screen.h"
 
-/*
- * The size of our block of ROM is 12k
- */
-#define APPLE2_ROM_SIZE 0x3000
-
-/*
- * Whereas the second bank of RAM is a mere 4k
- */
-#define APPLE2_RAM2_SIZE 0x1000
-
-/*
- * This is the base address (or offset) for all bank-switched memory
- */
-#define APPLE2_BANK_OFFSET 0xD000
-
 enum video_modes {
     VIDEO_40COL_TEXT,
     VIDEO_LORES,
