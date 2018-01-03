@@ -58,9 +58,8 @@ apple2_mem_write_bank(vm_segment *segment,
     mach = (apple2 *)_mach;
 
     switch (mach->memory_mode) {
+        // Whoops -- we can't write any data into ROM.
         case MEMORY_BANK_ROM:
-            vm_segment_set(mach->rom,
-                           address - APPLE2_BANK_OFFSET, value);
             return;
 
         case MEMORY_BANK_RAM2:
