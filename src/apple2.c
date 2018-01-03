@@ -69,6 +69,18 @@ apple2_create(int width, int height)
         return NULL;
     }
 
+    if (apple2_mem_init_disk2_rom(mach) != OK) {
+        log_critical("Could not initialize disk2 ROM");
+        apple2_free(mach);
+        return NULL;
+    }
+
+    if (apple2_mem_init_sys_rom(mach) != OK) {
+        log_critical("Could not initialize apple2 ROM");
+        apple2_free(mach);
+        return NULL;
+    }
+
     // Our two drives -- we create both of them, even if we intend to
     // use only one.
     mach->drive1 = apple2dd_create();
