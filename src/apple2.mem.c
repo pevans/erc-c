@@ -87,6 +87,8 @@ apple2_mem_map(apple2 *mach)
 {
     size_t addr;
 
+    vm_segment_set_map_machine(mach);
+
     for (addr = APPLE2_BANK_OFFSET; addr < MOS6502_MEMSIZE; addr++) {
         vm_segment_read_map(mach->memory, addr, apple2_mem_read_bank);
         vm_segment_write_map(mach->memory, addr, apple2_mem_write_bank);
