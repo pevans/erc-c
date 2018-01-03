@@ -54,7 +54,7 @@ struct vm_segment {
 };
 
 extern int vm_segment_copy(vm_segment *, vm_segment *, size_t, size_t, size_t);
-extern int vm_segment_fread(vm_segment *, FILE *, size_t);
+extern int vm_segment_fread(vm_segment *, FILE *, size_t, size_t);
 extern int vm_segment_read_map(vm_segment *, size_t, vm_segment_read_fn);
 extern int vm_segment_set(vm_segment *, size_t, vm_8bit);
 extern int vm_segment_write_map(vm_segment *, size_t, vm_segment_write_fn);

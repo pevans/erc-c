@@ -226,9 +226,9 @@ vm_segment_write_map(vm_segment *segment,
  * for some reason, signal that and return an error.
  */
 int
-vm_segment_fread(vm_segment *segment, FILE *stream, size_t len)
+vm_segment_fread(vm_segment *segment, FILE *stream, size_t offset, size_t len)
 {
-    fread(segment->memory, sizeof(vm_8bit), len, stream);
+    fread(segment->memory + offset, sizeof(vm_8bit), len, stream);
 
     // fread() may return zero in the case of an error, but it may
     // return a positive non-zero number short of len; we can't quite
