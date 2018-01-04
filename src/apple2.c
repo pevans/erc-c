@@ -9,6 +9,7 @@
 #include "apple2.draw.h"
 #include "apple2.mem.h"
 #include "mos6502.dis.h"
+#include "objstore.h"
 #include "option.h"
 #include "vm_segment.h"
 
@@ -32,6 +33,8 @@ apple2_create(int width, int height)
 {
     apple2 *mach;
     int err;
+
+    objstore_init();
 
     mach = malloc(sizeof(apple2));
     if (mach == NULL) {
@@ -117,7 +120,8 @@ apple2_create(int width, int height)
 
     // Let's install our bitmap font.
     mach->sysfont = vm_bitfont_create(mach->screen,
-                                      "apple2-system",
+                                      objstore_apple2_sysfont(),
+                                      APPLE2_SYSFONT_SIZE,
                                       7, 8,         // 7 pixels wide, 8 pixels tall
                                       0x7f);        // 7-bit values only
     if (mach->sysfont == NULL) {
