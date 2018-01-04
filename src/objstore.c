@@ -27,7 +27,11 @@ static objstore store;
 int
 objstore_init()
 {
-    int cmp;
+    // Oh, you're calling this again? Cool, but let's bail before we do
+    // anything else.
+    if (objstore_ready()) {
+        return OK;
+    }
 
     // We want to input some bad header data and compare with what
     // eventually should get put into there by memcmp.
@@ -38,6 +42,20 @@ objstore_init()
 
     memcpy(&store, store_data, sizeof(store));
 
+    // If the copy didn't work out somehow...
+    if (!objstore_ready()) {
+        log_critical("Object store initialization failed with bad data");
+        return ERR_BADFILE;
+    }
+
+    return OK;
+}
+
+bool
+objstore_ready()
+{
+    int cmp;
+
     // Test if the header field data is exactly equivalent to that
     // defined in HEADER_DATA. Note we use memcmp(), because the header
     // field is an array of just 4 bytes; strcmp() and strncmp() have an
@@ -47,13 +65,7 @@ objstore_init()
     cmp = memcmp(store.header, HEADER_DATA,
                  sizeof(store.header) / sizeof(char));
 
-    // If the two areas of memory were not a complete match...
-    if (cmp != 0) {
-        log_critical("Object store initialization failed with bad data");
-        return ERR_BADFILE;
-    }
-
-    return OK;
+    return cmp == 0;
 }
 
 /*

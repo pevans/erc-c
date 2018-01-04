@@ -1,6 +1,8 @@
 #ifndef _OBJSTORE_H_
 #define _OBJSTORE_H_
 
+#include <stdbool.h>
+
 #include "apple2.mem.h"
 #include "vm_bits.h"
 
@@ -12,6 +14,7 @@ typedef struct {
 } objstore;
 
 extern int objstore_init();
+extern bool objstore_ready();
 
 #define OBJSTORE_DECL(x) \
     const vm_8bit *objstore_##x()
