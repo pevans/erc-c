@@ -36,6 +36,33 @@ Test(apple2_mem, map)
 
 Test(apple2_mem, read_bank)
 {
+    vm_8bit val;
+
+    // Test that setting a value in the rom segment is returned to us
+    // when addressing from main memory
+    mach->memory_mode = MEMORY_BANK_ROM;
+    val = 123;
+    vm_segment_set(mach->rom, 0x77, val);
+    val = vm_segment_get(mach->rom, 0x77);
+    cr_assert_eq(vm_segment_get(mach->memory, 0xD077), val);
+
+    // In RAM1 bank mode, setting a value in memory should return thaty
+    // value in memory... but, as a twist, also check that the value is
+    // not set in ROM nor in RAM2.
+    val = 222;
+    mach->memory_mode = MEMORY_BANK_RAM1;
+    vm_segment_set(mach->memory, 0xD077, val);
+    cr_assert_eq(vm_segment_get(mach->memory, 0xD077), val);
+    cr_assert_neq(vm_segment_get(mach->rom, 0x77), val);
+    cr_assert_neq(vm_segment_get(mach->ram2, 0x77), val);
+
+    // Finally, in RAM2 bank mode, we test similarly to ROM mode. Set
+    // the value directly in ram2 and see if it's there when addressing
+    // from main memory.
+    val = 111;
+    mach->memory_mode = MEMORY_BANK_RAM2;
+    vm_segment_set(mach->ram2, 0x77, val);
+    cr_assert_eq(vm_segment_get(mach->memory, 0xD077), val);
 }
 
 Test(apple2_mem, write_bank)
