@@ -6,6 +6,11 @@
 #include "vm_bitfont.h"
 #include "vm_screen.h"
 
+/*
+ * This is the size of the bitmap font we use for the apple2
+ */
+#define APPLE2_SYSFONT_SIZE 21558
+
 enum video_modes {
     VIDEO_40COL_TEXT,
     VIDEO_LORES,
