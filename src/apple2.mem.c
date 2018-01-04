@@ -4,6 +4,7 @@
 
 #include "apple2.h"
 #include "apple2.mem.h"
+#include "objstore.h"
 
 /*
  * Return a byte of memory from a bank-switchable address. This may be
@@ -102,20 +103,13 @@ apple2_mem_map(apple2 *mach)
 int
 apple2_mem_init_disk2_rom(apple2 *mach)
 {
-    FILE *stream;
     int err;
 
-    stream = fopen("./disk2.rom", "r");
-    if (stream == NULL) {
-        log_critical("Could not read disk2.rom");
-        return ERR_BADFILE;
-    }
-
-    err = vm_segment_fread(mach->memory, stream,
-                           APPLE2_DISK2_ROM_OFFSET, APPLE2_DISK2_ROM_SIZE);
+    err = vm_segment_copy_buf(mach->memory, objstore_apple2_disk2_rom(),
+                              APPLE2_DISK2_ROM_OFFSET, 0,
+                              APPLE2_DISK2_ROM_SIZE);
     if (err != OK) {
-        fclose(stream);
-        log_critical("Could not read disk2.rom");
+        log_critical("Could not acquire apple2 disk2 rom");
         return ERR_BADFILE;
     }
 
@@ -125,19 +119,12 @@ apple2_mem_init_disk2_rom(apple2 *mach)
 int
 apple2_mem_init_sys_rom(apple2 *mach)
 {
-    FILE *stream;
     int err;
 
-    stream = fopen("./apple2.rom", "r");
-    if (stream == NULL) {
-        log_critical("Could not read apple2.rom");
-        return ERR_BADFILE;
-    }
-
-    err = vm_segment_fread(mach->rom, stream, 0, APPLE2_ROM_SIZE);
+    err = vm_segment_copy_buf(mach->rom, objstore_apple2_sys_rom(),
+                              0, 0, APPLE2_ROM_SIZE);
     if (err != OK) {
-        fclose(stream);
-        log_critical("Could not read apple2.rom");
+        log_critical("Could not acquire apple2 system rom");
         return ERR_BADFILE;
     }
 
