@@ -187,6 +187,33 @@ vm_segment_copy(vm_segment *dest,
 }
 
 /*
+ * Copy the contents of buf into the given dest segment. This is mostly
+ * governed by the same restrictions that copy() has, except that we
+ * can't do all of the bounds-checking we do there. This is just saying,
+ * hey, I have a bunch of bytes and I just need this copied into a
+ * segment, if you don't mind.
+ */
+int
+vm_segment_copy_buf(vm_segment *dest, const vm_8bit *src, 
+                    size_t destoff, size_t srcoff, size_t len)
+{
+    if (destoff + len > dest->size) {
+        log_critical("Attempt to copy buffer out of bounds (%d + %d >= %d)",
+                     destoff, len, dest->size);
+        return ERR_OOB;
+    }
+
+    // Heh heh...there's no way of knowing if srcoff + len is out of
+    // bounds at any point of src, since it's just a dumb buffer. Here's
+    // hopin' it's not! Also, it'll be a fun day when sizeof(vm_8bit) is
+    // not 1, BUT HEY. Let's do it right.
+    memcpy(dest->memory + destoff, src + srcoff,
+           len * sizeof(vm_8bit));
+
+    return OK;
+}
+
+/*
  * Set the read mapper for a given address. We'll use this function
  * instead of the normal logic on a get for that address.
  */
