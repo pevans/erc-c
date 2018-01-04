@@ -18,28 +18,32 @@
  */
 vm_bitfont *
 vm_bitfont_create(vm_screen *screen, 
-                  const char *from_name, 
-                  int width, 
-                  int height,
-                  char cmask)
+                  const vm_8bit *fontdata, int fontsize,
+                  int width, int height, char cmask)
 {
     SDL_Surface *surf;
+    SDL_RWops *rw;
     vm_bitfont *font;
-    char namebuf[1024];
+
+    rw = SDL_RWFromConstMem(fontdata, fontsize);
+    if (rw == NULL) {
+        log_critical("Failed to create RWops from font data: %s", 
+                     SDL_GetError());
+        return NULL;
+    }
+
+    surf = SDL_LoadBMP_RW(rw, 0);
+    if (surf == NULL) {
+        log_critical("Failed to create bitmap from RWops: %s",
+                     SDL_GetError());
+        return NULL;
+    }
 
     font = malloc(sizeof(vm_bitfont));
     if (font == NULL) {
         log_critical("Could not allocate memory for font");
         return NULL;
     }
-
-    snprintf(namebuf, 
-             sizeof(namebuf) - 1, 
-             "%s/fonts/%s.bmp",
-             INSTALL_PATH, from_name);
-
-    // FIXME: test if this even works... fail if not
-    surf = SDL_LoadBMP(namebuf);
 
     font->texture = SDL_CreateTextureFromSurface(screen->render, surf);
     font->width = width;

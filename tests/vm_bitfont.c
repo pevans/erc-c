@@ -4,6 +4,7 @@
 
 #include <criterion/criterion.h>
 
+#include "objstore.h"
 #include "vm_bitfont.h"
 
 static vm_bitfont *font;
@@ -13,8 +14,13 @@ setup()
 {
     vm_screen *screen;
 
+    objstore_init();
+
     screen = vm_screen_create();
-    font = vm_bitfont_create(screen, "apple2-system", 7, 8, 0x7F);
+    font = vm_bitfont_create(screen, 
+                             objstore_apple2_sysfont(), 
+                             APPLE2_SYSFONT_SIZE,
+                             7, 8, 0x7F);
 }
 
 static void
