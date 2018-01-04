@@ -25,6 +25,9 @@ vm_bitfont_create(vm_screen *screen,
     SDL_RWops *rw;
     vm_bitfont *font;
 
+    // Build the RWops object from the given fontdata; we have to use
+    // FromConstMem because we passed a const pointer into this
+    // function.
     rw = SDL_RWFromConstMem(fontdata, fontsize);
     if (rw == NULL) {
         log_critical("Failed to create RWops from font data: %s", 
@@ -32,6 +35,8 @@ vm_bitfont_create(vm_screen *screen,
         return NULL;
     }
 
+    // And here we build a surface from the RWops, which is a nifty way
+    // of getting a bitmap from memory rather than loading from a file.
     surf = SDL_LoadBMP_RW(rw, 0);
     if (surf == NULL) {
         log_critical("Failed to create bitmap from RWops: %s",
@@ -45,7 +50,9 @@ vm_bitfont_create(vm_screen *screen,
         return NULL;
     }
 
+    // The texture is what we can use to blit onto the renderer
     font->texture = SDL_CreateTextureFromSurface(screen->render, surf);
+
     font->width = width;
     font->height = height;
     font->cmask = cmask;
