@@ -185,11 +185,23 @@ apple2_boot(apple2 *mach)
         mos6502_dis_scan(mach->cpu, stdout, 0, mach->cpu->memory->size);
     }
 
+    // Run the reset routine to get the machine ready to go.
+    apple2_reset(mach);
+
+    return OK;
+}
+
+/*
+ * This function marks out the procedures that happen when the machine
+ * is reset. A reset can happen at a cold boot, but it can also happen
+ * after the computer is already operational.
+ */
+void
+apple2_reset(apple2 *mach)
+{
     mach->cpu->P = MOS_INTERRUPT;
     mach->cpu->PC = (vm_16bit)vm_segment_get(mach->memory, 0xFFFC);
     mach->cpu->S = 0;
-
-    return OK;
 }
 
 /*
