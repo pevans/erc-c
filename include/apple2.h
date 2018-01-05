@@ -132,6 +132,7 @@ extern void apple2_clear_strobe(apple2 *);
 extern void apple2_free(apple2 *);
 extern void apple2_press_key(apple2 *, vm_8bit);
 extern void apple2_release_key(apple2 *);
+extern void apple2_reset(apple2 *);
 extern void apple2_run_loop(apple2 *);
 extern void apple2_set_color(apple2 *, int);
 extern void apple2_set_video(apple2 *, int);
