@@ -65,6 +65,42 @@ Test(apple2_mem, read_bank)
     cr_assert_eq(vm_segment_get(mach->memory, 0xD077), val);
 }
 
+/*
+ * The write_bank test will look a bit similar to the read_bank one,
+ * except in logic it should be written somewhat as an inverse. That is,
+ * we want our writes to all go to memory, and double-check that the
+ * right location is being updated (or not being updated).
+ */
 Test(apple2_mem, write_bank)
 {
+    vm_8bit right, wrong;
+
+    // In BANK_ROM mode, we expect that updates to ROM will never be
+    // successful (after all, it wouldn't be read-only memory if they
+    // were).
+    right = 123;
+    wrong = 222;
+    mach->memory_mode = MEMORY_BANK_ROM;
+    vm_segment_set(mach->rom, 0x77, right);
+    vm_segment_set(mach->memory, 0xD077, wrong);
+    cr_assert_eq(vm_segment_get(mach->rom, 0x77), right);
+    cr_assert_eq(vm_segment_get(mach->memory, 0xD077), right);
+
+    // RAM1 is the main bank; it's all 64k RAM in one chunk.
+    right = 111;
+    wrong = 232;
+    mach->memory_mode = MEMORY_BANK_RAM1;
+    vm_segment_set(mach->memory, 0xD078, right);
+    vm_segment_set(mach->ram2, 0x78, wrong);
+    cr_assert_eq(vm_segment_get(mach->memory, 0xD078), right);
+    cr_assert_eq(vm_segment_get(mach->ram2, 0x78), wrong);
+
+    // RAM2 is most of the 64k, except the first 4k of the last 12
+    // ($D000..$DFFF) is in ram2.
+    right = 210;
+    wrong = 132;
+    mach->memory_mode = MEMORY_BANK_RAM2;
+    vm_segment_set(mach->ram2, 0x73, wrong);
+    vm_segment_set(mach->memory, 0xD073, right);
+    cr_assert_eq(vm_segment_get(mach->ram2, 0x73), right);
 }
