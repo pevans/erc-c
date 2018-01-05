@@ -15,10 +15,10 @@
  */
 DEFINE_INST(adc)
 {
-    CARRY_BIT();
+    MOS_CARRY_BIT();
     cpu->A += oper + carry;
 
-    mos6502_modify_status(cpu, NEGATIVE | OVERFLOW | CARRY | ZERO, cpu->A);
+    mos6502_modify_status(cpu, MOS_NEGATIVE | MOS_OVERFLOW | MOS_CARRY | MOS_ZERO, cpu->A);
 }
 
 /*
@@ -30,7 +30,7 @@ DEFINE_INST(adc)
  */
 DEFINE_INST(cmp)
 {
-    mos6502_modify_status(cpu, ZERO | NEGATIVE | CARRY, cpu->A - oper);
+    mos6502_modify_status(cpu, MOS_ZERO | MOS_NEGATIVE | MOS_CARRY, cpu->A - oper);
 }
 
 /*
@@ -39,7 +39,7 @@ DEFINE_INST(cmp)
  */
 DEFINE_INST(cpx)
 {
-    mos6502_modify_status(cpu, ZERO | NEGATIVE | CARRY, cpu->X - oper);
+    mos6502_modify_status(cpu, MOS_ZERO | MOS_NEGATIVE | MOS_CARRY, cpu->X - oper);
 }
 
 /*
@@ -48,7 +48,7 @@ DEFINE_INST(cpx)
  */
 DEFINE_INST(cpy)
 {
-    mos6502_modify_status(cpu, ZERO | NEGATIVE | CARRY, cpu->Y - oper);
+    mos6502_modify_status(cpu, MOS_ZERO | MOS_NEGATIVE | MOS_CARRY, cpu->Y - oper);
 }
 
 /*
@@ -61,7 +61,7 @@ DEFINE_INST(dec)
 {
     if (cpu->last_addr) {
         vm_segment_set(cpu->memory, cpu->last_addr, oper - 1);
-        mos6502_modify_status(cpu, NEGATIVE | ZERO, oper - 1);
+        mos6502_modify_status(cpu, MOS_NEGATIVE | MOS_ZERO, oper - 1);
     }
 }
 
@@ -71,7 +71,7 @@ DEFINE_INST(dec)
 DEFINE_INST(dex)
 {
     cpu->X--;
-    mos6502_modify_status(cpu, NEGATIVE | ZERO, cpu->X);
+    mos6502_modify_status(cpu, MOS_NEGATIVE | MOS_ZERO, cpu->X);
 }
 
 /*
@@ -80,7 +80,7 @@ DEFINE_INST(dex)
 DEFINE_INST(dey)
 {
     cpu->Y--;
-    mos6502_modify_status(cpu, NEGATIVE | ZERO, cpu->Y);
+    mos6502_modify_status(cpu, MOS_NEGATIVE | MOS_ZERO, cpu->Y);
 }
 
 /*
@@ -92,7 +92,7 @@ DEFINE_INST(inc)
 {
     if (cpu->last_addr) {
         vm_segment_set(cpu->memory, cpu->last_addr, oper + 1);
-        mos6502_modify_status(cpu, NEGATIVE | ZERO, oper + 1);
+        mos6502_modify_status(cpu, MOS_NEGATIVE | MOS_ZERO, oper + 1);
     }
 }
 
@@ -102,7 +102,7 @@ DEFINE_INST(inc)
 DEFINE_INST(inx)
 {
     cpu->X++;
-    mos6502_modify_status(cpu, NEGATIVE | ZERO, cpu->X);
+    mos6502_modify_status(cpu, MOS_NEGATIVE | MOS_ZERO, cpu->X);
 }
 
 /*
@@ -111,7 +111,7 @@ DEFINE_INST(inx)
 DEFINE_INST(iny)
 {
     cpu->Y++;
-    mos6502_modify_status(cpu, NEGATIVE | ZERO, cpu->Y);
+    mos6502_modify_status(cpu, MOS_NEGATIVE | MOS_ZERO, cpu->Y);
 }
 
 /*
@@ -122,8 +122,8 @@ DEFINE_INST(iny)
  */
 DEFINE_INST(sbc)
 {
-    CARRY_BIT();
+    MOS_CARRY_BIT();
     cpu->A = cpu->A - oper - carry;
 
-    mos6502_modify_status(cpu, NEGATIVE | OVERFLOW | CARRY | ZERO, cpu->A);
+    mos6502_modify_status(cpu, MOS_NEGATIVE | MOS_OVERFLOW | MOS_CARRY | MOS_ZERO, cpu->A);
 }

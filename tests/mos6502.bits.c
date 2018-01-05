@@ -31,29 +31,29 @@ Test(mos6502_bits, bit)
 {
     cpu->A = 5;
     mos6502_handle_bit(cpu, 129);
-    cr_assert_eq(cpu->P & NEGATIVE, NEGATIVE);
-    cr_assert_eq(cpu->P & OVERFLOW, 0);
-    cr_assert_eq(cpu->P & ZERO, 0);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, MOS_NEGATIVE);
+    cr_assert_eq(cpu->P & MOS_OVERFLOW, 0);
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
 
     mos6502_handle_bit(cpu, 193);
-    cr_assert_eq(cpu->P & NEGATIVE, NEGATIVE);
-    cr_assert_eq(cpu->P & OVERFLOW, OVERFLOW);
-    cr_assert_eq(cpu->P & ZERO, 0);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, MOS_NEGATIVE);
+    cr_assert_eq(cpu->P & MOS_OVERFLOW, MOS_OVERFLOW);
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
 
     mos6502_handle_bit(cpu, 65);
-    cr_assert_eq(cpu->P & NEGATIVE, 0);
-    cr_assert_eq(cpu->P & OVERFLOW, OVERFLOW);
-    cr_assert_eq(cpu->P & ZERO, 0);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
+    cr_assert_eq(cpu->P & MOS_OVERFLOW, MOS_OVERFLOW);
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
 
     mos6502_handle_bit(cpu, 33);
-    cr_assert_eq(cpu->P & NEGATIVE, 0);
-    cr_assert_eq(cpu->P & OVERFLOW, 0);
-    cr_assert_eq(cpu->P & ZERO, 0);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
+    cr_assert_eq(cpu->P & MOS_OVERFLOW, 0);
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
 
     mos6502_handle_bit(cpu, 0);
-    cr_assert_eq(cpu->P & NEGATIVE, 0);
-    cr_assert_eq(cpu->P & OVERFLOW, 0);
-    cr_assert_eq(cpu->P & ZERO, ZERO);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
+    cr_assert_eq(cpu->P & MOS_OVERFLOW, 0);
+    cr_assert_eq(cpu->P & MOS_ZERO, MOS_ZERO);
 }
 
 Test(mos6502_bits, eor)
@@ -71,12 +71,12 @@ Test(mos6502_bits, lsr)
 {
     mos6502_handle_lsr(cpu, 5);
     cr_assert_eq(cpu->A, 2);
-    cr_assert_eq(cpu->P & CARRY, CARRY);
+    cr_assert_eq(cpu->P & MOS_CARRY, MOS_CARRY);
 
     cpu->last_addr = 123;
     mos6502_handle_lsr(cpu, 22);
     cr_assert_eq(vm_segment_get(cpu->memory, 123), 11);
-    cr_assert_eq(cpu->P & CARRY, CARRY);
+    cr_assert_eq(cpu->P & MOS_CARRY, MOS_CARRY);
 }
 
 Test(mos6502_bits, ora)

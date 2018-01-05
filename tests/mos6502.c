@@ -47,31 +47,31 @@ Test(mos6502, pop_stack)
 
 Test(mos6502, modify_status)
 {
-    mos6502_modify_status(cpu, NEGATIVE, 130);
-    cr_assert_eq(cpu->P & NEGATIVE, NEGATIVE);
-    mos6502_modify_status(cpu, NEGATIVE, 123);
-    cr_assert_neq(cpu->P & NEGATIVE, NEGATIVE);
+    mos6502_modify_status(cpu, MOS_NEGATIVE, 130);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, MOS_NEGATIVE);
+    mos6502_modify_status(cpu, MOS_NEGATIVE, 123);
+    cr_assert_neq(cpu->P & MOS_NEGATIVE, MOS_NEGATIVE);
 
-    mos6502_modify_status(cpu, OVERFLOW, 123);
-    cr_assert_eq(cpu->P & OVERFLOW, OVERFLOW);
-    mos6502_modify_status(cpu, OVERFLOW, 44);
-    cr_assert_neq(cpu->P & OVERFLOW, OVERFLOW);
+    mos6502_modify_status(cpu, MOS_OVERFLOW, 123);
+    cr_assert_eq(cpu->P & MOS_OVERFLOW, MOS_OVERFLOW);
+    mos6502_modify_status(cpu, MOS_OVERFLOW, 44);
+    cr_assert_neq(cpu->P & MOS_OVERFLOW, MOS_OVERFLOW);
 
-    mos6502_modify_status(cpu, CARRY, 23);
-    cr_assert_eq(cpu->P & CARRY, CARRY);
-    mos6502_modify_status(cpu, CARRY, 0);
-    cr_assert_neq(cpu->P & CARRY, CARRY);
+    mos6502_modify_status(cpu, MOS_CARRY, 23);
+    cr_assert_eq(cpu->P & MOS_CARRY, MOS_CARRY);
+    mos6502_modify_status(cpu, MOS_CARRY, 0);
+    cr_assert_neq(cpu->P & MOS_CARRY, MOS_CARRY);
 
-    mos6502_modify_status(cpu, ZERO, 0);
-    cr_assert_eq(cpu->P & ZERO, ZERO);
-    mos6502_modify_status(cpu, ZERO, 1);
-    cr_assert_neq(cpu->P & ZERO, ZERO);
+    mos6502_modify_status(cpu, MOS_ZERO, 0);
+    cr_assert_eq(cpu->P & MOS_ZERO, MOS_ZERO);
+    mos6502_modify_status(cpu, MOS_ZERO, 1);
+    cr_assert_neq(cpu->P & MOS_ZERO, MOS_ZERO);
 }
 
 Test(mos6502, set_status)
 {
-    mos6502_set_status(cpu, BREAK | INTERRUPT | DECIMAL);
-    cr_assert_eq(cpu->P & (BREAK | INTERRUPT | DECIMAL), BREAK | INTERRUPT | DECIMAL);
+    mos6502_set_status(cpu, MOS_BREAK | MOS_INTERRUPT | MOS_DECIMAL);
+    cr_assert_eq(cpu->P & (MOS_BREAK | MOS_INTERRUPT | MOS_DECIMAL), MOS_BREAK | MOS_INTERRUPT | MOS_DECIMAL);
 }
 
 Test(mos6502, instruction)

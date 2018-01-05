@@ -17,13 +17,13 @@
  * 6th bit.
  */
 enum status_flags {
-    CARRY = 1,
-    ZERO = 2,
-    INTERRUPT = 4,
-    DECIMAL = 8,
-    BREAK = 16,
-    OVERFLOW = 64,
-    NEGATIVE = 128,
+    MOS_CARRY = 1,
+    MOS_ZERO = 2,
+    MOS_INTERRUPT = 4,
+    MOS_DECIMAL = 8,
+    MOS_BREAK = 16,
+    MOS_OVERFLOW = 64,
+    MOS_NEGATIVE = 128,
 };
 
 /*

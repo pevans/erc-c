@@ -13,7 +13,7 @@
  */
 DEFINE_INST(clc)
 {
-    cpu->P &= ~CARRY;
+    cpu->P &= ~MOS_CARRY;
 }
 
 /*
@@ -21,7 +21,7 @@ DEFINE_INST(clc)
  */
 DEFINE_INST(cld)
 {
-    cpu->P &= ~DECIMAL;
+    cpu->P &= ~MOS_DECIMAL;
 }
 
 /*
@@ -29,7 +29,7 @@ DEFINE_INST(cld)
  */
 DEFINE_INST(cli)
 {
-    cpu->P &= ~INTERRUPT;
+    cpu->P &= ~MOS_INTERRUPT;
 }
 
 /*
@@ -37,7 +37,7 @@ DEFINE_INST(cli)
  */
 DEFINE_INST(clv)
 {
-    cpu->P &= ~OVERFLOW;
+    cpu->P &= ~MOS_OVERFLOW;
 }
 
 /*
@@ -45,7 +45,7 @@ DEFINE_INST(clv)
  */
 DEFINE_INST(sec)
 {
-    cpu->P |= CARRY;
+    cpu->P |= MOS_CARRY;
 }
 
 /*
@@ -53,7 +53,7 @@ DEFINE_INST(sec)
  */
 DEFINE_INST(sed)
 {
-    cpu->P |= DECIMAL;
+    cpu->P |= MOS_DECIMAL;
 }
 
 /*
@@ -61,5 +61,5 @@ DEFINE_INST(sed)
  */
 DEFINE_INST(sei)
 {
-    cpu->P |= INTERRUPT;
+    cpu->P |= MOS_INTERRUPT;
 }

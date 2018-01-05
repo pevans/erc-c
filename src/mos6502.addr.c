@@ -141,7 +141,7 @@ DEFINE_ADDR(abs)
 DEFINE_ADDR(abx)
 {
     ADDR_HILO(cpu);
-    CARRY_BIT();
+    MOS_CARRY_BIT();
     EFF_ADDR(addr + cpu->X + carry);
 
     return vm_segment_get(cpu->memory, eff_addr);
@@ -154,7 +154,7 @@ DEFINE_ADDR(abx)
 DEFINE_ADDR(aby)
 {
     ADDR_HILO(cpu);
-    CARRY_BIT();
+    MOS_CARRY_BIT();
     EFF_ADDR(addr + cpu->Y + carry);
 
     return vm_segment_get(cpu->memory, eff_addr);
@@ -217,7 +217,7 @@ DEFINE_ADDR(idx)
 DEFINE_ADDR(idy)
 {
     ADDR_LO(cpu);
-    CARRY_BIT();
+    MOS_CARRY_BIT();
     EFF_ADDR(vm_segment_get(cpu->memory, addr) + cpu->Y + carry);
 
     return vm_segment_get(cpu->memory, eff_addr);

@@ -32,9 +32,9 @@
  * therefore, the literal value we are adding, rather than a boolean
  * signifier.
  */
-#define CARRY_BIT() \
+#define MOS_CARRY_BIT() \
     vm_8bit carry = 0; \
-    if (cpu->P & CARRY) carry = 1
+    if (cpu->P & MOS_CARRY) carry = 1
 
 /*
  * A uniform way of declaring resolve functions for address modes, which

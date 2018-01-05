@@ -21,7 +21,7 @@
  */
 DEFINE_INST(bcc)
 {
-    JUMP_IF(~cpu->P & CARRY);
+    JUMP_IF(~cpu->P & MOS_CARRY);
 }
 
 /*
@@ -29,7 +29,7 @@ DEFINE_INST(bcc)
  */
 DEFINE_INST(bcs)
 {
-    JUMP_IF(cpu->P & CARRY);
+    JUMP_IF(cpu->P & MOS_CARRY);
 }
 
 /*
@@ -38,7 +38,7 @@ DEFINE_INST(bcs)
  */
 DEFINE_INST(beq)
 {
-    JUMP_IF(cpu->P & ZERO);
+    JUMP_IF(cpu->P & MOS_ZERO);
 }
 
 /*
@@ -46,7 +46,7 @@ DEFINE_INST(beq)
  */
 DEFINE_INST(bmi)
 {
-    JUMP_IF(cpu->P & NEGATIVE);
+    JUMP_IF(cpu->P & MOS_NEGATIVE);
 }
 
 /*
@@ -55,7 +55,7 @@ DEFINE_INST(bmi)
  */
 DEFINE_INST(bne)
 {
-    JUMP_IF(~cpu->P & ZERO);
+    JUMP_IF(~cpu->P & MOS_ZERO);
 }
 
 /*
@@ -64,7 +64,7 @@ DEFINE_INST(bne)
  */
 DEFINE_INST(bpl)
 {
-    JUMP_IF(~cpu->P & NEGATIVE);
+    JUMP_IF(~cpu->P & MOS_NEGATIVE);
 }
 
 /*
@@ -72,7 +72,7 @@ DEFINE_INST(bpl)
  */
 DEFINE_INST(bvc)
 {
-    JUMP_IF(~cpu->P & OVERFLOW);
+    JUMP_IF(~cpu->P & MOS_OVERFLOW);
 }
 
 /*
@@ -80,5 +80,5 @@ DEFINE_INST(bvc)
  */
 DEFINE_INST(bvs)
 {
-    JUMP_IF(cpu->P & OVERFLOW);
+    JUMP_IF(cpu->P & MOS_OVERFLOW);
 }

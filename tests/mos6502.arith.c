@@ -12,7 +12,7 @@ Test(mos6502_arith, adc)
     mos6502_handle_adc(cpu, 3);
     cr_assert_eq(cpu->A, 8);
 
-    cpu->P |= CARRY;
+    cpu->P |= MOS_CARRY;
     mos6502_handle_adc(cpu, 64);
     cr_assert_eq(cpu->A, 73);
 }
@@ -21,39 +21,39 @@ Test(mos6502_arith, cmp)
 {
     cpu->A = 5;
     mos6502_handle_cmp(cpu, 3);
-    cr_assert_eq(cpu->P & CARRY, CARRY);
-    cr_assert_eq(cpu->P & NEGATIVE, 0);
-    cr_assert_eq(cpu->P & ZERO, 0);
+    cr_assert_eq(cpu->P & MOS_CARRY, MOS_CARRY);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
 
     cpu->A = 3;
     mos6502_handle_cmp(cpu, 3);
-    cr_assert_eq(cpu->P & CARRY, 0);
-    cr_assert_eq(cpu->P & NEGATIVE, 0);
-    cr_assert_eq(cpu->P & ZERO, ZERO);
+    cr_assert_eq(cpu->P & MOS_CARRY, 0);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
+    cr_assert_eq(cpu->P & MOS_ZERO, MOS_ZERO);
 
     cpu->A = 192;
     mos6502_handle_cmp(cpu, 3);
-    cr_assert_eq(cpu->P & CARRY, CARRY);
-    cr_assert_eq(cpu->P & NEGATIVE, NEGATIVE);
-    cr_assert_eq(cpu->P & ZERO, 0);
+    cr_assert_eq(cpu->P & MOS_CARRY, MOS_CARRY);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, MOS_NEGATIVE);
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
 }
 
 Test(mos6502_arith, cpx)
 {
     cpu->X = 5;
     mos6502_handle_cpx(cpu, 3);
-    cr_assert_eq(cpu->P & CARRY, CARRY);
-    cr_assert_eq(cpu->P & NEGATIVE, 0);
-    cr_assert_eq(cpu->P & ZERO, 0);
+    cr_assert_eq(cpu->P & MOS_CARRY, MOS_CARRY);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
 }
 
 Test(mos6502_arith, cpy)
 {
     cpu->Y = 5;
     mos6502_handle_cpy(cpu, 3);
-    cr_assert_eq(cpu->P & CARRY, CARRY);
-    cr_assert_eq(cpu->P & NEGATIVE, 0);
-    cr_assert_eq(cpu->P & ZERO, 0);
+    cr_assert_eq(cpu->P & MOS_CARRY, MOS_CARRY);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
 }
 
 Test(mos6502_arith, dec)
@@ -115,7 +115,7 @@ Test(mos6502_arith, sbc)
     mos6502_handle_sbc(cpu, 3);
     cr_assert_eq(cpu->A, 2);
 
-    cpu->P |= CARRY;
+    cpu->P |= MOS_CARRY;
     cpu->A = 16;
     mos6502_handle_sbc(cpu, 8);
     cr_assert_eq(cpu->A, 7);

@@ -12,7 +12,7 @@ Test(mos6502_branch, bcc)
     mos6502_handle_bcc(cpu, 0);
     cr_assert_eq(cpu->PC, 123);
 
-    cpu->P |= CARRY;
+    cpu->P |= MOS_CARRY;
     cpu->last_addr = 125;
     mos6502_handle_bcc(cpu, 0);
     cr_assert_neq(cpu->PC, 125);
@@ -24,7 +24,7 @@ Test(mos6502_branch, bcs)
     mos6502_handle_bcs(cpu, 0);
     cr_assert_neq(cpu->PC, 123);
 
-    cpu->P |= CARRY;
+    cpu->P |= MOS_CARRY;
     cpu->last_addr = 125;
     mos6502_handle_bcs(cpu, 0);
     cr_assert_eq(cpu->PC, 125);
@@ -36,7 +36,7 @@ Test(mos6502_branch, beq)
     mos6502_handle_beq(cpu, 0);
     cr_assert_neq(cpu->PC, 123);
 
-    cpu->P |= ZERO;
+    cpu->P |= MOS_ZERO;
     cpu->last_addr = 125;
     mos6502_handle_beq(cpu, 0);
     cr_assert_eq(cpu->PC, 125);
@@ -48,7 +48,7 @@ Test(mos6502_branch, bmi)
     mos6502_handle_bmi(cpu, 0);
     cr_assert_neq(cpu->PC, 123);
 
-    cpu->P |= NEGATIVE;
+    cpu->P |= MOS_NEGATIVE;
     cpu->last_addr = 125;
     mos6502_handle_bmi(cpu, 0);
     cr_assert_eq(cpu->PC, 125);
@@ -60,7 +60,7 @@ Test(mos6502_branch, bne)
     mos6502_handle_bne(cpu, 0);
     cr_assert_eq(cpu->PC, 123);
 
-    cpu->P |= ZERO;
+    cpu->P |= MOS_ZERO;
     cpu->last_addr = 125;
     mos6502_handle_bne(cpu, 0);
     cr_assert_neq(cpu->PC, 125);
@@ -72,7 +72,7 @@ Test(mos6502_branch, bpl)
     mos6502_handle_bpl(cpu, 0);
     cr_assert_eq(cpu->PC, 123);
 
-    cpu->P |= NEGATIVE;
+    cpu->P |= MOS_NEGATIVE;
     cpu->last_addr = 125;
     mos6502_handle_bpl(cpu, 0);
     cr_assert_neq(cpu->PC, 125);
@@ -84,7 +84,7 @@ Test(mos6502_branch, bvc)
     mos6502_handle_bvc(cpu, 0);
     cr_assert_eq(cpu->PC, 123);
 
-    cpu->P |= OVERFLOW;
+    cpu->P |= MOS_OVERFLOW;
     cpu->last_addr = 125;
     mos6502_handle_bvc(cpu, 0);
     cr_assert_neq(cpu->PC, 125);
@@ -96,7 +96,7 @@ Test(mos6502_branch, bvs)
     mos6502_handle_bvs(cpu, 0);
     cr_assert_neq(cpu->PC, 123);
 
-    cpu->P |= OVERFLOW;
+    cpu->P |= MOS_OVERFLOW;
     cpu->last_addr = 125;
     mos6502_handle_bvs(cpu, 0);
     cr_assert_eq(cpu->PC, 125);

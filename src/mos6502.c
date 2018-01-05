@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "log.h"
 #include "mos6502.h"
@@ -252,31 +253,31 @@ mos6502_set_status(mos6502 *cpu, vm_8bit status)
 void
 mos6502_modify_status(mos6502 *cpu, vm_8bit status, vm_8bit oper)
 {
-    if (status & NEGATIVE) {
-        cpu->P &= ~NEGATIVE;
+    if (status & MOS_NEGATIVE) {
+        cpu->P &= ~MOS_NEGATIVE;
         if (oper & 0x80) {
-            cpu->P |= NEGATIVE;
+            cpu->P |= MOS_NEGATIVE;
         }
     }
 
-    if (status & OVERFLOW) {
-        cpu->P &= ~OVERFLOW;
-        if (oper & OVERFLOW) {
-            cpu->P |= OVERFLOW;
+    if (status & MOS_OVERFLOW) {
+        cpu->P &= ~MOS_OVERFLOW;
+        if (oper & MOS_OVERFLOW) {
+            cpu->P |= MOS_OVERFLOW;
         }
     }
 
-    if (status & CARRY) {
-        cpu->P &= ~CARRY;
+    if (status & MOS_CARRY) {
+        cpu->P &= ~MOS_CARRY;
         if (oper > 0) {
-            cpu->P |= CARRY;
+            cpu->P |= MOS_CARRY;
         }
     }
 
-    if (status & ZERO) {
-        cpu->P &= ~ZERO;
+    if (status & MOS_ZERO) {
+        cpu->P &= ~MOS_ZERO;
         if (oper == 0) {
-            cpu->P |= ZERO;
+            cpu->P |= MOS_ZERO;
         }
     }
 }
@@ -352,7 +353,7 @@ void
 mos6502_execute(mos6502 *cpu, vm_8bit opcode)
 {
     vm_8bit operand;
-    //int cycles;
+    int cycles;
     mos6502_address_resolver resolver;
     mos6502_instruction_handler handler;
 
@@ -380,9 +381,11 @@ mos6502_execute(mos6502 *cpu, vm_8bit opcode)
     // with the idea that certain instructions -- in certain address
     // modes -- were more expensive than others, and you want those
     // programs to feel faster or slower in relation to that.
-    //cycles = mos6502_cycles(cpu, opcode);
+    cycles = mos6502_cycles(cpu, opcode);
 
-    // FIXME: actually emulate the cycles
+    // FIXME: uh this probably isn't right, but I wanted to do
+    // something.
+    usleep(cycles * 100000);
 
     // Ok -- we're done! This wasn't so hard, was it?
     return;
