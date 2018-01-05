@@ -180,7 +180,6 @@ void
 vm_screen_refresh(vm_screen *screen)
 {
     SDL_RenderPresent(screen->render);
-    SDL_Delay(2000);
 }
 
 /*
