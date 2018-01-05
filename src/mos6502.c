@@ -352,7 +352,7 @@ mos6502_get_instruction_handler(vm_8bit opcode)
 void
 mos6502_execute(mos6502 *cpu, vm_8bit opcode)
 {
-    vm_8bit operand;
+    vm_8bit operand = 0;
     int cycles;
     mos6502_address_resolver resolver;
     mos6502_instruction_handler handler;
@@ -369,7 +369,13 @@ mos6502_execute(mos6502 *cpu, vm_8bit opcode)
     // side-effect, resolver will set the last_addr field in cpu to the
     // effective address where the operand can be found in memory, or
     // zero if that does not apply (such as in immediate mode).
-    operand = resolver(cpu);
+    //
+    // Note also that resolver may be NULL, as there may not be any
+    // operand for this instruction! If so, we let the default for
+    // operand stand, which is zero.
+    if (resolver) {
+        operand = resolver(cpu);
+    }
 
     // Here's where the magic happens. Whatever the instruction does, it
     // happens in the handler function.
