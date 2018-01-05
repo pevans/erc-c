@@ -147,6 +147,23 @@ vm_segment_get(vm_segment *segment, size_t index)
 }
 
 /*
+ * Return a 16-bit value from a given address. This will read the byte
+ * at addr and the byte at addr+1, then fit those into a two-byte
+ * variable such that addr contains the most significant byte and addr+1
+ * contains the least significant byte.
+ */
+vm_16bit
+vm_segment_get16(vm_segment *segment, size_t addr)
+{
+    vm_16bit msb, lsb;
+
+    msb = (vm_16bit)vm_segment_get(segment, addr);
+    lsb = (vm_16bit)vm_segment_get(segment, addr+1);
+
+    return (msb << 8) | lsb;
+}
+
+/*
  * Copy a set of bytes from `src` (at `src_index`) to `dest` (at
  * `dest_index`), such that the range is `length` bytes long. Note that
  * this function presently bypasses our mapper function code... we may
