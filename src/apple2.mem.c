@@ -104,9 +104,9 @@ int
 apple2_mem_init_disk2_rom(apple2 *mach)
 {
     int err;
-    vm_8bit *diskrom;
+    const vm_8bit *diskrom;
 
-    diskrom = objstore_apple2_disk_rom();
+    diskrom = objstore_apple2_disk2_rom();
 
     // Copy into the first peripheral page for disk ROM.
     err = vm_segment_copy_buf(mach->memory, diskrom,
@@ -139,7 +139,7 @@ int
 apple2_mem_init_sys_rom(apple2 *mach)
 {
     int err;
-    vm_8bit *sysrom;
+    const vm_8bit *sysrom;
     
     sysrom = objstore_apple2_sys_rom();
 
