@@ -104,27 +104,61 @@ int
 apple2_mem_init_disk2_rom(apple2 *mach)
 {
     int err;
+    vm_8bit *diskrom;
 
-    err = vm_segment_copy_buf(mach->memory, objstore_apple2_disk2_rom(),
+    diskrom = objstore_apple2_disk_rom();
+
+    // Copy into the first peripheral page for disk ROM.
+    err = vm_segment_copy_buf(mach->memory, diskrom,
                               APPLE2_DISK2_ROM_OFFSET, 0,
                               APPLE2_DISK2_ROM_SIZE);
     if (err != OK) {
-        log_critical("Could not acquire apple2 disk2 rom");
+        log_critical("Could not copy apple2 disk2 rom");
+        return ERR_BADFILE;
+    }
+
+    // This second copy will copy into the next slot over, which is
+    // essentially the second disk drive. It's all the same ROM.
+    err = vm_segment_copy_buf(mach->memory, diskrom,
+                              APPLE2_DISK2_ROM_OFFSET + 0x100, 0,
+                              APPLE2_DISK2_ROM_SIZE);
+    if (err != OK) {
+        log_critical("Could not copy apple2 disk2 rom");
         return ERR_BADFILE;
     }
 
     return OK;
 }
 
+/*
+ * I'm still a bit hazy on how this _should_ work, but this function
+ * will copy as much as we can from the system rom into both main memory
+ * and into the rom segment.
+ */
 int
 apple2_mem_init_sys_rom(apple2 *mach)
 {
     int err;
+    vm_8bit *sysrom;
+    
+    sysrom = objstore_apple2_sys_rom();
 
-    err = vm_segment_copy_buf(mach->rom, objstore_apple2_sys_rom(),
-                              0, 0, APPLE2_ROM_SIZE);
+    // The first two kilobytes of system rom are copied into memory
+    // beginning at $C800 (which is just after all of the peripheral ROM
+    // locations).
+    err = vm_segment_copy_buf(mach->memory, sysrom,
+                              0xC800, 0x800, 0x800);
     if (err != OK) {
-        log_critical("Could not acquire apple2 system rom");
+        log_critical("Could not copy apple2 system rom");
+        return ERR_BADFILE;
+    }
+
+    // The last 12k of sysrom (which is APPLE2_ROM_SIZE) are copied into
+    // the rom segment.
+    err = vm_segment_copy_buf(mach->rom, sysrom, 
+                              0, 0x1000, APPLE2_ROM_SIZE);
+    if (err != OK) {
+        log_critical("Could not copy apple2 system rom");
         return ERR_BADFILE;
     }
 
