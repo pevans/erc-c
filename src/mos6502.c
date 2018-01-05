@@ -13,6 +13,7 @@
 
 #include "log.h"
 #include "mos6502.h"
+#include "mos6502.dis.h"
 
 // All of our address modes, instructions, etc. are defined here.
 #include "mos6502.enums.h"
@@ -353,9 +354,18 @@ void
 mos6502_execute(mos6502 *cpu, vm_8bit opcode)
 {
     vm_8bit operand = 0;
-    int cycles;
+    int cycles, bytes;
     mos6502_address_resolver resolver;
     mos6502_instruction_handler handler;
+
+    // We want to know how many bytes this opcode and its operand
+    // consume. We know the opcode is one byte.
+    bytes = 1;
+
+    // The disassembler knows how many bytes each operand requires
+    // (maybe this code doesn't belong in the disassembler); let's use
+    // that to figure out the total number of bytes to skip.
+    bytes += mos6502_dis_expected_bytes(mos6502_addr_mode(opcode));
 
     // First, we need to know how to resolve our effective address and
     // how to execute anything.
@@ -392,6 +402,9 @@ mos6502_execute(mos6502 *cpu, vm_8bit opcode)
     // FIXME: uh this probably isn't right, but I wanted to do
     // something.
     usleep(cycles * 100000);
+
+    // Update the counter to move beyond the opcode and its operand.
+    cpu->PC += bytes;
 
     // Ok -- we're done! This wasn't so hard, was it?
     return;
