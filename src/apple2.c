@@ -184,6 +184,10 @@ apple2_boot(apple2 *mach)
         mos6502_dis_scan(mach->cpu, stdout, 0, mach->cpu->memory->size);
     }
 
+    cpu->P = INTERRUPT;
+    cpu->PC = (vm_16bit)vm_segment_get(mach->memory, 0xFFFC);
+    cpu->S = 0;
+
     return OK;
 }
 
