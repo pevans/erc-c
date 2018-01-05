@@ -200,7 +200,7 @@ void
 apple2_reset(apple2 *mach)
 {
     mach->cpu->P = MOS_INTERRUPT;
-    mach->cpu->PC = (vm_16bit)vm_segment_get(mach->memory, 0xFFFC);
+    mach->cpu->PC = vm_segment_get16(mach->memory, 0xFFFC);
     mach->cpu->S = 0;
 }
 
