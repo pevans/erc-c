@@ -8,6 +8,7 @@
 #include "apple2.h"
 #include "apple2.draw.h"
 #include "apple2.mem.h"
+#include "mos6502.enums.h"
 #include "mos6502.dis.h"
 #include "objstore.h"
 #include "option.h"
@@ -184,9 +185,9 @@ apple2_boot(apple2 *mach)
         mos6502_dis_scan(mach->cpu, stdout, 0, mach->cpu->memory->size);
     }
 
-    cpu->P = INTERRUPT;
-    cpu->PC = (vm_16bit)vm_segment_get(mach->memory, 0xFFFC);
-    cpu->S = 0;
+    mach->cpu->P = MOS_INTERRUPT;
+    mach->cpu->PC = (vm_16bit)vm_segment_get(mach->memory, 0xFFFC);
+    mach->cpu->S = 0;
 
     return OK;
 }
