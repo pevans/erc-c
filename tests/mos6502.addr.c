@@ -13,22 +13,6 @@ Test(mos6502_addr, mode)
     cr_assert_eq(mos6502_addr_mode(0xF0), REL);
 }
 
-Test(mos6502_addr, get_address_resolver)
-{
-    cr_assert_eq(mos6502_get_address_resolver(0x0A), mos6502_resolve_acc);
-    cr_assert_eq(mos6502_get_address_resolver(0x20), mos6502_resolve_abs);
-    cr_assert_eq(mos6502_get_address_resolver(0xBC), mos6502_resolve_abx);
-    cr_assert_eq(mos6502_get_address_resolver(0x19), mos6502_resolve_aby);
-    cr_assert_eq(mos6502_get_address_resolver(0xA0), mos6502_resolve_imm);
-    cr_assert_eq(mos6502_get_address_resolver(0x6C), mos6502_resolve_ind);
-    cr_assert_eq(mos6502_get_address_resolver(0x01), mos6502_resolve_idx);
-    cr_assert_eq(mos6502_get_address_resolver(0x11), mos6502_resolve_idy);
-    cr_assert_eq(mos6502_get_address_resolver(0x10), mos6502_resolve_rel);
-    cr_assert_eq(mos6502_get_address_resolver(0x05), mos6502_resolve_zpg);
-    cr_assert_eq(mos6502_get_address_resolver(0x15), mos6502_resolve_zpx);
-    cr_assert_eq(mos6502_get_address_resolver(0x96), mos6502_resolve_zpy);
-}
-
 Test(mos6502_addr, addr_mode_acc)
 {
     cpu->A = 123;

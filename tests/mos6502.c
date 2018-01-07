@@ -160,3 +160,20 @@ Test(mos6502, flash_memory)
     cr_assert_eq(vm_segment_get(cpu->memory, 0), 123);
     cr_assert_eq(vm_segment_get(cpu->memory, 1), 124);
 }
+
+Test(mos6502, get_address_resolver)
+{
+    cr_assert_eq(mos6502_get_address_resolver(0x0A), mos6502_resolve_acc);
+    cr_assert_eq(mos6502_get_address_resolver(0x20), mos6502_resolve_abs);
+    cr_assert_eq(mos6502_get_address_resolver(0xBC), mos6502_resolve_abx);
+    cr_assert_eq(mos6502_get_address_resolver(0x19), mos6502_resolve_aby);
+    cr_assert_eq(mos6502_get_address_resolver(0xA0), mos6502_resolve_imm);
+    cr_assert_eq(mos6502_get_address_resolver(0x6C), mos6502_resolve_ind);
+    cr_assert_eq(mos6502_get_address_resolver(0x01), mos6502_resolve_idx);
+    cr_assert_eq(mos6502_get_address_resolver(0x11), mos6502_resolve_idy);
+    cr_assert_eq(mos6502_get_address_resolver(0x10), mos6502_resolve_rel);
+    cr_assert_eq(mos6502_get_address_resolver(0x05), mos6502_resolve_zpg);
+    cr_assert_eq(mos6502_get_address_resolver(0x15), mos6502_resolve_zpx);
+    cr_assert_eq(mos6502_get_address_resolver(0x96), mos6502_resolve_zpy);
+}
+
