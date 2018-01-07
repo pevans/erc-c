@@ -6,7 +6,7 @@
 
 TestSuite(mos6502_addr, .init = setup, .fini = teardown);
 
-Test(mos6502_addr, addr_mode)
+Test(mos6502_addr, mode)
 {
     cr_assert_eq(mos6502_addr_mode(0xEA), IMP);
     cr_assert_eq(mos6502_addr_mode(0xD6), ZPX);
