@@ -31,7 +31,7 @@ teardown()
 
 TestSuite(options, .init = setup, .fini = teardown);
 
-Test(options, error)
+Test(option, error)
 {
     char *str = "hahaha FUN";
 
@@ -41,7 +41,7 @@ Test(options, error)
     cr_assert_str_eq(option_get_error(), str);
 }
 
-Test(options, input)
+Test(option, input)
 {
     cr_assert_eq(option_get_input(1), NULL);
     cr_assert_eq(option_get_input(2), NULL);
@@ -53,7 +53,7 @@ Test(options, input)
     cr_assert_eq(option_get_input(3), NULL);
 }
 
-Test(options, read_file)
+Test(option, read_file)
 {
     char *str = "so much FUN";
     char *bad_file = "/tmp/BLEH";
@@ -87,7 +87,7 @@ Test(options, read_file)
  * complexity here, while pushing as much of the logic as I can into
  * other functions that are more easily testable.
  */
-Test(options, parse)
+Test(option, parse)
 {
     int argc = 2;
     char *argv[] = {
@@ -102,7 +102,7 @@ Test(options, parse)
  * The get_width and get_height tests also implicitly test the
  * option_set_size() function (which is called by option_parse()).
  */
-Test(options, get_width)
+Test(option, get_width)
 {
     int argc = 2;
     char *argv[] = {
@@ -114,7 +114,7 @@ Test(options, get_width)
     cr_assert_eq(option_get_width(), 875);
 }
 
-Test(options, get_height)
+Test(option, get_height)
 {
     int argc = 2;
     char *argv[] = {
