@@ -16,9 +16,9 @@ teardown()
     apple2_dd_free(drive);
 }
 
-TestSuite(apple2dd, .init = setup, .fini = teardown);
+TestSuite(apple2_dd, .init = setup, .fini = teardown);
 
-Test(apple2dd, create)
+Test(apple2_dd, create)
 {
     cr_assert_eq(drive->data, NULL);
     cr_assert_eq(drive->track_pos, 0);
@@ -28,7 +28,7 @@ Test(apple2dd, create)
     cr_assert_eq(drive->mode, DD_READ);
 }
 
-Test(apple2dd, insert)
+Test(apple2_dd, insert)
 {
     FILE *stream;
 
@@ -48,7 +48,7 @@ Test(apple2dd, insert)
     fclose(stream);
 }
 
-Test(apple2dd, position)
+Test(apple2_dd, position)
 {
     // Without any data, the drive should return a null position
     // regardless of track position
@@ -59,7 +59,7 @@ Test(apple2dd, position)
     // FIXME: we need some dummy data for the drive...
 }
 
-Test(apple2dd, read)
+Test(apple2_dd, read)
 {
     drive->data = vm_segment_create(_140K_);
     vm_segment_set(drive->data, 0, 123);
@@ -74,14 +74,14 @@ Test(apple2dd, read)
     cr_assert_eq(drive->sector_pos, 2);
 }
 
-Test(apple2dd, eject)
+Test(apple2_dd, eject)
 {
     drive->data = vm_segment_create(1000);
     apple2_dd_eject(drive);
     cr_assert_eq(drive->data, NULL);
 }
 
-Test(apple2dd, set_mode)
+Test(apple2_dd, set_mode)
 {
     apple2_dd_set_mode(drive, DD_WRITE);
     cr_assert_eq(drive->mode, DD_WRITE);
@@ -93,7 +93,7 @@ Test(apple2dd, set_mode)
     cr_assert_eq(drive->mode, DD_READ);
 }
 
-Test(apple2dd, shift)
+Test(apple2_dd, shift)
 {
     apple2_dd_shift(drive, 5);
     cr_assert_eq(drive->sector_pos, 5);
@@ -107,7 +107,7 @@ Test(apple2dd, shift)
     cr_assert_eq(drive->sector_pos, 7);
 }
 
-Test(apple2dd, step)
+Test(apple2_dd, step)
 {
     // Does step work at all?
     apple2_dd_step(drive, 5);
@@ -127,7 +127,7 @@ Test(apple2dd, step)
     cr_assert_eq(drive->track_pos, 0);
 }
 
-Test(apple2dd, turn_on)
+Test(apple2_dd, turn_on)
 {
     apple2_dd_turn_on(drive, true);
     cr_assert(drive->online);
@@ -139,7 +139,7 @@ Test(apple2dd, turn_on)
     cr_assert(drive->online);
 }
 
-Test(apple2dd, write)
+Test(apple2_dd, write)
 {
     drive->data = vm_segment_create(_140K_);
 
@@ -154,7 +154,7 @@ Test(apple2dd, write)
     cr_assert_eq(drive->sector_pos, 2);
 }
 
-Test(apple2dd, write_protect)
+Test(apple2_dd, write_protect)
 {
     apple2_dd_write_protect(drive, true);
     cr_assert(drive->write_protect);
