@@ -15,23 +15,28 @@
  * any number of things, from a literal file on the filesystem, to
  * stdout.
  */
-static FILE *log_stream = NULL;
+static FILE *_stream = NULL;
 
 /*
  * Close the file stream we opened (or were given) in `log_open()`.
  * Nota bene: if you passed stdout into log_open(), this will actually
  * _close_ the stdout stream (!).
  */
-void
+int
 log_close()
 {
-    if (log_stream != NULL) {
-        fclose(log_stream);
+    int rval = 0;
+
+    if (_stream != NULL) {
+        rval = fclose(_stream);
+        _stream = NULL;
     }
+
+    return rval;
 }
 
 /*
- * This function will assign the log_stream variable to either a given
+ * This function will assign the _stream variable to either a given
  * file stream, or if none given, to the default location (which is a
  * filename defined by the `LOG_FILENAME` macro).
  */
@@ -40,13 +45,13 @@ log_open(FILE *stream)
 {
     // Oh, you're telling _me_ what the stream is? Neat!
     if (stream != NULL) {
-        log_stream = stream;
+        _stream = stream;
         return;
     }
 
     // Oh, well. I'll just open this dang thing.
-    log_stream = fopen(LOG_FILENAME, "w");
-    if (log_stream == NULL) {
+    _stream = fopen(LOG_FILENAME, "w");
+    if (_stream == NULL) {
         perror("Couldn't open log file (" LOG_FILENAME ")");
         exit(1);
     }
@@ -62,12 +67,21 @@ log_write(int level, const char *fmt, ...)
 {
     va_list ap;
 
-    if (log_stream == NULL) {
-        log_stream = stdout;
+    if (_stream == NULL) {
+        _stream = stdout;
     }
 
     va_start(ap, fmt);
-    vfprintf(log_stream, fmt, ap);
-    fprintf(log_stream, "\n");
+    vfprintf(_stream, fmt, ap);
+    fprintf(_stream, "\n");
     va_end(ap);
+}
+
+/*
+ * Return the file stream we're currently using for logging.
+ */
+FILE *
+log_stream()
+{
+    return _stream;
 }

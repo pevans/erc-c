@@ -17,7 +17,8 @@ enum log_errcode {
     ERR_GFXOP,          // we couldn't execute a specific graphic operation
 };
 
-extern void log_close();
+extern FILE *log_stream();
+extern int log_close();
 extern void log_open(FILE *);
 extern void log_write(int, const char *, ...);
 
