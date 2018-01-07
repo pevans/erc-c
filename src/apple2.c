@@ -119,6 +119,10 @@ apple2_create(int width, int height)
     // We default to lo-res mode.
     apple2_set_video(mach, VIDEO_LORES);
 
+    // By default we should have ROM be the addressable last 12k of
+    // memory.
+    apple2_set_memory(mach, MEMORY_BANK_ROM);
+
     // Let's install our bitmap font.
     mach->sysfont = vm_bitfont_create(mach->screen,
                                       objstore_apple2_sysfont(),
@@ -132,6 +136,15 @@ apple2_create(int width, int height)
     }
 
     return mach;
+}
+
+/*
+ * Change the memory mode of the apple2 to a given mode.
+ */
+void
+apple2_set_memory(apple2 *mach, int mode)
+{
+    mach->memory_mode = mode;
 }
 
 /*
@@ -202,6 +215,8 @@ apple2_reset(apple2 *mach)
     mach->cpu->P = MOS_INTERRUPT;
     mach->cpu->PC = vm_segment_get16(mach->memory, 0xFFFC);
     mach->cpu->S = 0;
+
+    log_critical("At end of reset, PC = 0x%x", mach->cpu->PC);
 }
 
 /*

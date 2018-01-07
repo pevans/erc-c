@@ -135,6 +135,7 @@ extern void apple2_release_key(apple2 *);
 extern void apple2_reset(apple2 *);
 extern void apple2_run_loop(apple2 *);
 extern void apple2_set_color(apple2 *, int);
+extern void apple2_set_memory(apple2 *, int);
 extern void apple2_set_video(apple2 *, int);
 
 #endif
