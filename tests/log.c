@@ -5,6 +5,28 @@
 
 #include "log.h"
 
+/* Test(log, stream) */
+/*
+ * This test works for both log_stream() and log_open().
+ */
+Test(log, open)
+{
+    log_open(stdin);
+    cr_assert_eq(log_stream(), stdin);
+    log_open(stdout);
+    cr_assert_eq(log_stream(), stdout);
+}
+
+Test(log, close)
+{
+    FILE *fp;
+
+    fp = fopen("/tmp/test.log.txt", "w");
+    log_open(fp);
+
+    cr_assert_eq(log_close(), 0);
+}
+
 Test(log, write) {
     char message[] = "we write the logs";
     char message_buffer[128];
