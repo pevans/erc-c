@@ -1,6 +1,7 @@
 #include <criterion/criterion.h>
 
 #include "apple2.h"
+#include "mos6502.enums.h"
 #include "option.h"
 
 static apple2 *mach;
@@ -18,6 +19,9 @@ teardown()
 }
 
 TestSuite(apple2, .init = setup, .fini = teardown);
+
+/* Test(apple2, free) */
+/* Test(apple2, run_loop) */
 
 Test(apple2, create)
 {
@@ -111,4 +115,24 @@ Test(apple2, set_video)
     cr_assert_eq(mach->video_mode, VIDEO_DOUBLE_HIRES);
     apple2_set_video(mach, VIDEO_LORES);
     cr_assert_eq(mach->video_mode, VIDEO_LORES);
+}
+
+Test(apple2, set_memory)
+{
+    apple2_set_memory(mach, MEMORY_BANK_RAM1);
+    cr_assert_eq(mach->memory_mode, MEMORY_BANK_RAM1);
+    apple2_set_memory(mach, MEMORY_BANK_RAM2);
+    cr_assert_eq(mach->memory_mode, MEMORY_BANK_RAM2);
+}
+
+Test(apple2, reset)
+{
+    apple2_set_memory(mach, MEMORY_BANK_ROM);
+    vm_segment_set(mach->rom, 0x2FFC, 0x12);
+    vm_segment_set(mach->rom, 0x2FFD, 0x34);
+    apple2_reset(mach);
+
+    cr_assert_eq(mach->cpu->PC, 0x1234);
+    cr_assert_eq(mach->cpu->P, MOS_INTERRUPT);
+    cr_assert_eq(mach->cpu->S, 0);
 }
