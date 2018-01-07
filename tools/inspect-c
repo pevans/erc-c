@@ -1,0 +1,98 @@
+#!/usr/bin/env python2
+#
+# This script is written to look through source code files, looking for
+# missing unit-tests and doc-block comments. It's mostly ugly, but so is
+# the task at hand.
+
+import os
+import re
+
+# This is sort of a monster function, but I've tried to lift as much out
+# of the logic as I could. Basically, this function tries to find
+# anything that's "wrong", which is one of:
+# 
+# - missing docblock comment for functions
+# - missing test for a function
+def parse(fname):
+    lines = []
+    with open(fname, 'r') as f:
+        lines = f.read().split("\n")
+
+    length = len(lines)
+
+    # We probably got a directory in the path (like './src'); let's chop
+    # it off.
+    basefname = os.path.basename(fname)
+
+    # The suite is the name of the test suite as Criterion would define
+    # it.
+    suite = suite_name_from_file(basefname)
+
+    for num in range(0, length):
+        match = find_func_name(lines[num])
+        if match is not None:
+            # The test name is a part of the function
+            test_name = test_name_from_func(suite, match.group(1))
+
+            # We want to find something in a test file for each of the
+            # functions we define.
+            if not has_test('tests/' + basefname, suite, test_name):
+                print "Missing test: %s_%s" % (suite, test_name)
+
+            # We also want to have some doc-block comment for every
+            # function we write.
+            if not has_doc_block(lines, num):
+                print "Missing docblock comment: %s:%d: %s" % (fname, num, lines[num])
+
+# Given a source file name, extract the suite name (which is really just
+# the name of the file minus the '.c' part, and -- well, you can read
+# the source).
+def suite_name_from_file(fname):
+    return fname.replace('.c', '').replace('.', '_')
+
+# Given a line of source code, figure out if there's a function that's
+# defined there. We define functions in the form of:
+#
+# <type>
+# <func>(...)
+# {
+#     <body...>
+# }
+#
+# So we can say a function definition will always begin at the first
+# character on a line in which the name is immediately followed by an
+# open parenthesis.
+def find_func_name(line):
+    return re.search(r'^([a-zA-Z_][a-zA-Z0-9_]*)\(', line)
+
+# Given a suite and a function name, figure out what the test name
+# should be.
+def test_name_from_func(suite, func):
+    return func.replace(suite + '_', '')
+
+# Given a line and a line number, determine if we have a doc-block or
+# not. (Which we can determine because there should be a closing comment
+# token on the line above the type.)
+def has_doc_block(lines, linenum):
+    return linenum-2 >= 0 and lines[linenum-2] == ' */'
+
+# Do we have a test for this function? The fname is the test file, and
+# the suite and test are -- well, what they are.
+def has_test(fname, suite, test):
+    data = ''
+    with open(fname, 'r') as f:
+        data = f.read()
+    return data.find('Test(%s, %s)' % (suite, test)) > -1
+
+# Walk through a directory, looking for C source files and header files
+# to examine.
+def walk(dname):
+    for root, subdirs, subfiles in os.walk(dname):
+        for fname in subfiles:
+            if fname[-2:] == '.c' or fname[-2:] == '.h':
+                parse(root + '/' + fname)
+
+# Walk through the src dir and see what we can see.
+walk('./src')
+
+# vim:ft=python:
