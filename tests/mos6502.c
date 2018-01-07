@@ -6,6 +6,8 @@
 
 TestSuite(mos6502, .init = setup, .fini = teardown);
 
+/* Test(mos6502, free) */
+
 Test(mos6502, create)
 {
     cr_assert_neq(cpu, NULL);
@@ -116,4 +118,45 @@ Test(mos6502, read_byte)
 {
     vm_segment_set(cpu->memory, 0, 0x54);
     cr_assert_eq(mos6502_read_byte(cpu), 0x54);
+}
+
+Test(mos6502, would_jump)
+{
+    bool expect;
+    for (int inst = 0; inst <= TYA; inst++) {
+        switch (inst) {
+            case BCC:
+            case BCS:
+            case BEQ:
+            case BMI:
+            case BNE:
+            case BPL:
+            case BRK:
+            case BVC:
+            case BVS:
+            case JMP:
+            case JSR:
+                expect = true;
+                break;
+
+            default:
+                expect = false;
+                break;
+        }
+
+        cr_assert_eq(mos6502_would_jump(inst), expect);
+    }
+}
+
+Test(mos6502, flash_memory)
+{
+    vm_segment *segment;
+
+    segment = vm_segment_create(MOS6502_MEMSIZE);
+    vm_segment_set(segment, 0, 123);
+    vm_segment_set(segment, 1, 124);
+    mos6502_flash_memory(cpu, segment);
+
+    cr_assert_eq(vm_segment_get(cpu->memory, 0), 123);
+    cr_assert_eq(vm_segment_get(cpu->memory, 1), 124);
 }
