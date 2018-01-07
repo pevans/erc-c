@@ -235,6 +235,11 @@ Test(mos6502_dis, scan)
                );
 }
 
+/*
+ * These tests are all contained within the jump_label test below.
+ * Test(mos6502_dis, jump_unlabel)
+ * Test(mos6502_dis, is_jump_label)
+ */
 Test(mos6502_dis, jump_label)
 {
     cr_assert_eq(mos6502_dis_is_jump_label(123), false);
