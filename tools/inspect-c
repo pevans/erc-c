@@ -89,8 +89,11 @@ def has_test(fname, suite, test):
 def walk(dname):
     for root, subdirs, subfiles in os.walk(dname):
         for fname in subfiles:
-            if fname[-2:] == '.c' or fname[-2:] == '.h':
-                parse(root + '/' + fname)
+            if fname == 'main.c':
+                continue
+            if fname[-2:] != '.c' and fname[-2:] != '.h':
+                continue
+            parse(root + '/' + fname)
 
 # Walk through the src dir and see what we can see.
 walk('./src')
