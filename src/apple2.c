@@ -87,8 +87,8 @@ apple2_create(int width, int height)
 
     // Our two drives -- we create both of them, even if we intend to
     // use only one.
-    mach->drive1 = apple2dd_create();
-    mach->drive2 = apple2dd_create();
+    mach->drive1 = apple2_dd_create();
+    mach->drive2 = apple2_dd_create();
 
     if (mach->drive1 == NULL || mach->drive2 == NULL) {
         log_critical("Could not create disk drives!");
@@ -174,7 +174,7 @@ apple2_boot(apple2 *mach)
     // Do we have any disks?
     stream = option_get_input(1);
     if (stream) {
-        err = apple2dd_insert(mach->drive1, stream);
+        err = apple2_dd_insert(mach->drive1, stream);
         if (err != OK) {
             log_critical("Unable to insert disk1 into drive");
             return err;
@@ -183,7 +183,7 @@ apple2_boot(apple2 *mach)
 
     stream = option_get_input(2);
     if (stream) {
-        err = apple2dd_insert(mach->drive2, stream);
+        err = apple2_dd_insert(mach->drive2, stream);
         if (err != OK) {
             log_critical("Unable to insert disk2 into drive");
             return err;
@@ -256,11 +256,11 @@ apple2_free(apple2 *mach)
     }
 
     if (mach->drive1) {
-        apple2dd_free(mach->drive1);
+        apple2_dd_free(mach->drive1);
     }
 
     if (mach->drive2) {
-        apple2dd_free(mach->drive2);
+        apple2_dd_free(mach->drive2);
     }
 
     if (mach->screen) {
