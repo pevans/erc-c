@@ -28,6 +28,8 @@ Test(apple2_dd, create)
     cr_assert_eq(drive->mode, DD_READ);
 }
 
+/* Test(apple2_dd, free) */
+
 Test(apple2_dd, insert)
 {
     FILE *stream;
