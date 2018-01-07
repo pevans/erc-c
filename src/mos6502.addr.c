@@ -38,35 +38,6 @@ static int addr_modes[] = {
 };
 
 /*
- * This is a _kind_ of factory method, except we're obviously not
- * instantiating an object. Given an address mode, we return the
- * resolver function which will give you the right value (for a given
- * cpu) that an instruction will use.
- */
-mos6502_address_resolver
-mos6502_get_address_resolver(vm_8bit opcode)
-{
-    switch (mos6502_addr_mode(opcode)) {
-        case ACC: return mos6502_resolve_acc;
-        case ABS: return mos6502_resolve_abs;
-        case ABX: return mos6502_resolve_abx;
-        case ABY: return mos6502_resolve_aby;
-        case IMM: return mos6502_resolve_imm;
-        case IND: return mos6502_resolve_ind;
-        case IDX: return mos6502_resolve_idx;
-        case IDY: return mos6502_resolve_idy;
-        case REL: return mos6502_resolve_rel;
-        case ZPG: return mos6502_resolve_zpg;
-        case ZPX: return mos6502_resolve_zpx;
-        case ZPY: return mos6502_resolve_zpy;
-        case IMP:   // FALLTHRU
-        default: break;
-    }
-
-    return NULL;
-}
-
-/*
  * Just a little macro to help us figure out what the address is for
  * for 16-bit values
  */
