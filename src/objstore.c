@@ -51,6 +51,9 @@ objstore_init()
     return OK;
 }
 
+/*
+ * Return true if the object store is ready to be used.
+ */
 bool
 objstore_ready()
 {

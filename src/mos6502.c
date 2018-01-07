@@ -446,6 +446,10 @@ mos6502_would_jump(int inst_code)
         inst_code == JSR;
 }
 
+/*
+ * Here we copy the segment directly into the cpu memory, to essentially
+ * "flash" memory with the contents of another segment.
+ */
 void
 mos6502_flash_memory(mos6502 *cpu, vm_segment *segment)
 {

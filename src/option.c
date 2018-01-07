@@ -280,6 +280,9 @@ option_get_height()
     return height;
 }
 
+/*
+ * Return true if the given option flag is set.
+ */
 bool
 option_flag(int flag)
 {

@@ -309,6 +309,10 @@ mos6502_dis_opcode(mos6502 *cpu, FILE *stream, int address)
     return expected + 1;
 }
 
+/*
+ * Scan the CPU memory, from a given position until a given end, and
+ * print the results into a given file stream.
+ */
 void
 mos6502_dis_scan(mos6502 *cpu, FILE *stream, int pos, int end)
 {
@@ -317,6 +321,12 @@ mos6502_dis_scan(mos6502 *cpu, FILE *stream, int pos, int end)
     }
 }
 
+/*
+ * Associate a label with a given address or operand, depending on the
+ * address mode. For example, with REL, the jump label will be based on
+ * the address but added to or subtracted with the operand. Whereas in
+ * IND, the address is wholly dependent on the operand.
+ */
 void
 mos6502_dis_jump_label(mos6502 *cpu, 
                        vm_16bit operand, 
@@ -355,18 +365,29 @@ mos6502_dis_jump_label(mos6502 *cpu,
     jump_table[jump_loc] = 1;
 }
 
+/*
+ * Print out the form of our label to the given file stream. This is
+ * fairly dumb; it'll print out whatever address you give to it.
+ */
 inline void
 mos6502_dis_label(FILE *stream, int address)
 {
     fprintf(stream, "ADDR_%d", address);
 }
 
+/*
+ * Remove the previously-set label in the jump table for a given
+ * address.
+ */
 inline void
 mos6502_dis_jump_unlabel(int address)
 {
     jump_table[address] = 0;
 }
 
+/*
+ * Return true if the given address has a jump label associated with it.
+ */
 inline bool
 mos6502_dis_is_jump_label(int address)
 {
