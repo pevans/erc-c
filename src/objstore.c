@@ -52,6 +52,16 @@ objstore_init()
 }
 
 /*
+ * This will empty out the store, which is not very _practically_
+ * useful, but is a bit useful when testing.
+ */
+void
+objstore_clear()
+{
+    memset(&store, 0, sizeof(store));
+}
+
+/*
  * Return true if the object store is ready to be used.
  */
 bool

@@ -13,8 +13,9 @@ typedef struct {
     vm_8bit apple2_sysfont[APPLE2_SYSFONT_SIZE];
 } objstore;
 
-extern int objstore_init();
 extern bool objstore_ready();
+extern int objstore_init();
+extern void objstore_clear();
 
 #define OBJSTORE_DECL(x) \
     const vm_8bit *objstore_##x()
