@@ -74,11 +74,18 @@ def test_name_from_func(suite, func):
 # not. (Which we can determine because there should be a closing comment
 # token on the line above the type.)
 def has_doc_block(lines, linenum):
-    return linenum-2 >= 0 and lines[linenum-2] == ' */'
+    return linenum-2 >= 0 and (lines[linenum-2] == ' */' or lines[linenum-1] == ' */')
 
 # Do we have a test for this function? The fname is the test file, and
 # the suite and test are -- well, what they are.
 def has_test(fname, suite, test):
+    # This is a bit of fakery, but inspect-c is not (yet) smart enough
+    # to know that a macro like `DEFINE_ADDR(xyz)` expands to
+    # `mos6502_resolve_xyz` and that the test it should associate is
+    # that. So we skip macro function definitions for now.
+    if test.isupper():
+        return True
+
     data = ''
     with open(fname, 'r') as f:
         data = f.read()
