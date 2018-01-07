@@ -10,7 +10,7 @@
  * the disk format.
  */
 apple2dd *
-apple2dd_create()
+apple2_dd_create()
 {
     apple2dd *drive;
 
@@ -40,7 +40,7 @@ apple2dd_create()
  * something we cannot accept.
  */
 int
-apple2dd_insert(apple2dd *drive, FILE *stream)
+apple2_dd_insert(apple2dd *drive, FILE *stream)
 {
     struct stat finfo;
     int err;
@@ -62,7 +62,7 @@ apple2dd_insert(apple2dd *drive, FILE *stream)
     }
 
     // If we have any data, get rid of it. We'll start fresh here.
-    apple2dd_eject(drive);
+    apple2_dd_eject(drive);
 
     drive->data = vm_segment_create(finfo.st_size);
     drive->track_pos = 0;
@@ -83,7 +83,7 @@ apple2dd_insert(apple2dd *drive, FILE *stream)
  * upon track and sector position.
  */
 int
-apple2dd_position(apple2dd *drive)
+apple2_dd_position(apple2dd *drive)
 {
     // Special case: they didn't load any image data into the "drive".
     // Return zero.
@@ -109,10 +109,10 @@ apple2dd_position(apple2dd *drive)
  * then shift the head by 1 byte.
  */
 vm_8bit
-apple2dd_read(apple2dd *drive)
+apple2_dd_read(apple2dd *drive)
 {
-    vm_8bit byte = vm_segment_get(drive->data, apple2dd_position(drive));
-    apple2dd_shift(drive, 1);
+    vm_8bit byte = vm_segment_get(drive->data, apple2_dd_position(drive));
+    apple2_dd_shift(drive, 1);
 
     return byte;
 }
@@ -122,7 +122,7 @@ apple2dd_read(apple2dd *drive)
  * memory and resetting the head position.
  */
 void
-apple2dd_eject(apple2dd *drive)
+apple2_dd_eject(apple2dd *drive)
 {
     if (drive->data) {
         vm_segment_free(drive->data);
@@ -137,7 +137,7 @@ apple2dd_eject(apple2dd *drive)
  * Free the memory taken up by the disk drive.
  */
 void
-apple2dd_free(apple2dd *drive)
+apple2_dd_free(apple2dd *drive)
 {
     if (drive->data) {
         vm_segment_free(drive->data);
@@ -151,7 +151,7 @@ apple2dd_free(apple2dd *drive)
  * be one or the other at a time.)
  */
 void
-apple2dd_set_mode(apple2dd *drive, int mode)
+apple2_dd_set_mode(apple2dd *drive, int mode)
 {
     if (mode != DD_READ && mode != DD_WRITE) {
         return;
@@ -166,7 +166,7 @@ apple2dd_set_mode(apple2dd *drive, int mode)
  * moves further away from the center of the magnetic wafer.
  */
 void
-apple2dd_shift(apple2dd *drive, int pos)
+apple2_dd_shift(apple2dd *drive, int pos)
 {
     drive->sector_pos += pos;
 
@@ -176,7 +176,7 @@ apple2dd_shift(apple2dd *drive, int pos)
         
         // We also need to move to the next track, so let's adjust by
         // two half-tracks.
-        apple2dd_step(drive, 2);
+        apple2_dd_step(drive, 2);
     }
 }
 
@@ -188,7 +188,7 @@ apple2dd_shift(apple2dd *drive, int pos)
  * against stepping too far out or too far in.
  */
 void
-apple2dd_step(apple2dd *drive, int steps)
+apple2_dd_step(apple2dd *drive, int steps)
 {
     drive->track_pos += steps;
 
@@ -203,7 +203,7 @@ apple2dd_step(apple2dd *drive, int steps)
  * A really simple function to turn the drive "on".
  */
 void
-apple2dd_turn_on(apple2dd *drive, bool online)
+apple2_dd_turn_on(apple2dd *drive, bool online)
 {
     drive->online = online;
 }
@@ -214,10 +214,10 @@ apple2dd_turn_on(apple2dd *drive, bool online)
  * shift the drive position forward by one byte.
  */
 void
-apple2dd_write(apple2dd *drive, vm_8bit byte)
+apple2_dd_write(apple2dd *drive, vm_8bit byte)
 {
-    vm_segment_set(drive->data, apple2dd_position(drive), byte);
-    apple2dd_shift(drive, 1);
+    vm_segment_set(drive->data, apple2_dd_position(drive), byte);
+    apple2_dd_shift(drive, 1);
 }
 
 /*
@@ -227,7 +227,7 @@ apple2dd_write(apple2dd *drive, vm_8bit byte)
  * similar to just taping over or removing that tape.
  */
 void
-apple2dd_write_protect(apple2dd *drive, bool protect)
+apple2_dd_write_protect(apple2dd *drive, bool protect)
 {
     drive->write_protect = protect;
 }
