@@ -104,3 +104,16 @@ Test(apple2_mem, write_bank)
     vm_segment_set(mach->memory, 0xD073, right);
     cr_assert_eq(vm_segment_get(mach->ram2, 0x73), right);
 }
+
+Test(apple2_mem, init_disk2_rom)
+{
+    // FIXME: this isn't working, _and_ it's pretty tightly coupled into
+    // the create() function. We could use a better way of testing this.
+    //cr_assert_eq(apple2_mem_init_disk2_rom(mach), OK);
+}
+
+Test(apple2_mem, init_sys_rom)
+{
+    // FIXME: same
+    //cr_assert_eq(apple2_mem_init_sys_rom(mach), OK);
+}
