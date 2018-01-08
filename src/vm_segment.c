@@ -294,3 +294,12 @@ vm_segment_set_map_machine(void *mach)
 {
     map_mach = mach;
 }
+
+/*
+ * Return the map machine
+ */
+void *
+vm_segment_get_map_machine()
+{
+    return map_mach;
+}
