@@ -169,8 +169,8 @@ Test(vm_segment, set_map_machine)
 
 Test(vm_segment, get16)
 {
-    vm_segment_set(segment, 0, 0x12);
-    vm_segment_set(segment, 1, 0x34);
+    vm_segment_set(segment, 0, 0x34);
+    vm_segment_set(segment, 1, 0x12);
 
     cr_assert_eq(vm_segment_get16(segment, 0), 0x1234);
 }

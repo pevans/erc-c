@@ -128,8 +128,8 @@ Test(apple2, set_memory)
 Test(apple2, reset)
 {
     apple2_set_memory(mach, MEMORY_BANK_ROM);
-    vm_segment_set(mach->rom, 0x2FFC, 0x12);
-    vm_segment_set(mach->rom, 0x2FFD, 0x34);
+    vm_segment_set(mach->rom, 0x2FFC, 0x34);
+    vm_segment_set(mach->rom, 0x2FFD, 0x12);
     apple2_reset(mach);
 
     cr_assert_eq(mach->cpu->PC, 0x1234);

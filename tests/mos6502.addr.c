@@ -22,16 +22,16 @@ Test(mos6502_addr, addr_mode_acc)
 Test(mos6502_addr, addr_mode_abs)
 {
     vm_segment_set(cpu->memory, 0x1234, 111);
-    SET_PC_BYTE(cpu, 0, 0x12);
-    SET_PC_BYTE(cpu, 1, 0x34);
+    SET_PC_BYTE(cpu, 0, 0x34);
+    SET_PC_BYTE(cpu, 1, 0x12);
     cr_assert_eq(mos6502_resolve_abs(cpu), 111);
 }
 
 Test(mos6502_addr, addr_mode_abx_carry0)
 {
     vm_segment_set(cpu->memory, 0x1234, 111);
-    SET_PC_BYTE(cpu, 0, 0x12);
-    SET_PC_BYTE(cpu, 1, 0x30);
+    SET_PC_BYTE(cpu, 0, 0x30);
+    SET_PC_BYTE(cpu, 1, 0x12);
     cpu->X = 4;
     cr_assert_eq(mos6502_resolve_abx(cpu), 111);
 }
@@ -39,8 +39,8 @@ Test(mos6502_addr, addr_mode_abx_carry0)
 Test(mos6502_addr, addr_mode_abx_carry1)
 {
     vm_segment_set(cpu->memory, 0x1234, 111);
-    SET_PC_BYTE(cpu, 0, 0x12);
-    SET_PC_BYTE(cpu, 1, 0x30);
+    SET_PC_BYTE(cpu, 0, 0x30);
+    SET_PC_BYTE(cpu, 1, 0x12);
     cpu->X = 3;
     cpu->P = cpu->P | MOS_CARRY;
     cr_assert_eq(mos6502_resolve_abx(cpu), 111);
@@ -49,8 +49,8 @@ Test(mos6502_addr, addr_mode_abx_carry1)
 Test(mos6502_addr, addr_mode_aby_carry0)
 {
     vm_segment_set(cpu->memory, 0x1234, 111);
-    SET_PC_BYTE(cpu, 0, 0x12);
-    SET_PC_BYTE(cpu, 1, 0x30);
+    SET_PC_BYTE(cpu, 0, 0x30);
+    SET_PC_BYTE(cpu, 1, 0x12);
     cpu->Y = 4;
     cr_assert_eq(mos6502_resolve_aby(cpu), 111);
 }
@@ -58,8 +58,8 @@ Test(mos6502_addr, addr_mode_aby_carry0)
 Test(mos6502_addr, addr_mode_aby_carry1)
 {
     vm_segment_set(cpu->memory, 0x1234, 111);
-    SET_PC_BYTE(cpu, 0, 0x12);
-    SET_PC_BYTE(cpu, 1, 0x30);
+    SET_PC_BYTE(cpu, 0, 0x30);
+    SET_PC_BYTE(cpu, 1, 0x12);
     cpu->Y = 3;
     cpu->P = cpu->P | MOS_CARRY;
     cr_assert_eq(mos6502_resolve_aby(cpu), 111);
@@ -93,12 +93,12 @@ Test(mos6502_addr, addr_mode_idy)
 
 Test(mos6502_addr, addr_mode_ind)
 {
-    vm_segment_set(cpu->memory, 0x1234, 0x23);
-    vm_segment_set(cpu->memory, 0x1235, 0x45);
+    vm_segment_set(cpu->memory, 0x1234, 0x45);
+    vm_segment_set(cpu->memory, 0x1235, 0x23);
     vm_segment_set(cpu->memory, 0x2345, 123);
 
-    SET_PC_BYTE(cpu, 0, 0x12);
-    SET_PC_BYTE(cpu, 1, 0x34);
+    SET_PC_BYTE(cpu, 0, 0x34);
+    SET_PC_BYTE(cpu, 1, 0x12);
     cr_assert_eq(mos6502_resolve_ind(cpu), 123);
 }
 

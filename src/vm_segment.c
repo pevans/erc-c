@@ -157,8 +157,8 @@ vm_segment_get16(vm_segment *segment, size_t addr)
 {
     vm_16bit msb, lsb;
 
-    msb = (vm_16bit)vm_segment_get(segment, addr);
-    lsb = (vm_16bit)vm_segment_get(segment, addr+1);
+    lsb = (vm_16bit)vm_segment_get(segment, addr);
+    msb = (vm_16bit)vm_segment_get(segment, addr+1);
 
     return (msb << 8) | lsb;
 }

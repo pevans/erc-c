@@ -44,8 +44,8 @@ static int addr_modes[] = {
 #define ADDR_HILO(cpu) \
     vm_16bit addr; \
     vm_8bit hi, lo; \
-    hi = mos6502_next_byte(cpu); \
     lo = mos6502_next_byte(cpu); \
+    hi = mos6502_next_byte(cpu); \
     addr = (hi << 8) | lo
 
 /*
@@ -155,8 +155,8 @@ DEFINE_ADDR(ind)
 
     ADDR_HILO(cpu);
 
-    ind_hi = vm_segment_get(cpu->memory, addr);
-    ind_lo = vm_segment_get(cpu->memory, addr + 1);
+    ind_lo = vm_segment_get(cpu->memory, addr);
+    ind_hi = vm_segment_get(cpu->memory, addr + 1);
     EFF_ADDR((ind_hi << 8) | ind_lo);
 
     return vm_segment_get(cpu->memory, eff_addr);
