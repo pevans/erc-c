@@ -13,8 +13,8 @@ data = 'hope'
 
 # These must be appended in the exact order indicated by the struct definition
 # in objstore.h
-data += file_data('./data/apple2.rom')
 data += file_data('./data/disk2.rom')
+data += file_data('./data/apple2.rom')
 data += file_data('./fonts/apple2-system.bmp')
 
 # Let's not keep calling len(data) since we know it won't change over our
@@ -35,7 +35,7 @@ for i in range(0, data_len):
     if i == data_len - 1:
         break
     if i > 0 and (i+1) % 16 == 0:
-        sys.stdout.write('"\n"')
+        sys.stdout.write('" // %06x\n"' % (i))
 
 # And we're about done; finish with the last quote, and then terminate with a
 # semicolon.
