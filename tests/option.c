@@ -31,6 +31,11 @@ teardown()
 
 TestSuite(options, .init = setup, .fini = teardown);
 
+// No need to do this one...
+/* Test(option, print_help) */
+
+/* Test(option, get_error) */
+/* Test(option, set_error) */
 Test(option, error)
 {
     char *str = "hahaha FUN";
@@ -41,6 +46,8 @@ Test(option, error)
     cr_assert_str_eq(option_get_error(), str);
 }
 
+/* Test(option, get_input) */
+/* Test(option, set_input) */
 Test(option, input)
 {
     cr_assert_eq(option_get_input(1), NULL);
@@ -101,6 +108,7 @@ Test(option, parse)
 /*
  * The get_width and get_height tests also implicitly test the
  * option_set_size() function (which is called by option_parse()).
+ * Test(option, set_size)
  */
 Test(option, get_width)
 {
@@ -124,4 +132,17 @@ Test(option, get_height)
 
     cr_assert_eq(option_parse(argc, argv), 1);
     cr_assert_eq(option_get_height(), 600);
+}
+
+Test(option, flag)
+{
+    int argc = 2;
+    char *argv[] = {
+        "prog_name",
+        "--flash",
+    };
+
+    cr_assert_eq(option_flag(OPTION_FLASH), false);
+    cr_assert_eq(option_parse(argc, argv), 1);
+    cr_assert_eq(option_flag(OPTION_FLASH), true);
 }
