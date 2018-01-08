@@ -31,6 +31,7 @@ teardown()
 
 TestSuite(vm_bitfont, .init = setup, .fini = teardown);
 
+/* Test(vm_bitfont, free) */
 Test(vm_bitfont, create)
 {
     cr_assert_neq(font, NULL);

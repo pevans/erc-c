@@ -19,6 +19,7 @@ teardown()
 
 TestSuite(vm_segment, .init = setup, .fini = teardown);
 
+/* Test(vm_segment, free) */
 Test(vm_segment, create) {
     int i;
 
@@ -129,4 +130,47 @@ Test(vm_segment, use_write_map)
     vm_segment_set(segment, addr, 111);
     cr_assert_eq(vm_segment_get(segment, addr), 111);
     cr_assert_eq(vm_segment_get(segment, addr + 1), 111);
+}
+
+Test(vm_segment, copy_buf)
+{
+    vm_8bit buf[] = {1, 2, 3, 4, 5};
+
+    vm_segment_copy_buf(segment, buf, 0, 0, 3);
+
+    cr_assert_eq(vm_segment_get(segment, 0), 1);
+    cr_assert_eq(vm_segment_get(segment, 1), 2);
+    cr_assert_eq(vm_segment_get(segment, 2), 3);
+
+    // Note that segments by default are zeroed out, so we can safely
+    // assume its original values should not be 4 or 5 at these indexes.
+    cr_assert_neq(vm_segment_get(segment, 3), 4);
+    cr_assert_neq(vm_segment_get(segment, 4), 5);
+}
+
+Test(vm_segment, fread)
+{
+    FILE *stream;
+
+    stream = fopen("../data/zero.img", "r");
+    cr_assert_eq(vm_segment_fread(segment, stream, 0, 123), OK);
+}
+
+/* Test(vm_segment, get_map_machine) */
+Test(vm_segment, set_map_machine)
+{
+    void *ptr = (void *)123;
+
+    cr_assert_eq(vm_segment_get_map_machine(), NULL);
+    vm_segment_set_map_machine(ptr);
+    cr_assert_eq(vm_segment_get_map_machine(), ptr);
+    vm_segment_set_map_machine(NULL);
+}
+
+Test(vm_segment, get16)
+{
+    vm_segment_set(segment, 0, 0x12);
+    vm_segment_set(segment, 1, 0x34);
+
+    cr_assert_eq(vm_segment_get16(segment, 0), 0x1234);
 }
