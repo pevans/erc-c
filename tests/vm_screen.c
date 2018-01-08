@@ -28,6 +28,21 @@ teardown()
 
 TestSuite(vm_screen, .init = setup, .fini = teardown);
 
+/*
+ * We're missing a good way of testing some functions here... I'm going
+ * to list them for now. FIXME
+ *
+ * Test(vm_screen, init)
+ * Test(vm_screen, finish)
+ * Test(vm_screen, set_logical_coords)
+ * Test(vm_screen, add_window)
+ * Test(vm_screen, active)
+ * Test(vm_screen, refresh)
+ * Test(vm_screen, set_color)
+ * Test(vm_screen, draw_rect)
+ */
+
+/* Test(vm_screen, free) */
 Test(vm_screen, create) {
     cr_assert_neq(screen, NULL);
 
@@ -63,3 +78,4 @@ Test(vm_screen, area_set)
     cr_assert_eq(area.width, 3);
     cr_assert_eq(area.height, 4);
 }
+
