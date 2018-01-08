@@ -74,6 +74,8 @@ def test_name_from_func(suite, func):
 # not. (Which we can determine because there should be a closing comment
 # token on the line above the type.)
 def has_doc_block(lines, linenum):
+    if lines[linenum].find('// ignore docblock'):
+        return True
     return linenum-2 >= 0 and (lines[linenum-2] == ' */' or lines[linenum-1] == ' */')
 
 # Do we have a test for this function? The fname is the test file, and
