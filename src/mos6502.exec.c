@@ -36,7 +36,7 @@ DEFINE_INST(jmp)
  */
 DEFINE_INST(jsr)
 {
-    mos6502_push_stack(cpu, cpu->PC + 2);
+    mos6502_push_stack(cpu, cpu->PC);
     cpu->PC = cpu->last_addr;
 }
 
