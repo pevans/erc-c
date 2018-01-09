@@ -4,8 +4,30 @@
 #include "apple2.h"
 #include "vm_segment.h"
 
-#define APPLE2_DISK2_ROM_OFFSET 0xC600
-#define APPLE2_DISK2_ROM_SIZE 0x100
+/*
+ * Given a slot number (1-7), this will return the memory page address
+ * for the site of the ROM that is associated for the peripheral that
+ * would be connected there.
+ */
+#define APPLE2_PERIPHERAL_SLOT(n) \
+    (0xC000 + (n << 8))
+
+/*
+ * This is the size of any peripheral's ROM that we can hold in memory
+ * (which is any page from $C100 - $C700).
+ */
+#define APPLE2_PERIPHERAL_SIZE 0x700
+
+/*
+ * Peripheral ROM can only occupy a single page in memory.
+ */
+#define APPLE2_PERIPHERAL_PAGE 0x100
+
+/*
+ * System ROM requires a full 16k; part of it is copied into several
+ * pages beginning at $C800, and much more go into $D000 - $FFFF.
+ */
+#define APPLE2_SYSROM_SIZE 0x4000
 
 /*
  * The size of our block of ROM is 12k
@@ -26,7 +48,7 @@
 extern vm_8bit apple2_mem_read_bank(vm_segment *, size_t, void *);
 extern void apple2_mem_write_bank(vm_segment *, size_t, vm_8bit, void *);
 extern void apple2_mem_map(apple2 *);
-extern int apple2_mem_init_disk2_rom(apple2 *);
+extern int apple2_mem_init_peripheral_rom(apple2 *);
 extern int apple2_mem_init_sys_rom(apple2 *);
 
 #endif

@@ -93,6 +93,6 @@ objstore_ready()
  * screwing up my indent, to be honest. But C will ignore the
  * semicolons, so all is well.
  */
-OBJSTORE_DEFN(apple2_sys_rom);      // ignore docblock
-OBJSTORE_DEFN(apple2_disk2_rom);    // ignore docblock
-OBJSTORE_DEFN(apple2_sysfont);      // ignore docblock
+OBJSTORE_DEFN(apple2_peripheral_rom);   // ignore docblock
+OBJSTORE_DEFN(apple2_sys_rom);          // ignore docblock
+OBJSTORE_DEFN(apple2_sysfont);          // ignore docblock

@@ -96,34 +96,19 @@ apple2_mem_map(apple2 *mach)
     }
 }
 
-/*
- * Since we can't write into ROM normally, we need a separate function
- * we can call which will do the writing for us.
- */
 int
-apple2_mem_init_disk2_rom(apple2 *mach)
+apple2_mem_init_peripheral_rom(apple2 *mach)
 {
     int err;
-    const vm_8bit *diskrom;
 
-    diskrom = objstore_apple2_disk2_rom();
-
-    // Copy into the first peripheral page for disk ROM.
-    err = vm_segment_copy_buf(mach->memory, diskrom,
-                              APPLE2_DISK2_ROM_OFFSET, 0,
-                              APPLE2_DISK2_ROM_SIZE);
+    // Let's copy beginning at the 1-slot offset in memory, but going
+    // all the way as far as the length of all peripheral ROM in memory.
+    err = vm_segment_copy_buf(mach->memory, 
+                              objstore_apple2_peripheral_rom(),
+                              APPLE2_PERIPHERAL_SLOT(1), 0, 
+                              APPLE2_PERIPHERAL_SIZE);
     if (err != OK) {
-        log_critical("Could not copy apple2 disk2 rom");
-        return ERR_BADFILE;
-    }
-
-    // This second copy will copy into the next slot over, which is
-    // essentially the second disk drive. It's all the same ROM.
-    err = vm_segment_copy_buf(mach->memory, diskrom,
-                              APPLE2_DISK2_ROM_OFFSET + 0x100, 0,
-                              APPLE2_DISK2_ROM_SIZE);
-    if (err != OK) {
-        log_critical("Could not copy apple2 disk2 rom");
+        log_critical("Could not copy apple2 peripheral rom");
         return ERR_BADFILE;
     }
 

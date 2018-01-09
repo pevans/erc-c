@@ -8,8 +8,8 @@
 
 typedef struct {
     char header[4];
-    vm_8bit apple2_disk2_rom[APPLE2_DISK2_ROM_SIZE];
-    vm_8bit apple2_sys_rom[0x4000];
+    vm_8bit apple2_peripheral_rom[APPLE2_PERIPHERAL_SIZE];
+    vm_8bit apple2_sys_rom[APPLE2_SYSROM_SIZE];
     vm_8bit apple2_sysfont[APPLE2_SYSFONT_SIZE];
 } objstore;
 
@@ -20,7 +20,7 @@ extern void objstore_clear();
 #define OBJSTORE_DECL(x) \
     const vm_8bit *objstore_##x()
 
-OBJSTORE_DECL(apple2_disk2_rom);
+OBJSTORE_DECL(apple2_peripheral_rom);
 OBJSTORE_DECL(apple2_sys_rom);
 OBJSTORE_DECL(apple2_sysfont);
 
