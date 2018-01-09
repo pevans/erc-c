@@ -359,8 +359,8 @@ mos6502_dis_jump_label(mos6502 *cpu,
         // of the operand as a kind of double pointer, or just re-watch
         // Inception.
         case IND:
-            jump_loc = vm_segment_get(cpu->memory, operand) << 8;
-            jump_loc |= vm_segment_get(cpu->memory, operand + 1);
+            jump_loc = vm_segment_get(cpu->memory, operand + 1) << 8;
+            jump_loc |= vm_segment_get(cpu->memory, operand);
             break;
 
         // In relative address mode, the jump location will be a
