@@ -107,7 +107,7 @@ Test(mos6502_addr, addr_mode_rel_positive)
     cpu->PC = 123;
     SET_PC_BYTE(cpu, 0, 88);
     cr_assert_eq(mos6502_resolve_rel(cpu), 0);
-    cr_assert_eq(cpu->last_addr, 211);
+    cr_assert_eq(cpu->last_addr, 212);
 }
 
 Test(mos6502_addr, addr_mode_rel_negative)
@@ -115,7 +115,11 @@ Test(mos6502_addr, addr_mode_rel_negative)
     cpu->PC = 123;
     SET_PC_BYTE(cpu, 0, 216);
     cr_assert_eq(mos6502_resolve_rel(cpu), 0);
-    cr_assert_eq(cpu->last_addr, 34);
+
+    // Why not 83? Because when we resolve the relative address, PC will
+    // have incremented to account for the byte operand. So the correct
+    // calculation seems to be 123 + 1 + 216 - 256, which is 84.
+    cr_assert_eq(cpu->last_addr, 84);
 }
 
 Test(mos6502_addr, addr_mode_zpg)
