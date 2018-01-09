@@ -81,8 +81,8 @@ Test(mos6502_dis, operand)
     mos6502_dis_operand(cpu, stream, 0, IMM, 0x12);
     assert_buf("#$12");
 
-    vm_segment_set(cpu->memory, 0x1234, 0x33);
-    vm_segment_set(cpu->memory, 0x1235, 0x48);
+    vm_segment_set(cpu->memory, 0x1234, 0x48);
+    vm_segment_set(cpu->memory, 0x1235, 0x34);
 
     // For JMPs and JSRs (and BRKs), this should be a label and not a
     // literal value. So we need to test both the literal and
@@ -91,7 +91,7 @@ Test(mos6502_dis, operand)
     assert_buf("($1234)");
     mos6502_dis_jump_label(cpu, 0x1234, 0, IND);
     mos6502_dis_operand(cpu, stream, 0, IND, 0x1234);
-    assert_buf("ADDR_13128"); // = 0x1234
+    assert_buf("ADDR_3448");
 
     // Let's undo our label above...
     mos6502_dis_jump_unlabel(0x1234);
@@ -101,7 +101,7 @@ Test(mos6502_dis, operand)
     mos6502_dis_operand(cpu, stream, 0, IDY, 0x34);
     assert_buf("($34),Y");
     mos6502_dis_operand(cpu, stream, 0, ZPG, 0x34);
-    assert_buf("$34");
+    assert_buf("$34  ");
     mos6502_dis_operand(cpu, stream, 0, ZPX, 0x34);
     assert_buf("$34,X");
     mos6502_dis_operand(cpu, stream, 0, ZPY, 0x34);
@@ -115,11 +115,11 @@ Test(mos6502_dis, operand)
 
     // Test a forward jump (operand < 128)
     mos6502_dis_operand(cpu, stream, 500, REL, 52);
-    assert_buf("ADDR_552");
+    assert_buf("ADDR_228");
 
     // Test a backward jump (operand >= 128)
     mos6502_dis_operand(cpu, stream, 500, REL, 152);
-    assert_buf("ADDR_396");
+    assert_buf("ADDR_18c");
 }
 
 Test(mos6502_dis, instruction)
@@ -214,7 +214,7 @@ Test(mos6502_dis, opcode)
     vm_segment_set(cpu->memory, 1, 0x38);
 
     bytes = mos6502_dis_opcode(cpu, stream, 0);
-    assert_buf("    AND     #$38\n");
+    assert_buf("    AND     #$38	; pc=$0000 cy=02: 29 38\n");
     cr_assert_eq(bytes, 2);
 }
 
@@ -224,14 +224,18 @@ Test(mos6502_dis, scan)
     vm_segment_set(cpu->memory, 1, 0x38);
     vm_segment_set(cpu->memory, 2, 0x88);   // DEY (imp)
     vm_segment_set(cpu->memory, 3, 0x6C);   // JMP (ind)
-    vm_segment_set(cpu->memory, 4, 0x12);
-    vm_segment_set(cpu->memory, 5, 0x34);
+    vm_segment_set(cpu->memory, 4, 0x34);
+    vm_segment_set(cpu->memory, 5, 0x12);
 
     mos6502_dis_scan(cpu, stream, 0, 6);
 
-    assert_buf("    AND     #$38\n"
-               "    DEY\n"
-               "    JMP     ($1234)\n"
+    // FIXME: scan does not currently advance the PC byte; _should_ it?
+    // I'm honestly not sure. There are definitely times (e.g. during
+    // runtime operation) when you don't want it to, but as a standalone
+    // disassembler, it feels less useful when PC isn't emulated.
+    assert_buf("    AND     #$38	; pc=$0000 cy=02: 29 38\n"
+               "    DEY     		; pc=$0000 cy=02: 88\n"
+               "    JMP     ($1234)	; pc=$0000 cy=05: 6c 34 12\n"
                );
 }
 
@@ -244,8 +248,8 @@ Test(mos6502_dis, jump_label)
 {
     cr_assert_eq(mos6502_dis_is_jump_label(123), false);
     
-    vm_segment_set(cpu->memory, 123, 0);
-    vm_segment_set(cpu->memory, 124, 5);
+    vm_segment_set(cpu->memory, 123, 5);
+    vm_segment_set(cpu->memory, 124, 0);
 
     mos6502_dis_jump_label(cpu, 123, 0, IND);
     cr_assert_eq(mos6502_dis_is_jump_label(5), true);
@@ -266,5 +270,5 @@ Test(mos6502_dis, jump_label)
 Test(mos6502_dis, label)
 {
     mos6502_dis_label(stream, 123);
-    assert_buf("ADDR_123");
+    assert_buf("ADDR_7b");
 }
