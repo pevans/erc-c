@@ -37,8 +37,8 @@ Test(mos6502, next_byte)
 Test(mos6502, push_stack)
 {
     mos6502_push_stack(cpu, 0x1234);
-    cr_assert_eq(vm_segment_get(cpu->memory, 0x0100), 0x12);
-    cr_assert_eq(vm_segment_get(cpu->memory, 0x0101), 0x34);
+    cr_assert_eq(vm_segment_get(cpu->memory, 0x0100), 0x34);
+    cr_assert_eq(vm_segment_get(cpu->memory, 0x0101), 0x12);
 }
 
 Test(mos6502, pop_stack)
