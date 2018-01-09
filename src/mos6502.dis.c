@@ -304,8 +304,9 @@ mos6502_dis_opcode(mos6502 *cpu, FILE *stream, int address)
         // Here we just want to show a few pieces of information; one,
         // what the PC was at the point of this opcode sequence; two,
         // the opcode;
-        fprintf(stream, "\t; pc=$%02x%02x: %02x", 
-                cpu->PC >> 8, cpu->PC & 0xff, opcode);
+        fprintf(stream, "\t; pc=$%02x%02x cy=%02d: %02x", 
+                cpu->PC >> 8, cpu->PC & 0xff,
+                mos6502_cycles(cpu, opcode), opcode);
 
         // And three, the operand, if any. Remembering that the operand
         // should be shown in little-endian order.
