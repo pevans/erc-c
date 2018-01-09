@@ -129,7 +129,9 @@ mos6502_dis_operand(mos6502 *cpu,
             mos6502_dis_label(stream, rel_address);
             break;
         case ZPG:
-            fprintf(stream, "$%02X", value);
+            // We add a couple of spaces here to help our output
+            // comments line up.
+            fprintf(stream, "$%02X  ", value);
             break;
         case ZPX:
             fprintf(stream, "$%02X,X", value);
@@ -236,21 +238,16 @@ mos6502_dis_opcode(mos6502 *cpu, FILE *stream, int address)
 
     switch (expected) {
         case 2:
-            // If we have a two-byte operand, then the first byte is the
-            // MSB and our operand will need to shift it 8 positions to
-            // the left before it can be OR'd.
-            operand |= vm_segment_get(cpu->memory, address) << 8;
-            address++;
-
-            // Note we fall through here to the next case...
+            // Remember that the 6502 is little-endian, so the operand
+            // needs to be retrieved with the LSB first and the MSB
+            // second.
+            operand |= vm_segment_get(cpu->memory, address++);
+            operand |= vm_segment_get(cpu->memory, address++) << 8;
+            break;
 
         case 1:
-            // If it's a one-byte operand, then this byte should occupy
-            // the LSB space which simply requires we OR the byte
-            // directly in. If this is part of a two-byte operand, then
-            // the same logic still applies.
-            operand |= vm_segment_get(cpu->memory, address);
-            address++;
+            operand |= vm_segment_get(cpu->memory, address++);
+            break;
 
             // And, in any other case (e.g. 0), we are done; we don't
             // read anything, and we leave the operand as it is.
@@ -289,14 +286,33 @@ mos6502_dis_opcode(mos6502 *cpu, FILE *stream, int address)
         // Print out the instruction code that our opcode represents.
         mos6502_dis_instruction(stream, inst_code);
 
-        if (expected) {
-            // Let's "tab" over; each instruction code is 3 characters, so let's
-            // move over 5 spaces (4 spaces indent + 1, just to keep everything
-            // aligned by 4-character boundaries).
-            fprintf(stream, "     ");
+        // Let's "tab" over; each instruction code is 3 characters, so let's
+        // move over 5 spaces (4 spaces indent + 1, just to keep everything
+        // aligned by 4-character boundaries).
+        fprintf(stream, "     ");
 
+        if (expected) {
             // Print out the operand given the proper address mode.
             mos6502_dis_operand(cpu, stream, address, addr_mode, operand);
+        } else {
+            // Print out a tab to get a consistent look in our
+            // disassembled code (e.g. to take up the space that an
+            // operand would otherwise occupy).
+            fprintf(stream, "\t");
+        }
+
+        // Here we just want to show a few pieces of information; one,
+        // what the PC was at the point of this opcode sequence; two,
+        // the opcode;
+        fprintf(stream, "\t; pc=$%02x%02x: %02x", 
+                cpu->PC >> 8, cpu->PC & 0xff, opcode);
+
+        // And three, the operand, if any. Remembering that the operand
+        // should be shown in little-endian order.
+        if (expected == 2) {
+            fprintf(stream, " %02x %02x", operand & 0xff, operand >> 8);
+        } else if (expected == 1) {
+            fprintf(stream, " %02x", operand & 0xff);
         }
 
         // And let's terminate the line.
