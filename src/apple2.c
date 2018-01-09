@@ -73,7 +73,7 @@ apple2_create(int width, int height)
         return NULL;
     }
 
-    if (apple2_mem_init_disk2_rom(mach) != OK) {
+    if (apple2_mem_init_peripheral_rom(mach) != OK) {
         log_critical("Could not initialize disk2 ROM");
         apple2_free(mach);
         return NULL;
@@ -215,8 +215,6 @@ apple2_reset(apple2 *mach)
     mach->cpu->P = MOS_INTERRUPT;
     mach->cpu->PC = vm_segment_get16(mach->memory, 0xFFFC);
     mach->cpu->S = 0;
-
-    log_critical("At end of reset, PC = 0x%x", mach->cpu->PC);
 }
 
 /*
