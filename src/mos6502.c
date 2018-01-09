@@ -207,11 +207,11 @@ mos6502_push_stack(mos6502 *cpu, vm_16bit addr)
 {
     // First we need to set the hi byte, by shifting the address right 8
     // positions and using the base offset of the S register.
-    vm_segment_set(cpu->memory, 0x0100 + cpu->S, addr >> 8);
+    vm_segment_set(cpu->memory, 0x0100 + cpu->S, addr & 0xff);
 
     // Next we must record the lo byte, this time by using a bitmask to
     // capture just the low end of addr, but recording it in S + 1.
-    vm_segment_set(cpu->memory, 0x0100 + cpu->S + 1, addr & 0xFF);
+    vm_segment_set(cpu->memory, 0x0100 + cpu->S + 1, addr >> 8);
 
     // And finally we need to increment S by 2 (since we've used two
     // bytes in the stack).
@@ -231,9 +231,7 @@ mos6502_pop_stack(mos6502 *cpu)
     // We need to use a bitwise-or operation to combine the hi and lo
     // bytes we retrieve from the stack into the actual position we
     // would use for the PC register.
-    return
-        (vm_segment_get(cpu->memory, 0x0100 + cpu->S) << 8) |
-        vm_segment_get(cpu->memory, 0x0100 + cpu->S + 1);
+    return vm_segment_get16(cpu->memory, 0x0100 + cpu->S);
 }
 
 /*
@@ -354,18 +352,14 @@ void
 mos6502_execute(mos6502 *cpu, vm_8bit opcode)
 {
     vm_8bit operand = 0;
-    int cycles, bytes;
+    int cycles;
     mos6502_address_resolver resolver;
     mos6502_instruction_handler handler;
-
-    // We want to know how many bytes this opcode and its operand
-    // consume. We know the opcode is one byte.
-    bytes = 1;
 
     // The disassembler knows how many bytes each operand requires
     // (maybe this code doesn't belong in the disassembler); let's use
     // that to figure out the total number of bytes to skip.
-    bytes += mos6502_dis_expected_bytes(mos6502_addr_mode(opcode));
+    mos6502_dis_expected_bytes(mos6502_addr_mode(opcode));
 
     // First, we need to know how to resolve our effective address and
     // how to execute anything.
@@ -402,9 +396,6 @@ mos6502_execute(mos6502 *cpu, vm_8bit opcode)
     // FIXME: uh this probably isn't right, but I wanted to do
     // something.
     usleep(cycles * 100000);
-
-    // Update the counter to move beyond the opcode and its operand.
-    cpu->PC += bytes;
 
     // Ok -- we're done! This wasn't so hard, was it?
     return;
