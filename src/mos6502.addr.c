@@ -202,20 +202,20 @@ DEFINE_ADDR(idy)
  */
 DEFINE_ADDR(rel)
 {
-    vm_16bit orig_pc;
+    vm_16bit reladdr;
 
-    orig_pc = cpu->PC;
     ADDR_LO(cpu);
+    reladdr = cpu->PC + addr;
 
     if (addr > 127) {
-        // e.g. if lo == 128, then cpu->PC + 127 - lo is the
-        // same as subtracting 1 from PC.
-        EFF_ADDR(orig_pc + 127 - addr);
-        return 0;
+        // If the address has the 8th bit high, then we treat the
+        // relative number as signed; we then subtract 256 from whatever
+        // the addition was with the operand (addr, in this case).
+        reladdr -= 256;
     }
 
-    // Otherwise lo is a positive offset from PC
-    EFF_ADDR(orig_pc + addr);
+    // But if not, then we can let the addition done above stand.
+    EFF_ADDR(reladdr);
     return 0;
 }
 
