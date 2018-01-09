@@ -106,8 +106,8 @@ mos6502_dis_operand(mos6502 *cpu,
         case IMP:
             break;
         case IND:
-            ind_address = vm_segment_get(cpu->memory, value) << 8;
-            ind_address |= vm_segment_get(cpu->memory, value + 1);
+            ind_address = vm_segment_get(cpu->memory, value + 1) << 8;
+            ind_address |= vm_segment_get(cpu->memory, value);
             if (jump_table[ind_address]) {
                 mos6502_dis_label(stream, ind_address);
             } else {
@@ -388,7 +388,7 @@ mos6502_dis_jump_label(mos6502 *cpu,
 inline void
 mos6502_dis_label(FILE *stream, int address)
 {
-    fprintf(stream, "ADDR_%d", address);
+    fprintf(stream, "ADDR_%x", address);
 }
 
 /*
