@@ -15,7 +15,7 @@ Test(mos6502_branch, bcc)
     cpu->P |= MOS_CARRY;
     cpu->last_addr = 125;
     mos6502_handle_bcc(cpu, 0);
-    cr_assert_neq(cpu->PC, 125);
+    cr_assert_neq(cpu->PC, 127);
 }
 
 Test(mos6502_branch, bcs)
@@ -63,7 +63,7 @@ Test(mos6502_branch, bne)
     cpu->P |= MOS_ZERO;
     cpu->last_addr = 125;
     mos6502_handle_bne(cpu, 0);
-    cr_assert_neq(cpu->PC, 125);
+    cr_assert_neq(cpu->PC, 127);
 }
 
 Test(mos6502_branch, bpl)
@@ -75,7 +75,7 @@ Test(mos6502_branch, bpl)
     cpu->P |= MOS_NEGATIVE;
     cpu->last_addr = 125;
     mos6502_handle_bpl(cpu, 0);
-    cr_assert_neq(cpu->PC, 125);
+    cr_assert_neq(cpu->PC, 127);
 }
 
 Test(mos6502_branch, bvc)
@@ -87,7 +87,7 @@ Test(mos6502_branch, bvc)
     cpu->P |= MOS_OVERFLOW;
     cpu->last_addr = 125;
     mos6502_handle_bvc(cpu, 0);
-    cr_assert_neq(cpu->PC, 125);
+    cr_assert_neq(cpu->PC, 127);
 }
 
 Test(mos6502_branch, bvs)

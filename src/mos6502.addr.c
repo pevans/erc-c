@@ -44,8 +44,8 @@ static int addr_modes[] = {
 #define ADDR_HILO(cpu) \
     vm_16bit addr; \
     vm_8bit hi, lo; \
-    lo = mos6502_next_byte(cpu); \
-    hi = mos6502_next_byte(cpu); \
+    lo = vm_segment_get(cpu->memory, cpu->PC + 1); \
+    hi = vm_segment_get(cpu->memory, cpu->PC + 2); \
     addr = (hi << 8) | lo
 
 /*
@@ -54,7 +54,7 @@ static int addr_modes[] = {
  */
 #define ADDR_LO(cpu) \
     vm_16bit addr; \
-    addr = mos6502_next_byte(cpu)
+    addr = vm_segment_get(cpu->memory, cpu->PC + 1)
 
 /*
  * This will both define the `eff_addr` variable (which is the effective
@@ -140,7 +140,7 @@ DEFINE_ADDR(aby)
 DEFINE_ADDR(imm)
 {
     EFF_ADDR(0);
-    return mos6502_next_byte(cpu);
+    return vm_segment_get(cpu->memory, cpu->PC + 1);
 }
 
 /*
@@ -205,7 +205,7 @@ DEFINE_ADDR(rel)
     vm_16bit reladdr;
 
     ADDR_LO(cpu);
-    reladdr = cpu->PC + addr;
+    reladdr = cpu->PC + addr + 2;
 
     if (addr > 127) {
         // If the address has the 8th bit high, then we treat the

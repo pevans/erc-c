@@ -14,7 +14,7 @@
  * program counter to the last effective address.
  */
 #define JUMP_IF(cond) \
-    if (cond) cpu->PC = cpu->last_addr
+    if (cond) cpu->PC = cpu->last_addr; else cpu->PC += 2
 
 /*
  * Branch if the carry flag is clear.

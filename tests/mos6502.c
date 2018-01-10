@@ -22,18 +22,6 @@ Test(mos6502, create)
     cr_assert_eq(cpu->S, 0);
 }
 
-Test(mos6502, next_byte)
-{
-    cpu->PC = 128;
-    vm_segment_set(cpu->memory, cpu->PC, 123);
-    vm_segment_set(cpu->memory, cpu->PC + 1, 234);
-    vm_segment_set(cpu->memory, cpu->PC + 2, 12);
-
-    cr_assert_eq(mos6502_next_byte(cpu), 123);
-    cr_assert_eq(mos6502_next_byte(cpu), 234);
-    cr_assert_eq(mos6502_next_byte(cpu), 12);
-}
-
 Test(mos6502, push_stack)
 {
     mos6502_push_stack(cpu, 0x1234);
@@ -109,15 +97,11 @@ Test(mos6502, get_instruction_handler)
 
 Test(mos6502, execute)
 {
-    vm_segment_set(cpu->memory, 0, 34);
-    mos6502_execute(cpu, 0x69);
+    vm_segment_set(cpu->memory, 11, 34);
+    vm_segment_set(cpu->memory, 10, 0x69);
+    cpu->PC = 10;
+    mos6502_execute(cpu);
     cr_assert_eq(cpu->A, 34);
-}
-
-Test(mos6502, read_byte)
-{
-    vm_segment_set(cpu->memory, 0, 0x54);
-    cr_assert_eq(mos6502_read_byte(cpu), 0x54);
 }
 
 Test(mos6502, would_jump)
@@ -136,6 +120,8 @@ Test(mos6502, would_jump)
             case BVS:
             case JMP:
             case JSR:
+            case RTS:
+            case RTI:
                 expect = true;
                 break;
 
