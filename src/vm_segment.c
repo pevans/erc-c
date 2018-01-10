@@ -303,3 +303,28 @@ vm_segment_get_map_machine()
 {
     return map_mach;
 }
+
+int
+vm_segment_set16(vm_segment *segment, size_t addr, vm_16bit value)
+{
+    vm_8bit lsb, msb;
+    int err;
+
+    lsb = value & 0xff;
+    msb = value >> 8;
+
+    // This data needs to be saved in little-endian order; e.g. if we
+    // get $1234, then we need to store it as $34 $12.
+    err = vm_segment_set(segment, addr, lsb);
+
+    // If the previous set() worked out, then let's try it again with
+    // the msb.
+    if (err == OK) {
+        err = vm_segment_set(segment, addr + 1, msb);
+    }
+
+    // If err != OK above, we will just return the err code. If err was
+    // OK, but is not OK after the msb set, then we'll return with that
+    // code.
+    return err;
+}

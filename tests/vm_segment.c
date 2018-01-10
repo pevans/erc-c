@@ -174,3 +174,9 @@ Test(vm_segment, get16)
 
     cr_assert_eq(vm_segment_get16(segment, 0), 0x1234);
 }
+
+Test(vm_segment, set16)
+{
+    vm_segment_set16(segment, 0, 0x2345);
+    cr_assert_eq(vm_segment_get16(segment, 0), 0x2345);
+}

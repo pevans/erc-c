@@ -58,6 +58,7 @@ extern int vm_segment_copy_buf(vm_segment *, const vm_8bit *, size_t, size_t, si
 extern int vm_segment_fread(vm_segment *, FILE *, size_t, size_t);
 extern int vm_segment_read_map(vm_segment *, size_t, vm_segment_read_fn);
 extern int vm_segment_set(vm_segment *, size_t, vm_8bit);
+extern int vm_segment_set16(vm_segment *, size_t, vm_16bit);
 extern int vm_segment_write_map(vm_segment *, size_t, vm_segment_write_fn);
 extern vm_16bit vm_segment_get16(vm_segment *, size_t);
 extern vm_8bit vm_segment_get(vm_segment *, size_t);
