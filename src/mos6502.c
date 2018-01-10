@@ -179,21 +179,6 @@ mos6502_free(mos6502 *cpu)
 }
 
 /*
- * Return the next byte from the PC register position, and increment the
- * PC register.
- */
-vm_8bit
-mos6502_next_byte(mos6502 *cpu)
-{
-    vm_8bit byte;
-
-    byte = vm_segment_get(cpu->memory, cpu->PC);
-    cpu->PC++;
-
-    return byte;
-}
-
-/*
  * Push a _16-bit_ number to the stack. Generally speaking, only
  * addresses are pushed to the stack, such that would be contained in
  * the PC register (which is 16-bit).
@@ -349,17 +334,20 @@ mos6502_get_instruction_handler(vm_8bit opcode)
  * from soup to nuts.
  */
 void
-mos6502_execute(mos6502 *cpu, vm_8bit opcode)
+mos6502_execute(mos6502 *cpu)
 {
-    vm_8bit operand = 0;
-    int cycles;
+    vm_8bit opcode, operand = 0;
+    int cycles, bytes;
     mos6502_address_resolver resolver;
     mos6502_instruction_handler handler;
 
+    opcode = vm_segment_get(cpu->memory, cpu->PC);
+
     // The disassembler knows how many bytes each operand requires
     // (maybe this code doesn't belong in the disassembler); let's use
-    // that to figure out the total number of bytes to skip.
-    mos6502_dis_expected_bytes(mos6502_addr_mode(opcode));
+    // that to figure out the total number of bytes to skip. We add 1
+    // because we need to account for the opcode as well.
+    bytes = 1 + mos6502_dis_expected_bytes(mos6502_addr_mode(opcode));
 
     // First, we need to know how to resolve our effective address and
     // how to execute anything.
@@ -393,27 +381,18 @@ mos6502_execute(mos6502 *cpu, vm_8bit opcode)
     // programs to feel faster or slower in relation to that.
     cycles = mos6502_cycles(cpu, opcode);
 
+    // If we need to jump, then the handler has to take care of updating
+    // PC. If not, then we need to do it. 
+    if (!mos6502_would_jump(mos6502_instruction(opcode))) {
+        cpu->PC += bytes;
+    }
+
     // FIXME: uh this probably isn't right, but I wanted to do
     // something.
     usleep(cycles * 100000);
 
     // Ok -- we're done! This wasn't so hard, was it?
     return;
-}
-
-/*
- * Return the next byte in memory according to the program counter
- * register, and then increment the register.
- */
-vm_8bit
-mos6502_read_byte(mos6502 *cpu)
-{
-    vm_8bit byte;
-
-    byte = vm_segment_get(cpu->memory, cpu->PC);
-    cpu->PC++;
-
-    return byte;
 }
 
 /*
@@ -434,7 +413,9 @@ mos6502_would_jump(int inst_code)
         inst_code == BVC ||
         inst_code == BVS ||
         inst_code == JMP ||
-        inst_code == JSR;
+        inst_code == JSR ||
+        inst_code == RTS ||
+        inst_code == RTI;
 }
 
 /*
