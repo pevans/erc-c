@@ -304,6 +304,12 @@ vm_segment_get_map_machine()
     return map_mach;
 }
 
+/*
+ * This is similar in spirit to the get16 function, but obviously more
+ * practically similar to the set() function. Given a 16-bit value, we
+ * will save this into the given address in little-endian order; this
+ * therefore consumes bytes at both addr and addr+1.
+ */
 int
 vm_segment_set16(vm_segment *segment, size_t addr, vm_16bit value)
 {
