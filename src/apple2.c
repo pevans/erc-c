@@ -190,6 +190,11 @@ apple2_boot(apple2 *mach)
         }
     }
 
+    // To begin with, we need to set the reset vector to the Applesoft
+    // interpeter.
+    vm_segment_set16(mach->memory, APPLE2_RESET_VECTOR,
+                     APPLE2_APPLESOFT_MAIN);
+
     if (option_flag(OPTION_FLASH)) {
         mos6502_flash_memory(mach->cpu, mach->drive1->data);
     }
