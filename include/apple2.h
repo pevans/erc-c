@@ -11,6 +11,30 @@
  */
 #define APPLE2_SYSFONT_SIZE 21558
 
+/*
+ * The reset vector is the address where the apple will consult to
+ * figure out where control should go after a reset. Think of this as
+ * something like a pointer to a main() function in C. That is: where's
+ * the main function? Let's ask the reset vector!
+ */
+#define APPLE2_RESET_VECTOR 0x03F2
+
+/*
+ * This is the address of the validity-check byte, aka the power-up
+ * byte. The Apple II will use this to see if the reset vector is valid.
+ */
+#define APPLE2_POWERUP_BYTE 0x03F4
+
+/*
+ * I'm not _exactly_ clear on where the applesoft interpreter lives in
+ * ROM, after spending possibly too-much time researching how this
+ * works. My guess is I'm missing something that's obvious to others.
+ * $E000 seems to be the original spot that Integer BASIC was contained,
+ * and I'm going to guess Applesoft BASIC is in the same spot. Here's
+ * hoping!
+ */
+#define APPLE2_APPLESOFT_MAIN 0xE000
+
 enum video_modes {
     VIDEO_40COL_TEXT,
     VIDEO_LORES,
