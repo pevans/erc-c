@@ -215,6 +215,8 @@ apple2_reset(apple2 *mach)
     mach->cpu->P = MOS_INTERRUPT;
     mach->cpu->PC = vm_segment_get16(mach->memory, 0xFFFC);
     mach->cpu->S = 0;
+
+    apple2_set_video(VIDEO_40COL_TEXT);
 }
 
 /*
