@@ -222,10 +222,10 @@ apple2_reset(apple2 *mach)
     mach->cpu->S = 0;
 
     // Switch video mode back to 40 column text
-    apple2_set_video(VIDEO_40COL_TEXT);
+    apple2_set_video(mach, VIDEO_40COL_TEXT);
 
     // Default to read from ROM
-    apple2_set_memory(MEMORY_BANK_ROM);
+    apple2_set_memory(mach, MEMORY_BANK_ROM);
 }
 
 /*
