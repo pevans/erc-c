@@ -320,7 +320,7 @@ apple2_run_loop(apple2 *mach)
 
     while (vm_screen_active(mach->screen)) {
         mos6502_dis_opcode(mach->cpu, stdout, mach->cpu->PC);
-        mos6502_execute(mach->cpu, mos6502_next_byte(mach->cpu));
+        mos6502_execute(mach->cpu);
         vm_screen_refresh(mach->screen);
     }
 }
