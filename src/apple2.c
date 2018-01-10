@@ -216,7 +216,11 @@ apple2_reset(apple2 *mach)
     mach->cpu->PC = vm_segment_get16(mach->memory, 0xFFFC);
     mach->cpu->S = 0;
 
+    // Switch video mode back to 40 column text
     apple2_set_video(VIDEO_40COL_TEXT);
+
+    // Default to read from ROM
+    apple2_set_memory(MEMORY_BANK_ROM);
 }
 
 /*
