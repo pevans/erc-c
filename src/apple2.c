@@ -67,8 +67,9 @@ apple2_create(int width, int height)
     // Initliaze our system ROM and separate bank-switched block of RAM
     mach->rom = vm_segment_create(APPLE2_ROM_SIZE);
     mach->ram2 = vm_segment_create(APPLE2_RAM2_SIZE);
-    if (mach->rom == NULL || mach->ram2 == NULL) {
-        log_critical("Could not initialize ROM / RAM2!");
+    mach->aux = vm_segment_create(APPLE2_AUX_SIZE);
+    if (mach->rom == NULL || mach->ram2 == NULL || mach->aux == NULL) {
+        log_critical("Could not initialize ROM / RAM2 / AUX!");
         apple2_free(mach);
         return NULL;
     }

@@ -40,6 +40,13 @@
 #define APPLE2_RAM2_SIZE 0x1000
 
 /*
+ * At the highest point (with the IIe extended 80 column text card), you
+ * could have a whole other 64k of data in auxiliary memory. (Of which
+ * only 1k was needed for 80 columns!)
+ */
+#define APPLE2_AUX_SIZE 0x10000
+
+/*
  * This is the base address (or offset) for all bank-switched memory
  */
 #define APPLE2_BANK_OFFSET 0xD000

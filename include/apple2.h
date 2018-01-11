@@ -125,6 +125,15 @@ typedef struct {
     vm_segment *ram2;
 
     /*
+     * The Apple II may have an auxiliary RAM bank; this was possible by
+     * installing a card there. If you had the 80-column text card (and
+     * you likely did), then you got an extra kilobyte of RAM to work
+     * with; it was either used for the extra columns or you could take
+     * advantage of it for extra storage otherwise.
+     */
+    vm_segment *aux;
+
+    /*
      * The screen wherein we shall render all of our graphics.
      */
     vm_screen *screen;
