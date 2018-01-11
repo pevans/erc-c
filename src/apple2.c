@@ -66,6 +66,9 @@ apple2_create(int width, int height)
         return NULL;
     }
 
+    // This is more-or-less the same setup you do in apple2_reset().
+    apple2_set_bank_switch(mach, MEMORY_ROM | MEMORY_WRITE | MEMORY_RAM2);
+
     // Set the read/write mappers for everything
     apple2_mem_map(mach);
 
@@ -124,11 +127,6 @@ apple2_create(int width, int height)
 
     // We default to lo-res mode.
     apple2_set_video(mach, VIDEO_LORES);
-
-    // At cold boot, we don't care what the bank switch is; the reset
-    // function will do the right thing, so let's default the flags to
-    // zero.
-    mach->bank_switch = 0;
 
     // Let's install our bitmap font.
     mach->sysfont = vm_bitfont_create(mach->screen,
