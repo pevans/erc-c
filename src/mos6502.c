@@ -391,7 +391,7 @@ mos6502_execute(mos6502 *cpu)
 
     // FIXME: uh this probably isn't right, but I wanted to do
     // something.
-    usleep(cycles * 100000);
+    usleep(cycles * 10000);
 
     // Ok -- we're done! This wasn't so hard, was it?
     return;
