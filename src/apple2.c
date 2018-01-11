@@ -45,6 +45,7 @@ apple2_create(int width, int height)
     // Forward set these to NULL in case we fail to build the machine
     // properly; that way, we won't try to free garbage data
     mach->rom = NULL;
+    mach->cpu = NULL;
     mach->aux = NULL;
     mach->main = NULL;
     mach->sysfont = NULL;
