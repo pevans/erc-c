@@ -40,7 +40,7 @@ Test(apple2_mem, read_bank)
 
     // Test that setting a value in the rom segment is returned to us
     // when addressing from main memory
-    mach->memory_mode = MEMORY_BANK_ROM;
+    apple2_set_bank_switch(mach, MEMORY_ROM | MEMORY_WRITE);
     val = 123;
     vm_segment_set(mach->rom, 0x77, val);
     val = vm_segment_get(mach->rom, 0x77);
@@ -50,7 +50,7 @@ Test(apple2_mem, read_bank)
     // value in memory... but, as a twist, also check that the value is
     // not set in ROM nor in RAM2.
     val = 222;
-    mach->memory_mode = MEMORY_BANK_RAM1;
+    apple2_set_bank_switch(mach, MEMORY_WRITE);
     vm_segment_set(mach->memory, 0xD077, val);
     cr_assert_eq(vm_segment_get(mach->memory, 0xD077), val);
     cr_assert_neq(vm_segment_get(mach->rom, 0x77), val);
@@ -60,7 +60,7 @@ Test(apple2_mem, read_bank)
     // the value directly in ram2 and see if it's there when addressing
     // from main memory.
     val = 111;
-    mach->memory_mode = MEMORY_BANK_RAM2;
+    apple2_set_bank_switch(mach, mach->bank_switch | MEMORY_RAM2);
     vm_segment_set(mach->ram2, 0x77, val);
     cr_assert_eq(vm_segment_get(mach->memory, 0xD077), val);
 }
@@ -80,7 +80,7 @@ Test(apple2_mem, write_bank)
     // were).
     right = 123;
     wrong = 222;
-    mach->memory_mode = MEMORY_BANK_ROM;
+    apple2_set_bank_switch(mach, MEMORY_ROM);
     vm_segment_set(mach->rom, 0x77, right);
     vm_segment_set(mach->memory, 0xD077, wrong);
     cr_assert_eq(vm_segment_get(mach->rom, 0x77), right);
@@ -89,7 +89,7 @@ Test(apple2_mem, write_bank)
     // RAM1 is the main bank; it's all 64k RAM in one chunk.
     right = 111;
     wrong = 232;
-    mach->memory_mode = MEMORY_BANK_RAM1;
+    apple2_set_bank_switch(mach, MEMORY_WRITE);
     vm_segment_set(mach->memory, 0xD078, right);
     vm_segment_set(mach->ram2, 0x78, wrong);
     cr_assert_eq(vm_segment_get(mach->memory, 0xD078), right);
@@ -99,7 +99,7 @@ Test(apple2_mem, write_bank)
     // ($D000..$DFFF) is in ram2.
     right = 210;
     wrong = 132;
-    mach->memory_mode = MEMORY_BANK_RAM2;
+    apple2_set_bank_switch(mach, mach->bank_switch | MEMORY_RAM2);
     vm_segment_set(mach->ram2, 0x73, wrong);
     vm_segment_set(mach->memory, 0xD073, right);
     cr_assert_eq(vm_segment_get(mach->ram2, 0x73), right);

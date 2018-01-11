@@ -119,9 +119,10 @@ apple2_create(int width, int height)
     // We default to lo-res mode.
     apple2_set_video(mach, VIDEO_LORES);
 
-    // By default we should have ROM be the addressable last 12k of
-    // memory.
-    apple2_set_memory(mach, MEMORY_BANK_ROM);
+    // At cold boot, we don't care what the bank switch is; the reset
+    // function will do the right thing, so let's default the flags to
+    // zero.
+    mach->bank_switch = 0;
 
     // Let's install our bitmap font.
     mach->sysfont = vm_bitfont_create(mach->screen,
@@ -139,12 +140,12 @@ apple2_create(int width, int height)
 }
 
 /*
- * Change the memory mode of the apple2 to a given mode.
+ * Change the bank switch flags for the apple 2.
  */
 void
-apple2_set_memory(apple2 *mach, int mode)
+apple2_set_bank_switch(apple2 *mach, vm_8bit flags)
 {
-    mach->memory_mode = mode;
+    mach->bank_switch = flags;
 }
 
 /*
@@ -224,8 +225,11 @@ apple2_reset(apple2 *mach)
     // Switch video mode back to 40 column text
     apple2_set_video(mach, VIDEO_40COL_TEXT);
 
-    // Default to read from ROM
-    apple2_set_memory(mach, MEMORY_BANK_ROM);
+    // Default to:
+    // - read from ROM
+    // - write to RAM
+    // - use bank 2 for $Dxxx hexapage
+    apple2_set_bank_switch(mach, MEMORY_ROM | MEMORY_WRITE | MEMORY_RAM2);
 }
 
 /*

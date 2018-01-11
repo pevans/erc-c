@@ -117,17 +117,16 @@ Test(apple2, set_video)
     cr_assert_eq(mach->video_mode, VIDEO_LORES);
 }
 
-Test(apple2, set_memory)
+Test(apple2, set_bank_switch)
 {
-    apple2_set_memory(mach, MEMORY_BANK_RAM1);
-    cr_assert_eq(mach->memory_mode, MEMORY_BANK_RAM1);
-    apple2_set_memory(mach, MEMORY_BANK_RAM2);
-    cr_assert_eq(mach->memory_mode, MEMORY_BANK_RAM2);
+    cr_assert_eq(mach->bank_switch, 0);
+    apple2_set_bank_switch(mach, MEMORY_ROM | MEMORY_WRITE | MEMORY_RAM2);
+    cr_assert_eq(mach->bank_switch, MEMORY_ROM | MEMORY_WRITE | MEMORY_RAM2);
 }
 
 Test(apple2, reset)
 {
-    apple2_set_memory(mach, MEMORY_BANK_ROM);
+    apple2_set_bank_switch(mach, MEMORY_ROM);
     vm_segment_set(mach->rom, 0x2FFC, 0x34);
     vm_segment_set(mach->rom, 0x2FFD, 0x12);
     apple2_reset(mach);

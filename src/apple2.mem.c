@@ -17,33 +17,23 @@ apple2_mem_read_bank(vm_segment *segment, size_t address, void *_mach)
 
     mach = (apple2 *)_mach;
     
-    switch (mach->memory_mode) {
-        // Return memory from the rom bank
-        case MEMORY_BANK_ROM:
-            // We need to account for the difference in address location
-            // before we can successfully get any data from ROM.
-            return vm_segment_get(mach->rom, address - APPLE2_BANK_OFFSET);
-
-        // If the address is $D000..$DFFF, then we need to get the byte
-        // from the ram2 bank. Otherwise, we break to use default
-        // behavior.
-        case MEMORY_BANK_RAM2:
-            if (address < 0xE000) {
-                // The same caution holds for getting data from the
-                // second RAM bank.
-                return vm_segment_get(mach->ram2, 
-                                      address - APPLE2_BANK_OFFSET);
-            }
-            
-            break;
-
-        case MEMORY_BANK_RAM1:
-        default:
-            break;
+    if (mach->bank_switch & MEMORY_ROM) {
+        // We need to account for the difference in address location
+        // before we can successfully get any data from ROM.
+        return vm_segment_get(mach->rom, address - APPLE2_BANK_OFFSET);
     }
 
-    // The "default" behavior as referred-to above is simply to return
-    // the value as held in our primary memory bank.
+    // If the address is $D000..$DFFF, then we may need to get the byte
+    // from the ram2 bank. 
+    if (address < 0xE000 && mach->bank_switch & MEMORY_RAM2) {
+        // The same caution holds for getting data from the
+        // second RAM bank.
+        return vm_segment_get(mach->ram2, 
+                              address - APPLE2_BANK_OFFSET);
+    }
+
+    // Otherwise, the byte is returned from bank 1 RAM, which is the
+    // literal memory available in the segment.
     return segment->memory[address];
 }
 
@@ -59,24 +49,29 @@ apple2_mem_write_bank(vm_segment *segment,
 
     mach = (apple2 *)_mach;
 
-    switch (mach->memory_mode) {
-        // Whoops -- we can't write any data into ROM.
-        case MEMORY_BANK_ROM:
-            return;
-
-        case MEMORY_BANK_RAM2:
-            if (address < 0xE000) {
-                vm_segment_set(mach->ram2,
-                               address - APPLE2_BANK_OFFSET, value);
-                return;
-            }
-
-        case MEMORY_BANK_RAM1:
-        default:
-            break;
+    // No writes are allowed... sorry!
+    if (~mach->bank_switch & MEMORY_WRITE) {
+        return;
     }
 
-    // Just set the value in main memory
+    // You will note, if we've gotten here, that it's possible to write
+    // to the bank-switch addresses even if the ROM flag is 1. It's
+    // true! Except that writes never go to ROM. That is to say, it's
+    // possible to read from ROM and write to RAM at the same
+    // time--well, nearly the same time, considering the 6502 does not
+    // allow parallel actions!
+
+    // If bank 2 RAM is turned on, and the address is in the $D000
+    // hexapage, then we write to our ram2 segment.
+    if (address < 0xE000 && mach->bank_switch & MEMORY_RAM2) {
+        vm_segment_set(mach->ram2,
+                       address - APPLE2_BANK_OFFSET, value);
+        return;
+    }
+
+    // But if bank 2 RAM is not turned on, or the address is between
+    // $E000 - $FFFF, then writes go to bank 1 RAM, which is our main
+    // memory.
     segment->memory[address] = value;
 }
 

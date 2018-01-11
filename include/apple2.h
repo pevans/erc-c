@@ -70,15 +70,30 @@ enum lores_colors {
     LORES_WHITE,
 };
 
+// Write-protect on/off.
+// Read target = ROM or RAM.
+// Write target = RAM.
+// Set mode of $Dxxx hexapage bank1 or bank2 ram.
+
+// 0 - 0=off 1=on
+// 1 - 0=ROM 1=RAM
+// 2 - 0=BANK1 1=BANK2
+
 /*
- * These are the potential memory modes we understand. You can only have
- * one memory mode at a time.
+ * An Apple II has bank-switched memory beginning with $D000 extending
+ * through $FFFF. The enums below define bit flag names to determine
+ * what is accessible through those addresses.
+ *
+ * Note that it _is_ possible to write while reading ROM, but your
+ * writes will not go to ROM; they'll go to _RAM_. Any write to $E000 -
+ * $FFFF may only be sent to bank 1 RAM. Writes to $D000-$DFFF may
+ * either be sent to bank 1 RAM or bank 2 RAM based upon the RAM2 bit
+ * flag below.
  */
 enum memory_mode {
-    MEMORY_BANK_ROM,        // the last 12k is system ROM
-    MEMORY_BANK_RAM1,       // the last 12k is system RAM
-    MEMORY_BANK_RAM2,       // the first 4k of the last 12k is a separate RAM
-                            // block from that in RAM1
+    MEMORY_ROM = 1,         // on = read ROM; off = read RAM
+    MEMORY_WRITE = 2,       // on = allow writes to RAM; off = disallow writes
+    MEMORY_RAM2 = 4,        // on = use bank 2 for $D000-$DFFF; off = use bank 1
 };
 
 typedef struct {
@@ -140,7 +155,7 @@ typedef struct {
      * our read/write mappers to know where writes into the
      * bank-switched area of memory should target.
      */
-    int memory_mode;
+    vm_8bit bank_switch;
 
     /*
      * Our two disk drives.
@@ -159,7 +174,7 @@ extern void apple2_release_key(apple2 *);
 extern void apple2_reset(apple2 *);
 extern void apple2_run_loop(apple2 *);
 extern void apple2_set_color(apple2 *, int);
-extern void apple2_set_memory(apple2 *, int);
+extern void apple2_set_bank_switch(apple2 *, vm_8bit);
 extern void apple2_set_video(apple2 *, int);
 
 #endif
