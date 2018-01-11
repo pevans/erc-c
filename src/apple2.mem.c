@@ -10,8 +10,7 @@
  * Return a byte of memory from a bank-switchable address. This may be
  * from ROM, from main memory, or from the "extra" 4k bank of RAM.
  */
-vm_8bit
-apple2_mem_read_bank(vm_segment *segment, size_t address, void *_mach)
+SEGMENT_READER(apple2_mem_read_bank)
 {
     apple2 *mach;
 
@@ -20,30 +19,28 @@ apple2_mem_read_bank(vm_segment *segment, size_t address, void *_mach)
     if (mach->bank_switch & MEMORY_ROM) {
         // We need to account for the difference in address location
         // before we can successfully get any data from ROM.
-        return vm_segment_get(mach->rom, address - APPLE2_BANK_OFFSET);
+        return vm_segment_get(mach->rom, addr - APPLE2_BANK_OFFSET);
     }
 
     // If the address is $D000..$DFFF, then we may need to get the byte
     // from the ram2 bank. 
-    if (address < 0xE000 && mach->bank_switch & MEMORY_RAM2) {
+    if (addr < 0xE000 && mach->bank_switch & MEMORY_RAM2) {
         // The same caution holds for getting data from the
         // second RAM bank.
         return vm_segment_get(mach->ram2, 
-                              address - APPLE2_BANK_OFFSET);
+                              addr - APPLE2_BANK_OFFSET);
     }
 
     // Otherwise, the byte is returned from bank 1 RAM, which is the
     // literal memory available in the segment.
-    return segment->memory[address];
+    return segment->memory[addr];
 }
 
 /*
  * Write a byte into bank-switchable memory. Many of the same cautions,
  * notes, etc. written for the read function apply here as well.
  */
-void
-apple2_mem_write_bank(vm_segment *segment, 
-                      size_t address, vm_8bit value, void *_mach)
+SEGMENT_WRITER(apple2_mem_write_bank)
 {
     apple2 *mach;
 
@@ -63,16 +60,16 @@ apple2_mem_write_bank(vm_segment *segment,
 
     // If bank 2 RAM is turned on, and the address is in the $D000
     // hexapage, then we write to our ram2 segment.
-    if (address < 0xE000 && mach->bank_switch & MEMORY_RAM2) {
+    if (addr < 0xE000 && mach->bank_switch & MEMORY_RAM2) {
         vm_segment_set(mach->ram2,
-                       address - APPLE2_BANK_OFFSET, value);
+                       addr - APPLE2_BANK_OFFSET, value);
         return;
     }
 
     // But if bank 2 RAM is not turned on, or the address is between
     // $E000 - $FFFF, then writes go to bank 1 RAM, which is our main
     // memory.
-    segment->memory[address] = value;
+    segment->memory[addr] = value;
 }
 
 /*

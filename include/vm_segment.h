@@ -22,6 +22,12 @@ typedef struct vm_segment vm_segment;
 typedef vm_8bit (*vm_segment_read_fn)(vm_segment *, size_t, void *);
 typedef void (*vm_segment_write_fn)(vm_segment *, size_t, vm_8bit, void *);
 
+#define SEGMENT_READER(x) \
+    vm_8bit x (vm_segment *segment, size_t addr, void *_mach)
+
+#define SEGMENT_WRITER(x) \
+    void x (vm_segment *segment, size_t addr, vm_8bit value, void *_mach)
+
 /*
  * The bounds check is just some inline code to try and cut down on the
  * cost of it.
