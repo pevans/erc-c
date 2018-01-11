@@ -22,13 +22,14 @@ SEGMENT_READER(apple2_mem_read_bank)
         return vm_segment_get(mach->rom, addr - APPLE2_BANK_OFFSET);
     }
 
-    // If the address is $D000..$DFFF, then we may need to get the byte
-    // from the ram2 bank. 
+    // Each memory bank (main or auxiliary) have an additional 4k of RAM
+    // that you can access through bank-switching in the $D000 - $DFFF
+    // range, which is actually held at the _end_ of memory beyond the
+    // 64k mark.
     if (addr < 0xE000 && mach->bank_switch & MEMORY_RAM2) {
         // The same caution holds for getting data from the
         // second RAM bank.
-        return vm_segment_get(mach->ram2, 
-                              addr - APPLE2_BANK_OFFSET);
+        return segment->memory[addr + 0x3000];
     }
 
     // Otherwise, the byte is returned from bank 1 RAM, which is the
@@ -58,11 +59,11 @@ SEGMENT_WRITER(apple2_mem_write_bank)
     // time--well, nearly the same time, considering the 6502 does not
     // allow parallel actions!
 
-    // If bank 2 RAM is turned on, and the address is in the $D000
-    // hexapage, then we write to our ram2 segment.
+    // In this case, we need to assign the value at the 64-68k range at
+    // the end of memory; this is just a simple offset from the given
+    // address.
     if (addr < 0xE000 && mach->bank_switch & MEMORY_RAM2) {
-        vm_segment_set(mach->ram2,
-                       addr - APPLE2_BANK_OFFSET, value);
+        segment->memory[addr + 0x3000] = value;
         return;
     }
 

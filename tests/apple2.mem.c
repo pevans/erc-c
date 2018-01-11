@@ -54,14 +54,15 @@ Test(apple2_mem, read_bank)
     vm_segment_set(mach->main, 0xD077, val);
     cr_assert_eq(vm_segment_get(mach->main, 0xD077), val);
     cr_assert_neq(vm_segment_get(mach->rom, 0x77), val);
-    cr_assert_neq(vm_segment_get(mach->ram2, 0x77), val);
+    cr_assert_neq(vm_segment_get(mach->main, 0x10077), val);
 
     // Finally, in RAM2 bank mode, we test similarly to ROM mode. Set
-    // the value directly in ram2 and see if it's there when addressing
-    // from main memory.
+    // the value directly in ram2 (which is at $10000 - $1FFFF) and see
+    // if it's there when addressing from main memory in the $Dnnn
+    // range.
     val = 111;
     apple2_set_bank_switch(mach, mach->bank_switch | MEMORY_RAM2);
-    vm_segment_set(mach->ram2, 0x77, val);
+    vm_segment_set(mach->main, 0x10077, val);
     cr_assert_eq(vm_segment_get(mach->main, 0xD077), val);
 }
 
@@ -91,18 +92,18 @@ Test(apple2_mem, write_bank)
     wrong = 232;
     apple2_set_bank_switch(mach, MEMORY_WRITE);
     vm_segment_set(mach->main, 0xD078, right);
-    vm_segment_set(mach->ram2, 0x78, wrong);
+    vm_segment_set(mach->main, 0x10078, wrong);
     cr_assert_eq(vm_segment_get(mach->main, 0xD078), right);
-    cr_assert_eq(vm_segment_get(mach->ram2, 0x78), wrong);
+    cr_assert_eq(vm_segment_get(mach->main, 0x10078), wrong);
 
     // RAM2 is most of the 64k, except the first 4k of the last 12
     // ($D000..$DFFF) is in ram2.
     right = 210;
     wrong = 132;
     apple2_set_bank_switch(mach, mach->bank_switch | MEMORY_RAM2);
-    vm_segment_set(mach->ram2, 0x73, wrong);
+    vm_segment_set(mach->main, 0x10073, wrong);
     vm_segment_set(mach->main, 0xD073, right);
-    cr_assert_eq(vm_segment_get(mach->ram2, 0x73), right);
+    cr_assert_eq(vm_segment_get(mach->main, 0x10073), right);
 }
 
 Test(apple2_mem, init_disk2_rom)

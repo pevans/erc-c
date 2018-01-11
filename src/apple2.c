@@ -45,14 +45,14 @@ apple2_create(int width, int height)
     // Forward set these to NULL in case we fail to build the machine
     // properly; that way, we won't try to free garbage data
     mach->rom = NULL;
-    mach->ram2 = NULL;
+    mach->aux = NULL;
     mach->main = NULL;
     mach->sysfont = NULL;
     mach->screen = NULL;
     mach->drive1 = NULL;
     mach->drive2 = NULL;
 
-    mach->main = vm_segment_create(MOS6502_MEMSIZE);
+    mach->main = vm_segment_create(APPLE2_MEMORY_SIZE);
     if (mach->main == NULL) {
         log_critical("Could not initialize main RAM!");
         apple2_free(mach);
@@ -74,10 +74,9 @@ apple2_create(int width, int height)
 
     // Initliaze our system ROM and separate bank-switched block of RAM
     mach->rom = vm_segment_create(APPLE2_ROM_SIZE);
-    mach->ram2 = vm_segment_create(APPLE2_RAM2_SIZE);
-    mach->aux = vm_segment_create(APPLE2_AUX_SIZE);
-    if (mach->rom == NULL || mach->ram2 == NULL || mach->aux == NULL) {
-        log_critical("Could not initialize ROM / RAM2 / AUX!");
+    mach->aux = vm_segment_create(APPLE2_MEMORY_SIZE);
+    if (mach->rom == NULL || mach->aux == NULL) {
+        log_critical("Could not initialize ROM / AUX!");
         apple2_free(mach);
         return NULL;
     }
@@ -258,10 +257,6 @@ apple2_free(apple2 *mach)
 
     if (mach->rom) {
         vm_segment_free(mach->rom);
-    }
-
-    if (mach->ram2) {
-        vm_segment_free(mach->ram2);
     }
 
     if (mach->main) {

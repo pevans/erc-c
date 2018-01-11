@@ -116,15 +116,6 @@ typedef struct {
     vm_segment *rom;
     
     /*
-     * Additionally, the Apple II had a standalone block of RAM (with no
-     * good name for it, really, hence the regrettably vague "ram2") so
-     * that you technically could use 16k of RAM from a set of 12k
-     * addresses. The extra 4k lives a lonely life in the garage
-     * apartment.
-     */
-    vm_segment *ram2;
-
-    /*
      * The Apple II may have an auxiliary RAM bank; this was possible by
      * installing a card there. If you had the 80-column text card (and
      * you likely did), then you got an extra kilobyte of RAM to work

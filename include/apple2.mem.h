@@ -5,6 +5,16 @@
 #include "vm_segment.h"
 
 /*
+ * The MOS 6502 expects 64k of addressable space, but the Apple II
+ * technically has 68k of memory in each bank. (Along with having both a
+ * main and an auxiliary memory bank, with identical address schemes.)
+ * This is handled through bank-switching; the additional memory (which
+ * is accessible through $D000 - $DFFF) is actually stored in the
+ * 64k-68k block at the end.
+ */
+#define APPLE2_MEMORY_SIZE 0x11000
+
+/*
  * Given a slot number (1-7), this will return the memory page address
  * for the site of the ROM that is associated for the peripheral that
  * would be connected there.
@@ -33,11 +43,6 @@
  * The size of our block of ROM is 12k
  */
 #define APPLE2_ROM_SIZE 0x3000
-
-/*
- * Whereas the second bank of RAM is a mere 4k
- */
-#define APPLE2_RAM2_SIZE 0x1000
 
 /*
  * At the highest point (with the IIe extended 80 column text card), you
