@@ -44,8 +44,8 @@ static int addr_modes[] = {
 #define ADDR_HILO(cpu) \
     vm_16bit addr; \
     vm_8bit hi, lo; \
-    lo = vm_segment_get(cpu->memory, cpu->PC + 1); \
-    hi = vm_segment_get(cpu->memory, cpu->PC + 2); \
+    lo = mos6502_get(cpu, cpu->PC + 1); \
+    hi = mos6502_get(cpu, cpu->PC + 2); \
     addr = (hi << 8) | lo
 
 /*
@@ -54,7 +54,7 @@ static int addr_modes[] = {
  */
 #define ADDR_LO(cpu) \
     vm_16bit addr; \
-    addr = vm_segment_get(cpu->memory, cpu->PC + 1)
+    addr = mos6502_get(cpu, cpu->PC + 1)
 
 /*
  * This will both define the `eff_addr` variable (which is the effective
@@ -100,7 +100,7 @@ DEFINE_ADDR(abs)
 {
     ADDR_HILO(cpu);
     EFF_ADDR(addr);
-    return vm_segment_get(cpu->memory, addr);
+    return mos6502_get(cpu, addr);
 }
 
 /*
@@ -115,7 +115,7 @@ DEFINE_ADDR(abx)
     MOS_CARRY_BIT();
     EFF_ADDR(addr + cpu->X + carry);
 
-    return vm_segment_get(cpu->memory, eff_addr);
+    return mos6502_get(cpu, eff_addr);
 }
 
 /*
@@ -128,7 +128,7 @@ DEFINE_ADDR(aby)
     MOS_CARRY_BIT();
     EFF_ADDR(addr + cpu->Y + carry);
 
-    return vm_segment_get(cpu->memory, eff_addr);
+    return mos6502_get(cpu, eff_addr);
 }
 
 /*
@@ -140,7 +140,7 @@ DEFINE_ADDR(aby)
 DEFINE_ADDR(imm)
 {
     EFF_ADDR(0);
-    return vm_segment_get(cpu->memory, cpu->PC + 1);
+    return mos6502_get(cpu, cpu->PC + 1);
 }
 
 /*
@@ -155,11 +155,11 @@ DEFINE_ADDR(ind)
 
     ADDR_HILO(cpu);
 
-    ind_lo = vm_segment_get(cpu->memory, addr);
-    ind_hi = vm_segment_get(cpu->memory, addr + 1);
+    ind_lo = mos6502_get(cpu, addr);
+    ind_hi = mos6502_get(cpu, addr + 1);
     EFF_ADDR((ind_hi << 8) | ind_lo);
 
-    return vm_segment_get(cpu->memory, eff_addr);
+    return mos6502_get(cpu, eff_addr);
 }
 
 /*
@@ -174,9 +174,9 @@ DEFINE_ADDR(idx)
     ADDR_LO(cpu);
     EFF_ADDR(addr + cpu->X);
 
-    return vm_segment_get(
-        cpu->memory, 
-        vm_segment_get(cpu->memory, eff_addr));
+    return mos6502_get(
+        cpu, 
+        mos6502_get(cpu, eff_addr));
 }
 
 /*
@@ -189,9 +189,9 @@ DEFINE_ADDR(idy)
 {
     ADDR_LO(cpu);
     MOS_CARRY_BIT();
-    EFF_ADDR(vm_segment_get(cpu->memory, addr) + cpu->Y + carry);
+    EFF_ADDR(mos6502_get(cpu, addr) + cpu->Y + carry);
 
-    return vm_segment_get(cpu->memory, eff_addr);
+    return mos6502_get(cpu, eff_addr);
 }
 
 /*
@@ -230,7 +230,7 @@ DEFINE_ADDR(zpg)
     ADDR_LO(cpu);
     EFF_ADDR(addr);
 
-    return vm_segment_get(cpu->memory, eff_addr);
+    return mos6502_get(cpu, eff_addr);
 }
 
 /*
@@ -242,7 +242,7 @@ DEFINE_ADDR(zpx)
     ADDR_LO(cpu);
     EFF_ADDR(addr + cpu->X);
 
-    return vm_segment_get(cpu->memory, eff_addr);
+    return mos6502_get(cpu, eff_addr);
 }
 
 /*
@@ -255,5 +255,5 @@ DEFINE_ADDR(zpy)
     ADDR_LO(cpu);
     EFF_ADDR(addr + cpu->Y);
 
-    return vm_segment_get(cpu->memory, eff_addr);
+    return mos6502_get(cpu, eff_addr);
 }

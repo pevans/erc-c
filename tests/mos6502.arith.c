@@ -65,13 +65,13 @@ Test(mos6502_arith, dec)
     cr_assert_neq(cpu->A, 4);
 
     cpu->last_addr = 123;
-    vm_segment_set(cpu->memory, 123, 44);
+    mos6502_set(cpu, 123, 44);
 
     // Note _also_ that DEC expects the number to be decremented will be
     // passed in as the effective operand, although it doesn't
     // necessarily need for that to be so.
     mos6502_handle_dec(cpu, 44);
-    cr_assert_eq(vm_segment_get(cpu->memory, 123), 43);
+    cr_assert_eq(mos6502_get(cpu, 123), 43);
 }
 
 Test(mos6502_arith, dex)
@@ -92,7 +92,7 @@ Test(mos6502_arith, inc)
 {
     cpu->last_addr = 123;
     mos6502_handle_inc(cpu, 55);
-    cr_assert_eq(vm_segment_get(cpu->memory, 123), 56);
+    cr_assert_eq(mos6502_get(cpu, 123), 56);
 }
 
 Test(mos6502_arith, inx)

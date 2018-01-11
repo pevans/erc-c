@@ -24,7 +24,7 @@ Test(mos6502_bits, asl)
 
     cpu->last_addr = 123;
     mos6502_handle_asl(cpu, 22);
-    cr_assert_eq(vm_segment_get(cpu->memory, 123), 44);
+    cr_assert_eq(mos6502_get(cpu, 123), 44);
 }
 
 Test(mos6502_bits, bit)
@@ -75,7 +75,7 @@ Test(mos6502_bits, lsr)
 
     cpu->last_addr = 123;
     mos6502_handle_lsr(cpu, 22);
-    cr_assert_eq(vm_segment_get(cpu->memory, 123), 11);
+    cr_assert_eq(mos6502_get(cpu, 123), 11);
     cr_assert_eq(cpu->P & MOS_CARRY, MOS_CARRY);
 }
 
@@ -97,7 +97,7 @@ Test(mos6502_bits, rol)
 
     cpu->last_addr = 234;
     mos6502_handle_rol(cpu, 128);
-    cr_assert_eq(vm_segment_get(cpu->memory, 234), 1);
+    cr_assert_eq(mos6502_get(cpu, 234), 1);
 }
 
 Test(mos6502_bits, ror)
@@ -107,5 +107,5 @@ Test(mos6502_bits, ror)
 
     cpu->last_addr = 123;
     mos6502_handle_ror(cpu, 1);
-    cr_assert_eq(vm_segment_get(cpu->memory, 123), 128);
+    cr_assert_eq(mos6502_get(cpu, 123), 128);
 }

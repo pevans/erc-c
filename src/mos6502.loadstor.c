@@ -75,7 +75,7 @@ DEFINE_INST(plp)
  */
 DEFINE_INST(sta)
 {
-    vm_segment_set(cpu->memory, cpu->last_addr, cpu->A);
+    mos6502_set(cpu, cpu->last_addr, cpu->A);
 }
 
 /*
@@ -83,7 +83,7 @@ DEFINE_INST(sta)
  */
 DEFINE_INST(stx)
 {
-    vm_segment_set(cpu->memory, cpu->last_addr, cpu->X);
+    mos6502_set(cpu, cpu->last_addr, cpu->X);
 }
 
 /*
@@ -91,7 +91,7 @@ DEFINE_INST(stx)
  */
 DEFINE_INST(sty)
 {
-    vm_segment_set(cpu->memory, cpu->last_addr, cpu->Y);
+    mos6502_set(cpu, cpu->last_addr, cpu->Y);
 }
 
 /*

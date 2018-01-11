@@ -60,7 +60,7 @@ DEFINE_INST(cpy)
 DEFINE_INST(dec) 
 {
     if (cpu->last_addr) {
-        vm_segment_set(cpu->memory, cpu->last_addr, oper - 1);
+        mos6502_set(cpu, cpu->last_addr, oper - 1);
         mos6502_modify_status(cpu, MOS_NEGATIVE | MOS_ZERO, oper - 1);
     }
 }
@@ -91,7 +91,7 @@ DEFINE_INST(dey)
 DEFINE_INST(inc)
 {
     if (cpu->last_addr) {
-        vm_segment_set(cpu->memory, cpu->last_addr, oper + 1);
+        mos6502_set(cpu, cpu->last_addr, oper + 1);
         mos6502_modify_status(cpu, MOS_NEGATIVE | MOS_ZERO, oper + 1);
     }
 }

@@ -77,16 +77,16 @@ Test(apple2, boot)
 Test(apple2, press_key)
 {
     apple2_press_key(mach, 123);
-    cr_assert_eq(vm_segment_get(mach->memory, 0xC000), 123 | 0x80);
-    cr_assert_eq(vm_segment_get(mach->memory, 0xC010), 0x80);
+    cr_assert_eq(vm_segment_get(mach->main, 0xC000), 123 | 0x80);
+    cr_assert_eq(vm_segment_get(mach->main, 0xC010), 0x80);
 }
 
 Test(apple2, clear_strobe)
 {
     apple2_press_key(mach, 123);
-    cr_assert_eq(vm_segment_get(mach->memory, 0xC000), 123 | 0x80);
+    cr_assert_eq(vm_segment_get(mach->main, 0xC000), 123 | 0x80);
     apple2_clear_strobe(mach);
-    cr_assert_eq(vm_segment_get(mach->memory, 0xC000), 123);
+    cr_assert_eq(vm_segment_get(mach->main, 0xC000), 123);
 }
 
 /*
@@ -96,9 +96,9 @@ Test(apple2, clear_strobe)
 Test(apple2, release_key)
 {
     apple2_press_key(mach, 123);
-    cr_assert_eq(vm_segment_get(mach->memory, 0xC010), 0x80);
+    cr_assert_eq(vm_segment_get(mach->main, 0xC010), 0x80);
     apple2_release_key(mach);
-    cr_assert_eq(vm_segment_get(mach->memory, 0xC010), 0);
+    cr_assert_eq(vm_segment_get(mach->main, 0xC010), 0);
 }
 
 Test(apple2, set_color)

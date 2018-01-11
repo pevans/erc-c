@@ -39,7 +39,7 @@ DEFINE_INST(asl)
     oper <<= 1;
 
     if (cpu->last_addr) {
-        vm_segment_set(cpu->memory, cpu->last_addr, oper);
+        mos6502_set(cpu, cpu->last_addr, oper);
     } else {
         cpu->A = oper;
     }
@@ -98,7 +98,7 @@ DEFINE_INST(lsr)
     oper >>= 1;
 
     if (cpu->last_addr) {
-        vm_segment_set(cpu->memory, cpu->last_addr, oper);
+        mos6502_set(cpu, cpu->last_addr, oper);
     } else {
         cpu->A = oper;
     }
@@ -137,7 +137,7 @@ DEFINE_INST(rol)
     }
 
     if (cpu->last_addr) {
-        vm_segment_set(cpu->memory, cpu->last_addr, oper);
+        mos6502_set(cpu, cpu->last_addr, oper);
     } else {
         cpu->A = oper;
     }
@@ -164,7 +164,7 @@ DEFINE_INST(ror)
     }
 
     if (cpu->last_addr) {
-        vm_segment_set(cpu->memory, cpu->last_addr, oper);
+        mos6502_set(cpu, cpu->last_addr, oper);
     } else {
         cpu->A = oper;
     }

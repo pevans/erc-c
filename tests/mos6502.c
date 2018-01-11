@@ -12,7 +12,8 @@ Test(mos6502, create)
 {
     cr_assert_neq(cpu, NULL);
 
-    cr_assert_eq(cpu->memory->size, MOS6502_MEMSIZE);
+    cr_assert_eq(cpu->rmem->size, MOS6502_MEMSIZE);
+    cr_assert_eq(cpu->wmem->size, MOS6502_MEMSIZE);
 
     cr_assert_eq(cpu->PC, 0);
     cr_assert_eq(cpu->A, 0);
@@ -25,8 +26,8 @@ Test(mos6502, create)
 Test(mos6502, push_stack)
 {
     mos6502_push_stack(cpu, 0x1234);
-    cr_assert_eq(vm_segment_get(cpu->memory, 0x0100), 0x34);
-    cr_assert_eq(vm_segment_get(cpu->memory, 0x0101), 0x12);
+    cr_assert_eq(mos6502_get(cpu, 0x0100), 0x34);
+    cr_assert_eq(mos6502_get(cpu, 0x0101), 0x12);
 }
 
 Test(mos6502, pop_stack)
@@ -97,8 +98,8 @@ Test(mos6502, get_instruction_handler)
 
 Test(mos6502, execute)
 {
-    vm_segment_set(cpu->memory, 11, 34);
-    vm_segment_set(cpu->memory, 10, 0x69);
+    mos6502_set(cpu, 11, 34);
+    mos6502_set(cpu, 10, 0x69);
     cpu->PC = 10;
     mos6502_execute(cpu);
     cr_assert_eq(cpu->A, 34);
@@ -132,19 +133,6 @@ Test(mos6502, would_jump)
 
         cr_assert_eq(mos6502_would_jump(inst), expect);
     }
-}
-
-Test(mos6502, flash_memory)
-{
-    vm_segment *segment;
-
-    segment = vm_segment_create(MOS6502_MEMSIZE);
-    vm_segment_set(segment, 0, 123);
-    vm_segment_set(segment, 1, 124);
-    mos6502_flash_memory(cpu, segment);
-
-    cr_assert_eq(vm_segment_get(cpu->memory, 0), 123);
-    cr_assert_eq(vm_segment_get(cpu->memory, 1), 124);
 }
 
 Test(mos6502, get_address_resolver)

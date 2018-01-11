@@ -17,7 +17,7 @@
  * the PC register position; useful in testing.
  */
 #define SET_PC_BYTE(cpu, off, byte) \
-    vm_segment_set(cpu->memory, cpu->PC + off, byte)
+    mos6502_set(cpu, cpu->PC + off, byte)
 
 /*
  * This macro is used to define new instruction handler functions.
@@ -52,9 +52,13 @@
 
 typedef struct {
     /*
-     * Our memory.
+     * There are two different segment pointers for reading and writing,
+     * because it's possible for there to be two different banks in
+     * which an action occurs. These memory segments must be injected at
+     * creation time, and can be changed later.
      */
-    vm_segment *memory;
+    vm_segment *rmem;
+    vm_segment *wmem;
 
     /*
      * This contains the last _effective_ address we've resolved in one
@@ -116,14 +120,18 @@ typedef void (*mos6502_instruction_handler)(mos6502 *, vm_8bit);
 extern bool mos6502_would_jump(int);
 extern int mos6502_cycles(mos6502 *, vm_8bit);
 extern int mos6502_instruction(vm_8bit);
-extern mos6502 *mos6502_create();
+extern mos6502 *mos6502_create(vm_segment *, vm_segment *);
 extern mos6502_instruction_handler mos6502_get_instruction_handler(vm_8bit);
+extern vm_16bit mos6502_get16(mos6502 *, size_t);
 extern vm_16bit mos6502_pop_stack(mos6502 *);
+extern vm_8bit mos6502_get(mos6502 *, size_t);
 extern void mos6502_execute(mos6502 *);
 extern void mos6502_flash_memory(mos6502 *, vm_segment *);
 extern void mos6502_free(mos6502 *);
 extern void mos6502_modify_status(mos6502 *, vm_8bit, vm_8bit);
 extern void mos6502_push_stack(mos6502 *, vm_16bit);
+extern void mos6502_set(mos6502 *, size_t, vm_8bit);
+extern void mos6502_set16(mos6502 *, size_t, vm_16bit);
 extern void mos6502_set_status(mos6502 *, vm_8bit);
 
 /*

@@ -29,8 +29,8 @@ Test(apple2_mem, map)
     size_t addr;
 
     for (addr = APPLE2_BANK_OFFSET; addr < MOS6502_MEMSIZE; addr++) {
-        cr_assert_eq(mach->memory->read_table[addr], apple2_mem_read_bank);
-        cr_assert_eq(mach->memory->write_table[addr], apple2_mem_write_bank);
+        cr_assert_eq(mach->main->read_table[addr], apple2_mem_read_bank);
+        cr_assert_eq(mach->main->write_table[addr], apple2_mem_write_bank);
     }
 }
 
@@ -44,15 +44,15 @@ Test(apple2_mem, read_bank)
     val = 123;
     vm_segment_set(mach->rom, 0x77, val);
     val = vm_segment_get(mach->rom, 0x77);
-    cr_assert_eq(vm_segment_get(mach->memory, 0xD077), val);
+    cr_assert_eq(vm_segment_get(mach->main, 0xD077), val);
 
     // In RAM1 bank mode, setting a value in memory should return thaty
     // value in memory... but, as a twist, also check that the value is
     // not set in ROM nor in RAM2.
     val = 222;
     apple2_set_bank_switch(mach, MEMORY_WRITE);
-    vm_segment_set(mach->memory, 0xD077, val);
-    cr_assert_eq(vm_segment_get(mach->memory, 0xD077), val);
+    vm_segment_set(mach->main, 0xD077, val);
+    cr_assert_eq(vm_segment_get(mach->main, 0xD077), val);
     cr_assert_neq(vm_segment_get(mach->rom, 0x77), val);
     cr_assert_neq(vm_segment_get(mach->ram2, 0x77), val);
 
@@ -62,7 +62,7 @@ Test(apple2_mem, read_bank)
     val = 111;
     apple2_set_bank_switch(mach, mach->bank_switch | MEMORY_RAM2);
     vm_segment_set(mach->ram2, 0x77, val);
-    cr_assert_eq(vm_segment_get(mach->memory, 0xD077), val);
+    cr_assert_eq(vm_segment_get(mach->main, 0xD077), val);
 }
 
 /*
@@ -82,17 +82,17 @@ Test(apple2_mem, write_bank)
     wrong = 222;
     apple2_set_bank_switch(mach, MEMORY_ROM);
     vm_segment_set(mach->rom, 0x77, right);
-    vm_segment_set(mach->memory, 0xD077, wrong);
+    vm_segment_set(mach->main, 0xD077, wrong);
     cr_assert_eq(vm_segment_get(mach->rom, 0x77), right);
-    cr_assert_eq(vm_segment_get(mach->memory, 0xD077), right);
+    cr_assert_eq(vm_segment_get(mach->main, 0xD077), right);
 
     // RAM1 is the main bank; it's all 64k RAM in one chunk.
     right = 111;
     wrong = 232;
     apple2_set_bank_switch(mach, MEMORY_WRITE);
-    vm_segment_set(mach->memory, 0xD078, right);
+    vm_segment_set(mach->main, 0xD078, right);
     vm_segment_set(mach->ram2, 0x78, wrong);
-    cr_assert_eq(vm_segment_get(mach->memory, 0xD078), right);
+    cr_assert_eq(vm_segment_get(mach->main, 0xD078), right);
     cr_assert_eq(vm_segment_get(mach->ram2, 0x78), wrong);
 
     // RAM2 is most of the 64k, except the first 4k of the last 12
@@ -101,7 +101,7 @@ Test(apple2_mem, write_bank)
     wrong = 132;
     apple2_set_bank_switch(mach, mach->bank_switch | MEMORY_RAM2);
     vm_segment_set(mach->ram2, 0x73, wrong);
-    vm_segment_set(mach->memory, 0xD073, right);
+    vm_segment_set(mach->main, 0xD073, right);
     cr_assert_eq(vm_segment_get(mach->ram2, 0x73), right);
 }
 

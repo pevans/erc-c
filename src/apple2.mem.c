@@ -83,8 +83,8 @@ apple2_mem_map(apple2 *mach)
     vm_segment_set_map_machine(mach);
 
     for (addr = APPLE2_BANK_OFFSET; addr < MOS6502_MEMSIZE; addr++) {
-        vm_segment_read_map(mach->memory, addr, apple2_mem_read_bank);
-        vm_segment_write_map(mach->memory, addr, apple2_mem_write_bank);
+        vm_segment_read_map(mach->main, addr, apple2_mem_read_bank);
+        vm_segment_write_map(mach->main, addr, apple2_mem_write_bank);
     }
 }
 
@@ -95,7 +95,7 @@ apple2_mem_init_peripheral_rom(apple2 *mach)
 
     // Let's copy beginning at the 1-slot offset in memory, but going
     // all the way as far as the length of all peripheral ROM in memory.
-    err = vm_segment_copy_buf(mach->memory, 
+    err = vm_segment_copy_buf(mach->main, 
                               objstore_apple2_peripheral_rom(),
                               APPLE2_PERIPHERAL_SLOT(1), 0, 
                               APPLE2_PERIPHERAL_SIZE);
@@ -123,7 +123,7 @@ apple2_mem_init_sys_rom(apple2 *mach)
     // The first two kilobytes of system rom are copied into memory
     // beginning at $C800 (which is just after all of the peripheral ROM
     // locations).
-    err = vm_segment_copy_buf(mach->memory, sysrom,
+    err = vm_segment_copy_buf(mach->main, sysrom,
                               0xC800, 0x800, 0x800);
     if (err != OK) {
         log_critical("Could not copy apple2 system rom");

@@ -50,7 +50,7 @@ apple2_draw_pixel(apple2 *mach, vm_16bit addr)
 void
 apple2_draw_pixel_lores(apple2 *mach, vm_16bit addr)
 {
-    vm_8bit color = vm_segment_get(mach->memory, addr);
+    vm_8bit color = vm_segment_get(mach->main, addr);
     vm_8bit top, bottom;
     vm_area loc;
     int *colors;
@@ -151,7 +151,7 @@ apple2_draw_text(apple2 *mach, vm_16bit addr)
     dest.height = mach->sysfont->height;
 
     // And...lastly...what's in the address?
-    ch = (char)vm_segment_get(mach->memory, addr);
+    ch = (char)vm_segment_get(mach->main, addr);
 
     // Let's firstly blank out that space on screen.
     vm_bitfont_render(mach->sysfont, mach->screen, &dest, ' ');

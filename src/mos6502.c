@@ -145,7 +145,7 @@ static int cycles[] = {
  * used therein. All registers should be zeroed out.
  */
 mos6502 *
-mos6502_create()
+mos6502_create(vm_segment *rmem, vm_segment *wmem)
 {
     mos6502 *cpu;
    
@@ -155,7 +155,8 @@ mos6502_create()
         exit(1);
     }
 
-    cpu->memory = vm_segment_create(MOS6502_MEMSIZE);
+    cpu->rmem = rmem;
+    cpu->wmem = wmem;
 
     cpu->last_addr = 0;
     cpu->PC = 0;
@@ -174,7 +175,8 @@ mos6502_create()
 void
 mos6502_free(mos6502 *cpu)
 {
-    vm_segment_free(cpu->memory);
+    // Note we do not free rmem or wmem; we consider this to be the
+    // responsibility of the caller that passed us those values.
     free(cpu);
 }
 
@@ -192,11 +194,11 @@ mos6502_push_stack(mos6502 *cpu, vm_16bit addr)
 {
     // First we need to set the hi byte, by shifting the address right 8
     // positions and using the base offset of the S register.
-    vm_segment_set(cpu->memory, 0x0100 + cpu->S, addr & 0xff);
+    mos6502_set(cpu, 0x0100 + cpu->S, addr & 0xff);
 
     // Next we must record the lo byte, this time by using a bitmask to
     // capture just the low end of addr, but recording it in S + 1.
-    vm_segment_set(cpu->memory, 0x0100 + cpu->S + 1, addr >> 8);
+    mos6502_set(cpu, 0x0100 + cpu->S + 1, addr >> 8);
 
     // And finally we need to increment S by 2 (since we've used two
     // bytes in the stack).
@@ -216,7 +218,7 @@ mos6502_pop_stack(mos6502 *cpu)
     // We need to use a bitwise-or operation to combine the hi and lo
     // bytes we retrieve from the stack into the actual position we
     // would use for the PC register.
-    return vm_segment_get16(cpu->memory, 0x0100 + cpu->S);
+    return mos6502_get16(cpu, 0x0100 + cpu->S);
 }
 
 /*
@@ -341,7 +343,7 @@ mos6502_execute(mos6502 *cpu)
     mos6502_address_resolver resolver;
     mos6502_instruction_handler handler;
 
-    opcode = vm_segment_get(cpu->memory, cpu->PC);
+    opcode = mos6502_get(cpu, cpu->PC);
 
     // The disassembler knows how many bytes each operand requires
     // (maybe this code doesn't belong in the disassembler); let's use
@@ -425,7 +427,7 @@ mos6502_would_jump(int inst_code)
 void
 mos6502_flash_memory(mos6502 *cpu, vm_segment *segment)
 {
-    vm_segment_copy(cpu->memory, segment, 0, 0, cpu->memory->size - 1);
+    //vm_segment_copy(cpu, segment, 0, 0, cpu->size - 1);
 }
 
 /*
@@ -457,3 +459,26 @@ mos6502_get_address_resolver(vm_8bit opcode)
     return NULL;
 }
 
+inline vm_8bit
+mos6502_get(mos6502 *cpu, size_t addr)
+{
+    return vm_segment_get(cpu->rmem, addr);
+}
+
+inline vm_16bit
+mos6502_get16(mos6502 *cpu, size_t addr)
+{
+    return vm_segment_get16(cpu->rmem, addr);
+}
+
+inline void
+mos6502_set(mos6502 *cpu, size_t addr, vm_8bit value)
+{
+    vm_segment_set(cpu->wmem, addr, value);
+}
+
+inline void
+mos6502_set16(mos6502 *cpu, size_t addr, vm_16bit value)
+{
+    vm_segment_set16(cpu->wmem, addr, value);
+}

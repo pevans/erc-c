@@ -103,11 +103,11 @@ typedef struct {
     mos6502 *cpu;
 
     /*
-     * This is the literal memory that the CPU above will create. You
-     * should _not_ attempt to free this memory; allow the CPU's own
-     * delete function to do that.
+     * This is the main memory bank of the computer. Conventionally, it
+     * contains not only the first contiguous 48k of RAM, but it also
+     * contains the last 12k of bank 1 RAM.
      */
-    vm_segment *memory;
+    vm_segment *main;
 
     /*
      * The Apple II used a system of bank-switched memory to enable

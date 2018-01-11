@@ -17,7 +17,7 @@ static char buf[BUFSIZ];
  */
 static FILE *stream = NULL;
 static mos6502 *cpu = NULL;
-
+static vm_segment *mem = NULL;
 
 static void
 setup()
@@ -39,7 +39,8 @@ setup()
     // don't do that :D
     setvbuf(stream, buf, _IOFBF, 256);
 
-    cpu = mos6502_create();
+    mem = vm_segment_create(MOS6502_MEMSIZE);
+    cpu = mos6502_create(mem, mem);
 }
 
 static void
@@ -47,6 +48,7 @@ teardown()
 {
     fclose(stream);
     mos6502_free(cpu);
+    vm_segment_free(mem);
 }
 
 static void
@@ -81,8 +83,8 @@ Test(mos6502_dis, operand)
     mos6502_dis_operand(cpu, stream, 0, IMM, 0x12);
     assert_buf("#$12");
 
-    vm_segment_set(cpu->memory, 0x1234, 0x48);
-    vm_segment_set(cpu->memory, 0x1235, 0x34);
+    mos6502_set(cpu, 0x1234, 0x48);
+    mos6502_set(cpu, 0x1235, 0x34);
 
     // For JMPs and JSRs (and BRKs), this should be a label and not a
     // literal value. So we need to test both the literal and
@@ -210,8 +212,8 @@ Test(mos6502_dis, opcode)
 {
     int bytes;
 
-    vm_segment_set(cpu->memory, 0, 0x29);   // AND (imm)
-    vm_segment_set(cpu->memory, 1, 0x38);
+    mos6502_set(cpu, 0, 0x29);   // AND (imm)
+    mos6502_set(cpu, 1, 0x38);
 
     bytes = mos6502_dis_opcode(cpu, stream, 0);
     assert_buf("    AND     #$38	; pc=$0000 cy=02: 29 38\n");
@@ -220,12 +222,12 @@ Test(mos6502_dis, opcode)
 
 Test(mos6502_dis, scan)
 {
-    vm_segment_set(cpu->memory, 0, 0x29);   // AND (imm)
-    vm_segment_set(cpu->memory, 1, 0x38);
-    vm_segment_set(cpu->memory, 2, 0x88);   // DEY (imp)
-    vm_segment_set(cpu->memory, 3, 0x6C);   // JMP (ind)
-    vm_segment_set(cpu->memory, 4, 0x34);
-    vm_segment_set(cpu->memory, 5, 0x12);
+    mos6502_set(cpu, 0, 0x29);   // AND (imm)
+    mos6502_set(cpu, 1, 0x38);
+    mos6502_set(cpu, 2, 0x88);   // DEY (imp)
+    mos6502_set(cpu, 3, 0x6C);   // JMP (ind)
+    mos6502_set(cpu, 4, 0x34);
+    mos6502_set(cpu, 5, 0x12);
 
     mos6502_dis_scan(cpu, stream, 0, 6);
 
@@ -248,8 +250,8 @@ Test(mos6502_dis, jump_label)
 {
     cr_assert_eq(mos6502_dis_is_jump_label(123), false);
     
-    vm_segment_set(cpu->memory, 123, 5);
-    vm_segment_set(cpu->memory, 124, 0);
+    mos6502_set(cpu, 123, 5);
+    mos6502_set(cpu, 124, 0);
 
     mos6502_dis_jump_label(cpu, 123, 0, IND);
     cr_assert_eq(mos6502_dis_is_jump_label(5), true);

@@ -51,15 +51,19 @@ apple2_create(int width, int height)
     mach->drive1 = NULL;
     mach->drive2 = NULL;
 
-    mach->cpu = mos6502_create();
+    mach->main = vm_segment_create(MOS6502_MEMSIZE);
+    if (mach->main == NULL) {
+        log_critical("Could not initialize main RAM!");
+        apple2_free(mach);
+        return NULL;
+    }
+
+    mach->cpu = mos6502_create(mach->main, mach->main);
     if (mach->cpu == NULL) {
         log_critical("Could not create CPU!");
         apple2_free(mach);
         return NULL;
     }
-
-    // Our memory is that which is owned by the CPU.
-    mach->memory = mach->cpu->memory;
 
     // Set the read/write mappers for everything
     apple2_mem_map(mach);
@@ -194,15 +198,11 @@ apple2_boot(apple2 *mach)
 
     // To begin with, we need to set the reset vector to the Applesoft
     // interpeter.
-    vm_segment_set16(mach->memory, APPLE2_RESET_VECTOR,
+    vm_segment_set16(mach->main, APPLE2_RESET_VECTOR,
                      APPLE2_APPLESOFT_MAIN);
 
-    if (option_flag(OPTION_FLASH)) {
-        mos6502_flash_memory(mach->cpu, mach->drive1->data);
-    }
-
     if (option_flag(OPTION_DISASSEMBLE)) {
-        mos6502_dis_scan(mach->cpu, stdout, 0, mach->cpu->memory->size);
+        mos6502_dis_scan(mach->cpu, stdout, 0, mach->main->size);
     }
 
     // Run the reset routine to get the machine ready to go.
@@ -220,7 +220,7 @@ void
 apple2_reset(apple2 *mach)
 {
     mach->cpu->P = MOS_INTERRUPT;
-    mach->cpu->PC = vm_segment_get16(mach->memory, 0xFFFC);
+    mach->cpu->PC = vm_segment_get16(mach->main, 0xFFFC);
     mach->cpu->S = 0;
 
     // Switch video mode back to 40 column text
@@ -243,8 +243,8 @@ apple2_clear_strobe(apple2 *mach)
 {
     vm_8bit ch;
 
-    ch = vm_segment_get(mach->memory, LAST_KEY);
-    vm_segment_set(mach->memory, LAST_KEY, ch & 0x7F);
+    ch = vm_segment_get(mach->main, LAST_KEY);
+    vm_segment_set(mach->main, LAST_KEY, ch & 0x7F);
 }
 
 /*
@@ -303,13 +303,13 @@ apple2_press_key(apple2 *mach, vm_8bit ch)
 
     // This is the location in memory where a program will expect to
     // find the value of the last key that was pressed.
-    vm_segment_set(mach->memory, LAST_KEY, ch);
+    vm_segment_set(mach->main, LAST_KEY, ch);
 
     // This area is a combination of flags; the eighth bit here is the
     // "any-key-down" flag, which is a bit of a mouthful. It's 1 if a
     // key is pressed, and 0 if not. The effect of reading this bit will
     // also _clear_ the strobe bit in the $C000 address (above).
-    vm_segment_set(mach->memory, ANY_KEY_DOWN, 0x80);
+    vm_segment_set(mach->main, ANY_KEY_DOWN, 0x80);
 }
 
 /*
@@ -318,7 +318,7 @@ apple2_press_key(apple2 *mach, vm_8bit ch)
 void
 apple2_release_key(apple2 *mach)
 {
-    vm_segment_set(mach->memory, ANY_KEY_DOWN, 0);
+    vm_segment_set(mach->main, ANY_KEY_DOWN, 0);
 }
 
 /*

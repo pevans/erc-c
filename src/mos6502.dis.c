@@ -106,8 +106,8 @@ mos6502_dis_operand(mos6502 *cpu,
         case IMP:
             break;
         case IND:
-            ind_address = vm_segment_get(cpu->memory, value + 1) << 8;
-            ind_address |= vm_segment_get(cpu->memory, value);
+            ind_address = mos6502_get(cpu, value + 1) << 8;
+            ind_address |= mos6502_get(cpu, value);
             if (jump_table[ind_address]) {
                 mos6502_dis_label(stream, ind_address);
             } else {
@@ -218,7 +218,7 @@ mos6502_dis_opcode(mos6502 *cpu, FILE *stream, int address)
     int expected;
 
     // The next byte is assumed to be the opcode we work with.
-    opcode = vm_segment_get(cpu->memory, address);
+    opcode = mos6502_get(cpu, address);
 
     // And given that opcode, we need to see how many bytes large our
     // operand will be.
@@ -241,12 +241,12 @@ mos6502_dis_opcode(mos6502 *cpu, FILE *stream, int address)
             // Remember that the 6502 is little-endian, so the operand
             // needs to be retrieved with the LSB first and the MSB
             // second.
-            operand |= vm_segment_get(cpu->memory, address++);
-            operand |= vm_segment_get(cpu->memory, address++) << 8;
+            operand |= mos6502_get(cpu, address++);
+            operand |= mos6502_get(cpu, address++) << 8;
             break;
 
         case 1:
-            operand |= vm_segment_get(cpu->memory, address++);
+            operand |= mos6502_get(cpu, address++);
             break;
 
             // And, in any other case (e.g. 0), we are done; we don't
@@ -359,8 +359,8 @@ mos6502_dis_jump_label(mos6502 *cpu,
         // of the operand as a kind of double pointer, or just re-watch
         // Inception.
         case IND:
-            jump_loc = vm_segment_get(cpu->memory, operand + 1) << 8;
-            jump_loc |= vm_segment_get(cpu->memory, operand);
+            jump_loc = mos6502_get(cpu, operand + 1) << 8;
+            jump_loc |= mos6502_get(cpu, operand);
             break;
 
         // In relative address mode, the jump location will be a
