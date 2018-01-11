@@ -46,6 +46,7 @@ apple2_create(int width, int height)
     // properly; that way, we won't try to free garbage data
     mach->rom = NULL;
     mach->ram2 = NULL;
+    mach->main = NULL;
     mach->sysfont = NULL;
     mach->screen = NULL;
     mach->drive1 = NULL;
@@ -263,6 +264,14 @@ apple2_free(apple2 *mach)
 
     if (mach->ram2) {
         vm_segment_free(mach->ram2);
+    }
+
+    if (mach->main) {
+        vm_segment_free(mach->main);
+    }
+
+    if (mach->aux) {
+        vm_segment_free(mach->aux);
     }
 
     if (mach->sysfont) {
