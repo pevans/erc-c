@@ -119,6 +119,7 @@ Test(apple2, set_video)
 
 Test(apple2, set_bank_switch)
 {
+    apple2_set_bank_switch(mach, 0);
     cr_assert_eq(mach->bank_switch, 0);
     apple2_set_bank_switch(mach, MEMORY_ROM | MEMORY_WRITE | MEMORY_RAM2);
     cr_assert_eq(mach->bank_switch, MEMORY_ROM | MEMORY_WRITE | MEMORY_RAM2);
