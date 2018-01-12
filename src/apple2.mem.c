@@ -163,6 +163,12 @@ apple2_mem_init_sys_rom(apple2 *mach)
     return OK;
 }
 
+/*
+ * Handle reads to the soft switches that handle bank-switching. Note
+ * that some of these "reads" actually modify how banks are switched
+ * between ROM, RAM, or bank 2 RAM. Sorry about that -- it's just the
+ * way it worked on the Apple II.
+ */
 SEGMENT_READER(apple2_mem_read_bank_switch)
 {
     apple2 *mach;
@@ -235,6 +241,10 @@ SEGMENT_READER(apple2_mem_read_bank_switch)
     return 0;
 }
 
+/*
+ * Handle writes to the soft switches that modify bank-switching
+ * behavior.
+ */
 SEGMENT_WRITER(apple2_mem_write_bank_switch)
 {
     apple2 *mach = (apple2 *)_mach;
