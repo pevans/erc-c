@@ -77,16 +77,36 @@ SEGMENT_WRITER(apple2_mem_write_bank)
  * Set the memory map functions for main memory in an apple2 machine
  */
 void
-apple2_mem_map(apple2 *mach)
+apple2_mem_map(apple2 *mach, vm_segment *segment)
 {
     size_t addr;
 
     vm_segment_set_map_machine(mach);
 
     for (addr = APPLE2_BANK_OFFSET; addr < MOS6502_MEMSIZE; addr++) {
-        vm_segment_read_map(mach->main, addr, apple2_mem_read_bank);
-        vm_segment_write_map(mach->main, addr, apple2_mem_write_bank);
+        vm_segment_read_map(segment, addr, apple2_mem_read_bank);
+        vm_segment_write_map(segment, addr, apple2_mem_write_bank);
     }
+
+    apple2_mem_map_bank_switch(segment);
+}
+
+void
+apple2_mem_map_bank_switch(vm_segment *segment)
+{
+    vm_segment_read_map(segment, 0xC080, apple2_mem_read_bank_switch);
+    vm_segment_read_map(segment, 0xC081, apple2_mem_read_bank_switch);
+    vm_segment_read_map(segment, 0xC082, apple2_mem_read_bank_switch);
+    vm_segment_read_map(segment, 0xC083, apple2_mem_read_bank_switch);
+    vm_segment_read_map(segment, 0xC088, apple2_mem_read_bank_switch);
+    vm_segment_read_map(segment, 0xC089, apple2_mem_read_bank_switch);
+    vm_segment_read_map(segment, 0xC08A, apple2_mem_read_bank_switch);
+    vm_segment_read_map(segment, 0xC08B, apple2_mem_read_bank_switch);
+    vm_segment_read_map(segment, 0xC011, apple2_mem_read_bank_switch);
+    vm_segment_read_map(segment, 0xC012, apple2_mem_read_bank_switch);
+    vm_segment_read_map(segment, 0xC016, apple2_mem_read_bank_switch);
+    vm_segment_write_map(segment, 0xC008, apple2_mem_write_bank_switch);
+    vm_segment_write_map(segment, 0xC009, apple2_mem_write_bank_switch);
 }
 
 int
@@ -141,4 +161,94 @@ apple2_mem_init_sys_rom(apple2 *mach)
     }
 
     return OK;
+}
+
+SEGMENT_READER(apple2_mem_read_bank_switch)
+{
+    apple2 *mach;
+
+    mach = (apple2 *)_mach;
+
+    switch (addr) {
+        // The $C080 - $C083 range all control memory access while using
+        // bank 2 RAM for the $Dnnn range. Note that here and in the
+        // $C088 range, the returns are zero; I'm not exactly sure
+        // that's what they should be, but the purpose of reading from
+        // these soft switches is not actually to read anything useful,
+        // but simply to change the bank switch mode.
+        case 0xC080:
+            apple2_set_bank_switch(mach, MEMORY_RAM2);
+            return 0;
+
+        case 0xC081:
+            apple2_set_bank_switch(mach, 
+                                   MEMORY_ROM | MEMORY_WRITE | MEMORY_RAM2);
+            return 0;
+        case 0xC082:
+            apple2_set_bank_switch(mach, MEMORY_ROM | MEMORY_RAM2);
+            return 0;
+
+        case 0xC083:
+            apple2_set_bank_switch(mach, MEMORY_WRITE | MEMORY_RAM2);
+            return 0;
+
+        // Conversely, the $C088 - $C08B range control memory access
+        // while using bank 1 RAM.
+        case 0xC088:
+            // The 0 means there are no special privileges; reads are to
+            // RAM, writes are disabled, and we are using bank 1 memory.
+            apple2_set_bank_switch(mach, 0);
+            return 0;
+
+        case 0xC089:
+            apple2_set_bank_switch(mach, MEMORY_ROM | MEMORY_WRITE);
+            return 0;
+
+        case 0xC08A:
+            apple2_set_bank_switch(mach, MEMORY_ROM);
+            return 0;
+
+        case 0xC08B:
+            apple2_set_bank_switch(mach, MEMORY_WRITE);
+            return 0;
+
+        // Return high on the 7th bit if we're using bank 2 memory
+        case 0xC011:
+            return mach->bank_switch & MEMORY_RAM2
+                ? 0x80
+                : 0x00;
+
+        // Return high on 7th bit if we're reading RAM
+        case 0xC012:
+            return ~mach->bank_switch & MEMORY_ROM
+                ? 0x80
+                : 0x00;
+
+        // Return high on the 7th bit if we're using aux memory
+        case 0xC016:
+            return mach->bank_switch & MEMORY_AUX
+                ? 0x80
+                : 0x00;
+    }
+
+    log_critical("Bank switch mapper called with an unexpected address: %x", addr);
+    return 0;
+}
+
+SEGMENT_WRITER(apple2_mem_write_bank_switch)
+{
+    apple2 *mach = (apple2 *)_mach;
+
+    switch (addr) {
+        // Turn on auxiliary memory
+        case 0xC008:
+            apple2_set_bank_switch(mach,
+                                   mach->bank_switch | MEMORY_AUX);
+            break;
+
+        // Disable auxiliary memory
+        case 0xC009:
+            apple2_set_bank_switch(mach,
+                                   mach->bank_switch & ~MEMORY_AUX);
+    }
 }

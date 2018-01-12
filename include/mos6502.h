@@ -132,6 +132,7 @@ extern void mos6502_modify_status(mos6502 *, vm_8bit, vm_8bit);
 extern void mos6502_push_stack(mos6502 *, vm_16bit);
 extern void mos6502_set(mos6502 *, size_t, vm_8bit);
 extern void mos6502_set16(mos6502 *, size_t, vm_16bit);
+extern void mos6502_set_memory(mos6502 *, vm_segment *, vm_segment *);
 extern void mos6502_set_status(mos6502 *, vm_8bit);
 
 /*

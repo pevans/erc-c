@@ -94,6 +94,7 @@ enum memory_mode {
     MEMORY_ROM = 1,         // on = read ROM; off = read RAM
     MEMORY_WRITE = 2,       // on = allow writes to RAM; off = disallow writes
     MEMORY_RAM2 = 4,        // on = use bank 2 for $D000-$DFFF; off = use bank 1
+    MEMORY_AUX = 8,         // on = use auxiliary memory; off = use main memory
 };
 
 typedef struct {

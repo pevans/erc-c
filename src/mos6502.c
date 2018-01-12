@@ -155,8 +155,7 @@ mos6502_create(vm_segment *rmem, vm_segment *wmem)
         exit(1);
     }
 
-    cpu->rmem = rmem;
-    cpu->wmem = wmem;
+    mos6502_set_memory(cpu, rmem, wmem);
 
     cpu->last_addr = 0;
     cpu->PC = 0;
@@ -481,4 +480,11 @@ inline void
 mos6502_set16(mos6502 *cpu, size_t addr, vm_16bit value)
 {
     vm_segment_set16(cpu->wmem, addr, value);
+}
+
+void
+mos6502_set_memory(mos6502 *cpu, vm_segment *rmem, vm_segment *wmem)
+{
+    cpu->rmem = rmem;
+    cpu->wmem = wmem;
 }

@@ -53,6 +53,12 @@ apple2_create(int width, int height)
     mach->drive1 = NULL;
     mach->drive2 = NULL;
 
+    // This is more-or-less the same setup you do in apple2_reset(). We
+    // need to hard-set these values because apple2_set_bank_switch
+    // assumes that the bank_switch variable has been initialized
+    // before, which to this point, it hasn't!
+    mach->bank_switch = MEMORY_ROM | MEMORY_WRITE | MEMORY_RAM2;
+
     mach->main = vm_segment_create(APPLE2_MEMORY_SIZE);
     if (mach->main == NULL) {
         log_critical("Could not initialize main RAM!");
@@ -67,12 +73,6 @@ apple2_create(int width, int height)
         return NULL;
     }
 
-    // This is more-or-less the same setup you do in apple2_reset().
-    apple2_set_bank_switch(mach, MEMORY_ROM | MEMORY_WRITE | MEMORY_RAM2);
-
-    // Set the read/write mappers for everything
-    apple2_mem_map(mach);
-
     // Initliaze our system ROM and separate bank-switched block of RAM
     mach->rom = vm_segment_create(APPLE2_ROM_SIZE);
     mach->aux = vm_segment_create(APPLE2_MEMORY_SIZE);
@@ -81,6 +81,10 @@ apple2_create(int width, int height)
         apple2_free(mach);
         return NULL;
     }
+
+    // Set the read/write mappers for everything
+    apple2_mem_map(mach, mach->main);
+    apple2_mem_map(mach, mach->aux);
 
     if (apple2_mem_init_peripheral_rom(mach) != OK) {
         log_critical("Could not initialize disk2 ROM");
@@ -149,6 +153,24 @@ apple2_create(int width, int height)
 void
 apple2_set_bank_switch(apple2 *mach, vm_8bit flags)
 {
+    int have_aux = mach->bank_switch & MEMORY_AUX;
+    int flags_aux = flags & MEMORY_AUX;
+
+    if (flags_aux && !have_aux) {
+        // Switch to auxiliary memory.
+        mos6502_set_memory(mach->cpu, mach->aux, mach->aux);
+
+        // We need to copy page 0 and 1 from main over to aux.
+        vm_segment_copy(mach->aux, mach->main, 0, 0, 0x200);
+    } else if (!flags_aux && have_aux) {
+        // Switching back to main memory
+        mos6502_set_memory(mach->cpu, mach->main, mach->main);
+
+        // And, like above, we need to copy page 0 and 1 from aux back
+        // to main.
+        vm_segment_copy(mach->main, mach->aux, 0, 0, 0x200);
+    }
+
     mach->bank_switch = flags;
 }
 
