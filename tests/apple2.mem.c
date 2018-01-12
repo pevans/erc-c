@@ -130,6 +130,48 @@ Test(apple2_mem, write_bank)
     cr_assert_eq(vm_segment_get(mach->main, 0x10073), right);
 }
 
+Test(apple2_mem, read_bank_switch)
+{
+    vm_segment_get(mach->main, 0xC080);
+    cr_assert_eq(mach->bank_switch, MEMORY_RAM2);
+    vm_segment_get(mach->main, 0xC081);
+    cr_assert_eq(mach->bank_switch, MEMORY_ROM | MEMORY_WRITE | MEMORY_RAM2);
+    vm_segment_get(mach->main, 0xC082);
+    cr_assert_eq(mach->bank_switch, MEMORY_ROM | MEMORY_RAM2);
+    vm_segment_get(mach->main, 0xC083);
+    cr_assert_eq(mach->bank_switch, MEMORY_WRITE | MEMORY_RAM2);
+
+    vm_segment_get(mach->main, 0xC088);
+    cr_assert_eq(mach->bank_switch, 0);
+    vm_segment_get(mach->main, 0xC089);
+    cr_assert_eq(mach->bank_switch, MEMORY_ROM | MEMORY_WRITE);
+    vm_segment_get(mach->main, 0xC08A);
+    cr_assert_eq(mach->bank_switch, MEMORY_ROM);
+    vm_segment_get(mach->main, 0xC08B);
+    cr_assert_eq(mach->bank_switch, MEMORY_WRITE);
+
+    mach->bank_switch = MEMORY_RAM2;
+    cr_assert_eq(vm_segment_get(mach->main, 0xC011), 0x80);
+    mach->bank_switch = 0;
+    cr_assert_eq(vm_segment_get(mach->main, 0xC011), 0x00);
+    mach->bank_switch = 0;
+    cr_assert_eq(vm_segment_get(mach->main, 0xC012), 0x80);
+    mach->bank_switch = MEMORY_ROM;
+    cr_assert_eq(vm_segment_get(mach->main, 0xC012), 0x00);
+    mach->bank_switch = MEMORY_AUX;
+    cr_assert_eq(vm_segment_get(mach->main, 0xC016), 0x80);
+    mach->bank_switch = 0;
+    cr_assert_eq(vm_segment_get(mach->main, 0xC016), 0x00);
+}
+
+Test(apple2_mem, write_bank_switch)
+{
+    vm_segment_set(mach->main, 0xC008, 1);
+    cr_assert_eq(mach->bank_switch & MEMORY_AUX, MEMORY_AUX);
+    vm_segment_set(mach->main, 0xC009, 1);
+    cr_assert_eq(mach->bank_switch & MEMORY_AUX, 0);
+}
+
 Test(apple2_mem, init_peripheral_rom)
 {
     // FIXME: this isn't working, _and_ it's pretty tightly coupled into
