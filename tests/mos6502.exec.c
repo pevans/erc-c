@@ -22,7 +22,7 @@ Test(mos6502_exec, brk)
 Test(mos6502_exec, jmp)
 {
     cpu->PC = 123;
-    cpu->last_addr = 234;
+    cpu->eff_addr = 234;
     mos6502_handle_jmp(cpu, 0);
 
     cr_assert_eq(cpu->PC, 234);
@@ -31,7 +31,7 @@ Test(mos6502_exec, jmp)
 Test(mos6502_exec, jsr)
 {
     cpu->PC = 123;
-    cpu->last_addr = 235;
+    cpu->eff_addr = 235;
     mos6502_handle_jsr(cpu, 0);
 
     cr_assert_eq(cpu->PC, 235);

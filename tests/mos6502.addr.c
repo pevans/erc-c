@@ -107,7 +107,7 @@ Test(mos6502_addr, addr_mode_rel_positive)
     cpu->PC = 123;
     SET_PC_BYTE(cpu, 1, 88);
     cr_assert_eq(mos6502_resolve_rel(cpu), 0);
-    cr_assert_eq(cpu->last_addr, 213);
+    cr_assert_eq(cpu->eff_addr, 213);
 }
 
 Test(mos6502_addr, addr_mode_rel_negative)
@@ -115,7 +115,7 @@ Test(mos6502_addr, addr_mode_rel_negative)
     cpu->PC = 123;
     SET_PC_BYTE(cpu, 1, 216);
     cr_assert_eq(mos6502_resolve_rel(cpu), 0);
-    cr_assert_eq(cpu->last_addr, 85);
+    cr_assert_eq(cpu->eff_addr, 85);
 }
 
 Test(mos6502_addr, addr_mode_zpg)

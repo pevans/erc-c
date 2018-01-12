@@ -64,7 +64,7 @@ Test(mos6502_arith, dec)
     mos6502_handle_dec(cpu, 0);
     cr_assert_neq(cpu->A, 4);
 
-    cpu->last_addr = 123;
+    cpu->eff_addr = 123;
     mos6502_set(cpu, 123, 44);
 
     // Note _also_ that DEC expects the number to be decremented will be
@@ -90,7 +90,7 @@ Test(mos6502_arith, dey)
 
 Test(mos6502_arith, inc)
 {
-    cpu->last_addr = 123;
+    cpu->eff_addr = 123;
     mos6502_handle_inc(cpu, 55);
     cr_assert_eq(mos6502_get(cpu, 123), 56);
 }

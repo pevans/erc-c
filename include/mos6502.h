@@ -68,7 +68,7 @@ typedef struct {
      * memory. Another way of thinking of this is, this address is where
      * we found the value we care about.
      */
-    vm_16bit last_addr;
+    vm_16bit eff_addr;
 
     /*
      * Our program counter register; this is what we'll use to determine

@@ -79,7 +79,7 @@ Test(mos6502, cycles)
 
     // In this case, we aren't cross a page boundary, and the number of
     // cycles should stay at 4
-    cpu->last_addr = 0x5070;
+    cpu->eff_addr = 0x5070;
     cpu->X = 23;
     cr_assert_eq(mos6502_cycles(cpu, 0x1D), 4);
 

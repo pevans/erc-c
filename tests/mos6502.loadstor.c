@@ -61,25 +61,25 @@ Test(mos6502_loadstor, plp)
 Test(mos6502_loadstor, sta)
 {
     cpu->A = 123;
-    cpu->last_addr = 555;
+    cpu->eff_addr = 555;
     mos6502_handle_sta(cpu, 0);
-    cr_assert_eq(mos6502_get(cpu, cpu->last_addr), cpu->A);
+    cr_assert_eq(mos6502_get(cpu, cpu->eff_addr), cpu->A);
 }
 
 Test(mos6502_loadstor, stx)
 {
     cpu->X = 222;
-    cpu->last_addr = 444;
+    cpu->eff_addr = 444;
     mos6502_handle_stx(cpu, 0);
-    cr_assert_eq(mos6502_get(cpu, cpu->last_addr), cpu->X);
+    cr_assert_eq(mos6502_get(cpu, cpu->eff_addr), cpu->X);
 }
 
 Test(mos6502_loadstor, sty)
 {
     cpu->Y = 111;
-    cpu->last_addr = 253;
+    cpu->eff_addr = 253;
     mos6502_handle_sty(cpu, 0);
-    cr_assert_eq(mos6502_get(cpu, cpu->last_addr), cpu->Y);
+    cr_assert_eq(mos6502_get(cpu, cpu->eff_addr), cpu->Y);
 }
 
 Test(mos6502_loadstor, tax)

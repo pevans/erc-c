@@ -38,8 +38,8 @@ DEFINE_INST(asl)
 
     oper <<= 1;
 
-    if (cpu->last_addr) {
-        mos6502_set(cpu, cpu->last_addr, oper);
+    if (cpu->eff_addr) {
+        mos6502_set(cpu, cpu->eff_addr, oper);
     } else {
         cpu->A = oper;
     }
@@ -97,8 +97,8 @@ DEFINE_INST(lsr)
 
     oper >>= 1;
 
-    if (cpu->last_addr) {
-        mos6502_set(cpu, cpu->last_addr, oper);
+    if (cpu->eff_addr) {
+        mos6502_set(cpu, cpu->eff_addr, oper);
     } else {
         cpu->A = oper;
     }
@@ -136,8 +136,8 @@ DEFINE_INST(rol)
         oper |= 0x01;
     }
 
-    if (cpu->last_addr) {
-        mos6502_set(cpu, cpu->last_addr, oper);
+    if (cpu->eff_addr) {
+        mos6502_set(cpu, cpu->eff_addr, oper);
     } else {
         cpu->A = oper;
     }
@@ -163,8 +163,8 @@ DEFINE_INST(ror)
         oper |= 0x80;
     }
 
-    if (cpu->last_addr) {
-        mos6502_set(cpu, cpu->last_addr, oper);
+    if (cpu->eff_addr) {
+        mos6502_set(cpu, cpu->eff_addr, oper);
     } else {
         cpu->A = oper;
     }

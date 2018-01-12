@@ -58,11 +58,11 @@ static int addr_modes[] = {
 
 /*
  * This will both define the `eff_addr` variable (which is the effective
- * address) and assign that value to the `last_addr` field of the cpu.
+ * address) and assign that value to the `eff_addr` field of the cpu.
  */
 #define EFF_ADDR(addr) \
     vm_16bit eff_addr = addr; \
-    cpu->last_addr = eff_addr
+    cpu->eff_addr = eff_addr
 
 /*
  * A tiny convenience macro to help us define address resolver

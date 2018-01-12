@@ -157,7 +157,7 @@ mos6502_create(vm_segment *rmem, vm_segment *wmem)
 
     mos6502_set_memory(cpu, rmem, wmem);
 
-    cpu->last_addr = 0;
+    cpu->eff_addr = 0;
     cpu->PC = 0;
     cpu->A = 0;
     cpu->X = 0;
@@ -293,7 +293,7 @@ mos6502_cycles(mos6502 *cpu, vm_8bit opcode)
     addr_mode = mos6502_addr_mode(opcode);
 
     // Mainly we care about the lo byte of the last effective address
-    lo_addr = cpu->last_addr & 0xFF;
+    lo_addr = cpu->eff_addr & 0xFF;
 
     // Ok, here's the deal: if you are using an address mode that uses
     // any of the index registers, you need to return an additional
@@ -359,7 +359,7 @@ mos6502_execute(mos6502 *cpu)
     // instruction handler cares about (if it cares about any such
     // value). For example, the operand could be the literal value that
     // you pass into an instruction via immediate mode. As a
-    // side-effect, resolver will set the last_addr field in cpu to the
+    // side-effect, resolver will set the eff_addr field in cpu to the
     // effective address where the operand can be found in memory, or
     // zero if that does not apply (such as in immediate mode).
     //
