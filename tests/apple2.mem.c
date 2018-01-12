@@ -156,6 +156,7 @@ Test(apple2_mem, read_bank_switch)
     vm_segment_get(mach->main, 0xC088);
     cr_assert_eq(mach->bank_switch, 0);
 
+    // You get the idea
     vm_segment_get(mach->main, 0xC089);
     cr_assert_neq(mach->bank_switch, MEMORY_ROM | MEMORY_WRITE);
     mach->cpu->last_addr = 0xC089;
