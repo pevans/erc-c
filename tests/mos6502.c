@@ -151,3 +151,40 @@ Test(mos6502, get_address_resolver)
     cr_assert_eq(mos6502_get_address_resolver(0x96), mos6502_resolve_zpy);
 }
 
+
+Test(mos6502, get)
+{
+    vm_segment_set(cpu->wmem, 0, 123);
+    cr_assert_eq(mos6502_get(cpu, 0), 123);
+}
+
+Test(mos6502, get16)
+{
+    vm_segment_set16(cpu->wmem, 0, 0x3344);
+    cr_assert_eq(mos6502_get16(cpu, 0), 0x3344);
+}
+
+Test(mos6502, set)
+{
+    mos6502_set(cpu, 0, 111);
+    cr_assert_eq(vm_segment_get(cpu->rmem, 0), 111);
+}
+
+Test(mos6502, set16)
+{
+    mos6502_set16(cpu, 0, 0x2255);
+    cr_assert_eq(vm_segment_get16(cpu->rmem, 0), 0x2255);
+}
+
+Test(mos6502, set_memory)
+{
+    vm_segment *rmem, *wmem;
+
+    rmem = (vm_segment *)111;
+    wmem = (vm_segment *)222;
+
+    mos6502_set_memory(cpu, rmem, wmem);
+
+    cr_assert_eq(cpu->rmem, rmem);
+    cr_assert_eq(cpu->wmem, wmem);
+}

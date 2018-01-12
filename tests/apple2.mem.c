@@ -33,6 +33,31 @@ Test(apple2_mem, map)
     }
 }
 
+Test(apple2_mem, map_bank_switch)
+{
+    vm_segment *segments[2];
+
+    segments[0] = mach->main;
+    segments[1] = mach->aux;
+
+    for (int i = 0; i < 2; i++) {
+        cr_assert_eq(segments[i]->read_table[0xC080], apple2_mem_read_bank_switch);
+        cr_assert_eq(segments[i]->read_table[0xC081], apple2_mem_read_bank_switch);
+        cr_assert_eq(segments[i]->read_table[0xC082], apple2_mem_read_bank_switch);
+        cr_assert_eq(segments[i]->read_table[0xC083], apple2_mem_read_bank_switch);
+        cr_assert_eq(segments[i]->read_table[0xC088], apple2_mem_read_bank_switch);
+        cr_assert_eq(segments[i]->read_table[0xC089], apple2_mem_read_bank_switch);
+        cr_assert_eq(segments[i]->read_table[0xC08A], apple2_mem_read_bank_switch);
+        cr_assert_eq(segments[i]->read_table[0xC08B], apple2_mem_read_bank_switch);
+        cr_assert_eq(segments[i]->read_table[0xC088], apple2_mem_read_bank_switch);
+        cr_assert_eq(segments[i]->read_table[0xC011], apple2_mem_read_bank_switch);
+        cr_assert_eq(segments[i]->read_table[0xC012], apple2_mem_read_bank_switch);
+        cr_assert_eq(segments[i]->read_table[0xC016], apple2_mem_read_bank_switch);
+        cr_assert_eq(segments[i]->write_table[0xC008], apple2_mem_write_bank_switch);
+        cr_assert_eq(segments[i]->write_table[0xC009], apple2_mem_write_bank_switch);
+    }
+}
+
 Test(apple2_mem, read_bank)
 {
     vm_8bit val;
@@ -105,7 +130,7 @@ Test(apple2_mem, write_bank)
     cr_assert_eq(vm_segment_get(mach->main, 0x10073), right);
 }
 
-Test(apple2_mem, init_disk2_rom)
+Test(apple2_mem, init_peripheral_rom)
 {
     // FIXME: this isn't working, _and_ it's pretty tightly coupled into
     // the create() function. We could use a better way of testing this.
