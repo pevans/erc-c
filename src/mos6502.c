@@ -392,8 +392,36 @@ mos6502_execute(mos6502 *cpu)
     // something.
     usleep(cycles * 10000);
 
+    // We need to record the opcode and the effective address for
+    // anything which might need to reference it.
+    cpu->last_opcode = opcode;
+    cpu->last_addr = cpu->eff_addr;
+    cpu->last_operand = operand;
+
     // Ok -- we're done! This wasn't so hard, was it?
     return;
+}
+
+/*
+ * Given pointers for an opcode, operand, and effective address, set the
+ * dereferenced values of those pointers to what the CPU knows to have
+ * been the last of each.
+ */
+void
+mos6502_last_executed(mos6502 *cpu, vm_8bit *opcode,
+                      vm_8bit *operand, vm_16bit *addr)
+{
+    if (opcode) {
+        *opcode = cpu->last_opcode;
+    }
+
+    if (operand) {
+        *operand = cpu->last_operand;
+    }
+
+    if (addr) {
+        *addr = cpu->last_addr;
+    }
 }
 
 /*

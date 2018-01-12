@@ -179,8 +179,13 @@ apple2_mem_init_sys_rom(apple2 *mach)
 SEGMENT_READER(apple2_mem_read_bank_switch)
 {
     apple2 *mach;
+    vm_16bit last_addr;
 
     mach = (apple2 *)_mach;
+
+    // We need to know the last opcode and address, because some of our
+    // soft switches require two consecutive reads
+    mos6502_last_executed(mach->cpu, NULL, NULL, &last_addr);
 
     switch (addr) {
         // The $C080 - $C083 range all control memory access while using
@@ -194,15 +199,19 @@ SEGMENT_READER(apple2_mem_read_bank_switch)
             return 0;
 
         case 0xC081:
-            apple2_set_bank_switch(mach, 
-                                   MEMORY_ROM | MEMORY_WRITE | MEMORY_RAM2);
+            if (last_addr == addr) {
+                apple2_set_bank_switch(mach, 
+                                       MEMORY_ROM | MEMORY_WRITE | MEMORY_RAM2);
+            }
             return 0;
         case 0xC082:
             apple2_set_bank_switch(mach, MEMORY_ROM | MEMORY_RAM2);
             return 0;
 
         case 0xC083:
-            apple2_set_bank_switch(mach, MEMORY_WRITE | MEMORY_RAM2);
+            if (last_addr == addr) {
+                apple2_set_bank_switch(mach, MEMORY_WRITE | MEMORY_RAM2);
+            }
             return 0;
 
         // Conversely, the $C088 - $C08B range control memory access
@@ -214,7 +223,9 @@ SEGMENT_READER(apple2_mem_read_bank_switch)
             return 0;
 
         case 0xC089:
-            apple2_set_bank_switch(mach, MEMORY_ROM | MEMORY_WRITE);
+            if (last_addr == addr) {
+                apple2_set_bank_switch(mach, MEMORY_ROM | MEMORY_WRITE);
+            }
             return 0;
 
         case 0xC08A:
@@ -222,7 +233,9 @@ SEGMENT_READER(apple2_mem_read_bank_switch)
             return 0;
 
         case 0xC08B:
-            apple2_set_bank_switch(mach, MEMORY_WRITE);
+            if (last_addr == addr) {
+                apple2_set_bank_switch(mach, MEMORY_WRITE);
+            }
             return 0;
 
         // Return high on the 7th bit if we're using bank 2 memory

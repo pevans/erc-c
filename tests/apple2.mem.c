@@ -134,19 +134,40 @@ Test(apple2_mem, read_bank_switch)
 {
     vm_segment_get(mach->main, 0xC080);
     cr_assert_eq(mach->bank_switch, MEMORY_RAM2);
+
+    // This (and a few others) are trickier to test, as they require
+    // consecutive reads to trigger.
+    vm_segment_get(mach->main, 0xC081);
+    cr_assert_neq(mach->bank_switch, MEMORY_ROM | MEMORY_WRITE | MEMORY_RAM2);
+    mach->cpu->last_addr = 0xC081;
     vm_segment_get(mach->main, 0xC081);
     cr_assert_eq(mach->bank_switch, MEMORY_ROM | MEMORY_WRITE | MEMORY_RAM2);
+
     vm_segment_get(mach->main, 0xC082);
     cr_assert_eq(mach->bank_switch, MEMORY_ROM | MEMORY_RAM2);
+
+    // Another that needs consecutives
+    vm_segment_get(mach->main, 0xC083);
+    cr_assert_neq(mach->bank_switch, MEMORY_WRITE | MEMORY_RAM2);
+    mach->cpu->last_addr = 0xC083;
     vm_segment_get(mach->main, 0xC083);
     cr_assert_eq(mach->bank_switch, MEMORY_WRITE | MEMORY_RAM2);
 
     vm_segment_get(mach->main, 0xC088);
     cr_assert_eq(mach->bank_switch, 0);
+
+    vm_segment_get(mach->main, 0xC089);
+    cr_assert_neq(mach->bank_switch, MEMORY_ROM | MEMORY_WRITE);
+    mach->cpu->last_addr = 0xC089;
     vm_segment_get(mach->main, 0xC089);
     cr_assert_eq(mach->bank_switch, MEMORY_ROM | MEMORY_WRITE);
+
     vm_segment_get(mach->main, 0xC08A);
     cr_assert_eq(mach->bank_switch, MEMORY_ROM);
+
+    vm_segment_get(mach->main, 0xC08B);
+    cr_assert_neq(mach->bank_switch, MEMORY_WRITE);
+    mach->cpu->last_addr = 0xC08B;
     vm_segment_get(mach->main, 0xC08B);
     cr_assert_eq(mach->bank_switch, MEMORY_WRITE);
 

@@ -61,7 +61,7 @@ typedef struct {
     vm_segment *wmem;
 
     /*
-     * This contains the last _effective_ address we've resolved in one
+     * This contains the _effective_ address we've resolved in one
      * of our address modes. In absolute mode, this would be the literal
      * operand we read from memory; in indirect mode, this will be the
      * address we _find_ after dereferencing the operand we read from
@@ -69,6 +69,16 @@ typedef struct {
      * we found the value we care about.
      */
     vm_16bit eff_addr;
+
+    /*
+     * These are the last opcode and last effective address that was
+     * used in the instruction previous to the one currently being
+     * executed. Some things (notably soft switches) may need to
+     * the last opcode.
+     */
+    vm_8bit last_opcode;
+    vm_8bit last_operand;
+    vm_16bit last_addr;
 
     /*
      * Our program counter register; this is what we'll use to determine
@@ -127,6 +137,7 @@ extern vm_16bit mos6502_pop_stack(mos6502 *);
 extern vm_8bit mos6502_get(mos6502 *, size_t);
 extern void mos6502_execute(mos6502 *);
 extern void mos6502_free(mos6502 *);
+extern void mos6502_last_executed(mos6502 *, vm_8bit *, vm_8bit *, vm_16bit *);
 extern void mos6502_modify_status(mos6502 *, vm_8bit, vm_8bit);
 extern void mos6502_push_stack(mos6502 *, vm_16bit);
 extern void mos6502_set(mos6502 *, size_t, vm_8bit);
