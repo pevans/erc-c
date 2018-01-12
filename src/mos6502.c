@@ -420,16 +420,6 @@ mos6502_would_jump(int inst_code)
 }
 
 /*
- * Here we copy the segment directly into the cpu memory, to essentially
- * "flash" memory with the contents of another segment.
- */
-void
-mos6502_flash_memory(mos6502 *cpu, vm_segment *segment)
-{
-    //vm_segment_copy(cpu, segment, 0, 0, cpu->size - 1);
-}
-
-/*
  * This is a _kind_ of factory method, except we're obviously not
  * instantiating an object. Given an address mode, we return the
  * resolver function which will give you the right value (for a given
