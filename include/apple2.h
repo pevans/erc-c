@@ -91,10 +91,93 @@ enum lores_colors {
  * flag below.
  */
 enum memory_mode {
-    MEMORY_ROM = 1,         // on = read ROM; off = read RAM
-    MEMORY_WRITE = 2,       // on = allow writes to RAM; off = disallow writes
-    MEMORY_RAM2 = 4,        // on = use bank 2 for $D000-$DFFF; off = use bank 1
-    MEMORY_AUX = 8,         // on = use auxiliary memory; off = use main memory
+    /*
+     * By default, memory accesses go to main memory in _all_ cases.
+     * Auxiliary memory is not used in any capacity.
+     */
+    MEMORY_DEFAULT = 0x0,
+
+    /*
+     * When this is on, the core 48k (non bank-switchable) of memory
+     * will be read from auxiliary memory. When off, it will be read
+     * from main memory.
+     */
+    MEMORY_READ_AUX = 0x1,
+    
+    /*
+     * When on, writes to the core 48k of memory will go to aux; when
+     * off, they go to main.
+     */
+    MEMORY_WRITE_AUX = 0x2,
+
+    /*
+     * This bit is what the tech reference calls an "enabling" switch,
+     * for PAGE2 and HIRES below. If this bit is not on, then those two
+     * other bits don't do anything, and all aux memory access is
+     * governed by WRITE_AUX and READ_AUX above.
+     */
+    MEMORY_80STORE = 0x4,
+
+    /*
+     * When 80STORE is on, PAGE2 will allow you to access auxiliary
+     * memory for the display page. The range depends on HIRES below.
+     * When PAGE2 is on and HIRES is off, then PAGE2 causes accesses to
+     * $0400..$07FF to always go to auxiliary memory (read or writes).
+     * When both PAGE2 and HIRES are on, then $2000..$3FFF also go to
+     * aux memory. When 80STORE is off, then these two bits are ignored.
+     */
+    MEMORY_PAGE2 = 0x8,
+    MEMORY_HIRES = 0x10,
+};
+
+enum bank_switch {
+    /*
+     * In nominal bank-switch mode, reads in the bank-switchable address
+     * space go to ROM; writes to RAM are protected; and bank2 memory is
+     * used.
+     */
+    BANK_DEFAULT = 0x0,
+
+    /* 
+     * When on, this reads from RAM in bank-switched memory. When off,
+     * it reads from ROM.
+     */
+    BANK_RAM = 0x1,
+    
+    /*
+     * When on, we will write to RAM. When off, we will write-protect
+     * RAM in bank-switched memory. NOTE: we can never write to ROM--or
+     * else it wouldn't be ROM! So if you have BANK_RAM off, but
+     * BANK_WRITE on, then writes do not fail, but they do go to RAM.
+     */
+    BANK_WRITE = 0x2,
+
+    /*
+     * When on, the $Dnnn hexapage will use the first RAM bank for
+     * reads and/or writes. All other RAM access in bank-switched memory
+     * will still go to bank 1 RAM, with respect to BANK_RAM when it
+     * comes to reads. (The default behavior is actually to use bank 2
+     * RAM for the $D range.)
+     */
+    BANK_RAM1 = 0x4,
+    
+    /*
+     * This is a weird little bit. When BANK_ALTZP is on, the zero page
+     * and stack are accessed from auxiliary memory rather than main
+     * memory. Those two pages of memory, however,  are _copied_ from one
+     * to the other, so data should remain consistent.
+     *
+     * That's not the weird part. That part makes sense given the name
+     * (which isn't my name, but is the name used in the IIe technical
+     * reference). The part that isn't so obvious is that
+     * bank-switchable RAM will _also_ be accessed from auxiliary
+     * memory, not main memory. Note that aux memory has its own second
+     * bank of RAM, the way that main memory does, so BANK_RAM2 works
+     * the way you think, but it works with the aux RAM2. No data is
+     * copied between main and aux's bank-switched memory, unlike the
+     * way zero page and the stack are handled.
+     */
+    BANK_ALTZP = 0x8,
 };
 
 typedef struct {
@@ -157,6 +240,13 @@ typedef struct {
      * bank-switched area of memory should target.
      */
     vm_8bit bank_switch;
+
+    /*
+     * Beside bank-switching, we also need to keep track of memory
+     * modes; these pertain mostly to reading from main or auxiliary
+     * memory.
+     */
+    vm_8bit memory_mode;
 
     /*
      * Our two disk drives.

@@ -57,7 +57,8 @@ apple2_create(int width, int height)
     // need to hard-set these values because apple2_set_bank_switch
     // assumes that the bank_switch variable has been initialized
     // before, which to this point, it hasn't!
-    mach->bank_switch = MEMORY_ROM | MEMORY_WRITE | MEMORY_RAM2;
+    mach->bank_switch = BANK_DEFAULT;
+    mach->memory_mode = MEMORY_DEFAULT;
 
     mach->main = vm_segment_create(APPLE2_MEMORY_SIZE);
     if (mach->main == NULL) {
@@ -251,7 +252,8 @@ apple2_reset(apple2 *mach)
     // - read from ROM
     // - write to RAM
     // - use bank 2 for $Dxxx hexapage
-    apple2_set_bank_switch(mach, MEMORY_ROM | MEMORY_WRITE | MEMORY_RAM2);
+    apple2_set_bank_switch(mach, BANK_DEFAULT);
+    apple2_set_memory_mode(mach, MEMORY_NOMINAL);
 }
 
 /*
