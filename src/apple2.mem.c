@@ -91,6 +91,10 @@ apple2_mem_map(apple2 *mach, vm_segment *segment)
     apple2_mem_map_bank_switch(segment);
 }
 
+/*
+ * This function will establish all of the mapper functions to handle
+ * the soft switches for memory bank-switching.
+ */
 void
 apple2_mem_map_bank_switch(vm_segment *segment)
 {
@@ -109,6 +113,9 @@ apple2_mem_map_bank_switch(vm_segment *segment)
     vm_segment_write_map(segment, 0xC009, apple2_mem_write_bank_switch);
 }
 
+/*
+ * Initialize the peripheral ROM ($C100 - $C7FF).
+ */
 int
 apple2_mem_init_peripheral_rom(apple2 *mach)
 {

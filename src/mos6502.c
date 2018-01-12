@@ -448,30 +448,50 @@ mos6502_get_address_resolver(vm_8bit opcode)
     return NULL;
 }
 
+/*
+ * Get the byte at a given address from whatever the read memory segment
+ * is.
+ */
 inline vm_8bit
 mos6502_get(mos6502 *cpu, size_t addr)
 {
     return vm_segment_get(cpu->rmem, addr);
 }
 
+/*
+ * Return the 16-bit value from a given address using the read memory
+ * segment.
+ */
 inline vm_16bit
 mos6502_get16(mos6502 *cpu, size_t addr)
 {
     return vm_segment_get16(cpu->rmem, addr);
 }
 
+/*
+ * Set the byte at a given address to the given value, using whatever
+ * the write segment is.
+ */
 inline void
 mos6502_set(mos6502 *cpu, size_t addr, vm_8bit value)
 {
     vm_segment_set(cpu->wmem, addr, value);
 }
 
+/*
+ * Set the two bytes at a given address to the given value, using the
+ * write segment.
+ */
 inline void
 mos6502_set16(mos6502 *cpu, size_t addr, vm_16bit value)
 {
     vm_segment_set16(cpu->wmem, addr, value);
 }
 
+/*
+ * Given a read and write memory segment, update the CPU to use those
+ * implicitly when handling the mos6502_set/get functions.
+ */
 void
 mos6502_set_memory(mos6502 *cpu, vm_segment *rmem, vm_segment *wmem)
 {
