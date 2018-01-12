@@ -237,7 +237,7 @@ SEGMENT_READER(apple2_mem_read_bank_switch)
                 : 0x00;
     }
 
-    log_critical("Bank switch mapper called with an unexpected address: %x", addr);
+    log_critical("Bank switch read mapper called with an unexpected address: %x", addr);
     return 0;
 }
 
@@ -254,11 +254,14 @@ SEGMENT_WRITER(apple2_mem_write_bank_switch)
         case 0xC008:
             apple2_set_bank_switch(mach,
                                    mach->bank_switch | MEMORY_AUX);
-            break;
+            return;
 
         // Disable auxiliary memory
         case 0xC009:
             apple2_set_bank_switch(mach,
                                    mach->bank_switch & ~MEMORY_AUX);
+            return;
     }
+
+    log_critical("Bank switch write mapper called with an unexpected address: %x", addr);
 }
