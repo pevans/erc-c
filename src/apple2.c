@@ -154,25 +154,40 @@ apple2_create(int width, int height)
 void
 apple2_set_bank_switch(apple2 *mach, vm_8bit flags)
 {
-    int have_aux = mach->bank_switch & MEMORY_AUX;
-    int flags_aux = flags & MEMORY_AUX;
-
-    if (flags_aux && !have_aux) {
-        // Switch to auxiliary memory.
-        mos6502_set_memory(mach->cpu, mach->aux, mach->aux);
-
-        // We need to copy page 0 and 1 from main over to aux.
+    // If we already have BANK_ALTZP, and the flags we're setting do
+    // _not_ have BANK_ALTZP, then we need to copy aux's zero page and
+    // stack into main. But if we don't have BANK_ALTZP, and flags
+    // _does_, then we have to do the inverse: copy main's zero page and
+    // stack into aux. 
+    if (mach->bank_switch & BANK_ALTZP) {
+        if (~flags & BANK_ALTZP) {
+            vm_segment_copy(mach->main, mach->aux, 0, 0, 0x200);
+        }
+    } else if (flags & BANK_ALTZP) {
         vm_segment_copy(mach->aux, mach->main, 0, 0, 0x200);
-    } else if (!flags_aux && have_aux) {
-        // Switching back to main memory
-        mos6502_set_memory(mach->cpu, mach->main, mach->main);
-
-        // And, like above, we need to copy page 0 and 1 from aux back
-        // to main.
-        vm_segment_copy(mach->main, mach->aux, 0, 0, 0x200);
     }
 
     mach->bank_switch = flags;
+}
+
+/*
+ * Set the memory mode of the apple machine. This may cause us to change
+ * some behavior (i.e. start using or stop using auxiliary memory).
+ */
+void
+apple2_set_memory_mode(apple2 *mach, vm_8bit flags)
+{
+    vm_segment *rmem = NULL, 
+               *wmem = NULL;
+
+    mach->memory_mode = flags;
+
+    // We may need to change which segments the CPU can read from or
+    // write to, based upon the below flags. 
+    rmem = (flags & MEMORY_READ_AUX) ? mach->aux : mach->main;
+    wmem = (flags & MEMORY_WRITE_AUX) ? mach->aux : mach->main;
+
+    mos6502_set_memory(mach->cpu, rmem, wmem);
 }
 
 /*
@@ -248,12 +263,9 @@ apple2_reset(apple2 *mach)
     // Switch video mode back to 40 column text
     apple2_set_video(mach, VIDEO_40COL_TEXT);
 
-    // Default to:
-    // - read from ROM
-    // - write to RAM
-    // - use bank 2 for $Dxxx hexapage
+    // Switch us back to defaults
     apple2_set_bank_switch(mach, BANK_DEFAULT);
-    apple2_set_memory_mode(mach, MEMORY_NOMINAL);
+    apple2_set_memory_mode(mach, MEMORY_DEFAULT);
 }
 
 /*

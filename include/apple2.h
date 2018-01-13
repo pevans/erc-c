@@ -153,13 +153,10 @@ enum bank_switch {
     BANK_WRITE = 0x2,
 
     /*
-     * When on, the $Dnnn hexapage will use the first RAM bank for
-     * reads and/or writes. All other RAM access in bank-switched memory
-     * will still go to bank 1 RAM, with respect to BANK_RAM when it
-     * comes to reads. (The default behavior is actually to use bank 2
-     * RAM for the $D range.)
+     * When this is on, we will use bank 2 RAM when accessing the $Dnnn
+     * range; otherwise, we use bank 1 (as you might guess).
      */
-    BANK_RAM1 = 0x4,
+    BANK_RAM2 = 0x4,
     
     /*
      * This is a weird little bit. When BANK_ALTZP is on, the zero page
@@ -264,8 +261,9 @@ extern void apple2_press_key(apple2 *, vm_8bit);
 extern void apple2_release_key(apple2 *);
 extern void apple2_reset(apple2 *);
 extern void apple2_run_loop(apple2 *);
-extern void apple2_set_color(apple2 *, int);
 extern void apple2_set_bank_switch(apple2 *, vm_8bit);
+extern void apple2_set_color(apple2 *, int);
+extern void apple2_set_memory_mode(apple2 *, vm_8bit);
 extern void apple2_set_video(apple2 *, int);
 
 #endif

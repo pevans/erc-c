@@ -16,7 +16,7 @@ SEGMENT_READER(apple2_mem_read_bank)
 
     mach = (apple2 *)_mach;
     
-    if (mach->bank_switch & MEMORY_ROM) {
+    if (~mach->bank_switch & BANK_RAM) {
         // We need to account for the difference in address location
         // before we can successfully get any data from ROM.
         return vm_segment_get(mach->rom, addr - APPLE2_BANK_OFFSET);
@@ -26,7 +26,7 @@ SEGMENT_READER(apple2_mem_read_bank)
     // that you can access through bank-switching in the $D000 - $DFFF
     // range, which is actually held at the _end_ of memory beyond the
     // 64k mark.
-    if (addr < 0xE000 && mach->bank_switch & MEMORY_RAM2) {
+    if (addr < 0xE000 && mach->bank_switch & BANK_RAM2) {
         // The same caution holds for getting data from the
         // second RAM bank.
         return segment->memory[addr + 0x3000];
@@ -48,7 +48,7 @@ SEGMENT_WRITER(apple2_mem_write_bank)
     mach = (apple2 *)_mach;
 
     // No writes are allowed... sorry!
-    if (~mach->bank_switch & MEMORY_WRITE) {
+    if (~mach->bank_switch & BANK_WRITE) {
         return;
     }
 
@@ -62,7 +62,7 @@ SEGMENT_WRITER(apple2_mem_write_bank)
     // In this case, we need to assign the value at the 64-68k range at
     // the end of memory; this is just a simple offset from the given
     // address.
-    if (addr < 0xE000 && mach->bank_switch & MEMORY_RAM2) {
+    if (addr < 0xE000 && mach->bank_switch & BANK_RAM2) {
         segment->memory[addr + 0x3000] = value;
         return;
     }
@@ -195,64 +195,62 @@ SEGMENT_READER(apple2_mem_read_bank_switch)
         // these soft switches is not actually to read anything useful,
         // but simply to change the bank switch mode.
         case 0xC080:
-            apple2_set_bank_switch(mach, MEMORY_RAM2);
+            apple2_set_bank_switch(mach, BANK_RAM | BANK_RAM2);
             return 0;
 
         case 0xC081:
             if (last_addr == addr) {
-                apple2_set_bank_switch(mach, 
-                                       MEMORY_ROM | MEMORY_WRITE | MEMORY_RAM2);
+                apple2_set_bank_switch(mach, BANK_WRITE | BANK_RAM2);
             }
             return 0;
         case 0xC082:
-            apple2_set_bank_switch(mach, MEMORY_ROM | MEMORY_RAM2);
+            apple2_set_bank_switch(mach, BANK_RAM2);
             return 0;
 
         case 0xC083:
             if (last_addr == addr) {
-                apple2_set_bank_switch(mach, MEMORY_WRITE | MEMORY_RAM2);
+                apple2_set_bank_switch(mach, BANK_RAM | BANK_WRITE | BANK_RAM2);
             }
             return 0;
 
         // Conversely, the $C088 - $C08B range control memory access
         // while using bank 1 RAM.
         case 0xC088:
-            // The 0 means there are no special privileges; reads are to
-            // RAM, writes are disabled, and we are using bank 1 memory.
-            apple2_set_bank_switch(mach, 0);
+            apple2_set_bank_switch(mach, BANK_RAM);
             return 0;
 
         case 0xC089:
             if (last_addr == addr) {
-                apple2_set_bank_switch(mach, MEMORY_ROM | MEMORY_WRITE);
+                apple2_set_bank_switch(mach, BANK_WRITE);
             }
             return 0;
 
         case 0xC08A:
-            apple2_set_bank_switch(mach, MEMORY_ROM);
+            apple2_set_bank_switch(mach, BANK_DEFAULT);
             return 0;
 
         case 0xC08B:
             if (last_addr == addr) {
-                apple2_set_bank_switch(mach, MEMORY_WRITE);
+                apple2_set_bank_switch(mach, BANK_RAM | BANK_WRITE);
             }
             return 0;
 
         // Return high on the 7th bit if we're using bank 2 memory
         case 0xC011:
-            return mach->bank_switch & MEMORY_RAM2
+            return mach->bank_switch & BANK_RAM2
                 ? 0x80
                 : 0x00;
 
         // Return high on 7th bit if we're reading RAM
         case 0xC012:
-            return ~mach->bank_switch & MEMORY_ROM
+            return mach->bank_switch & BANK_RAM
                 ? 0x80
                 : 0x00;
 
-        // Return high on the 7th bit if we're using aux memory
+        // Return high on the 7th bit if we are using the zero page and
+        // stack from aux memory.
         case 0xC016:
-            return mach->bank_switch & MEMORY_AUX
+            return mach->bank_switch & BANK_ALTZP
                 ? 0x80
                 : 0x00;
     }
@@ -270,16 +268,16 @@ SEGMENT_WRITER(apple2_mem_write_bank_switch)
     apple2 *mach = (apple2 *)_mach;
 
     switch (addr) {
-        // Turn on auxiliary memory
+        // Turn on auxiliary memory for zero page + stack
         case 0xC008:
             apple2_set_bank_switch(mach,
-                                   mach->bank_switch | MEMORY_AUX);
+                                   mach->bank_switch | BANK_ALTZP);
             return;
 
-        // Disable auxiliary memory
+        // Disable auxiliary memory for zero page + stack
         case 0xC009:
             apple2_set_bank_switch(mach,
-                                   mach->bank_switch & ~MEMORY_AUX);
+                                   mach->bank_switch & ~BANK_ALTZP);
             return;
     }
 

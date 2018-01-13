@@ -64,7 +64,7 @@ Test(apple2_mem, read_bank)
 
     // Test that setting a value in the rom segment is returned to us
     // when addressing from main memory
-    apple2_set_bank_switch(mach, MEMORY_ROM | MEMORY_WRITE);
+    apple2_set_bank_switch(mach, BANK_WRITE);
     val = 123;
     vm_segment_set(mach->rom, 0x77, val);
     val = vm_segment_get(mach->rom, 0x77);
@@ -74,7 +74,7 @@ Test(apple2_mem, read_bank)
     // value in memory... but, as a twist, also check that the value is
     // not set in ROM nor in RAM2.
     val = 222;
-    apple2_set_bank_switch(mach, MEMORY_WRITE);
+    apple2_set_bank_switch(mach, BANK_RAM | BANK_WRITE);
     vm_segment_set(mach->main, 0xD077, val);
     cr_assert_eq(vm_segment_get(mach->main, 0xD077), val);
     cr_assert_neq(vm_segment_get(mach->rom, 0x77), val);
@@ -85,7 +85,7 @@ Test(apple2_mem, read_bank)
     // if it's there when addressing from main memory in the $Dnnn
     // range.
     val = 111;
-    apple2_set_bank_switch(mach, mach->bank_switch | MEMORY_RAM2);
+    apple2_set_bank_switch(mach, mach->bank_switch | BANK_RAM2);
     vm_segment_set(mach->main, 0x10077, val);
     cr_assert_eq(vm_segment_get(mach->main, 0xD077), val);
 }
@@ -100,12 +100,11 @@ Test(apple2_mem, write_bank)
 {
     vm_8bit right, wrong;
 
-    // In BANK_ROM mode, we expect that updates to ROM will never be
+    // In BANK_DEFAULT mode, we expect that updates to ROM will never be
     // successful (after all, it wouldn't be read-only memory if they
     // were).
     right = 123;
     wrong = 222;
-    apple2_set_bank_switch(mach, MEMORY_ROM);
     vm_segment_set(mach->rom, 0x77, right);
     vm_segment_set(mach->main, 0xD077, wrong);
     cr_assert_eq(vm_segment_get(mach->rom, 0x77), right);
@@ -114,7 +113,7 @@ Test(apple2_mem, write_bank)
     // RAM1 is the main bank; it's all 64k RAM in one chunk.
     right = 111;
     wrong = 232;
-    apple2_set_bank_switch(mach, MEMORY_WRITE);
+    apple2_set_bank_switch(mach, BANK_RAM | BANK_WRITE);
     vm_segment_set(mach->main, 0xD078, right);
     vm_segment_set(mach->main, 0x10078, wrong);
     cr_assert_eq(vm_segment_get(mach->main, 0xD078), right);
@@ -124,7 +123,7 @@ Test(apple2_mem, write_bank)
     // ($D000..$DFFF) is in ram2.
     right = 210;
     wrong = 132;
-    apple2_set_bank_switch(mach, mach->bank_switch | MEMORY_RAM2);
+    apple2_set_bank_switch(mach, mach->bank_switch | BANK_RAM2);
     vm_segment_set(mach->main, 0x10073, wrong);
     vm_segment_set(mach->main, 0xD073, right);
     cr_assert_eq(vm_segment_get(mach->main, 0x10073), right);
@@ -133,65 +132,65 @@ Test(apple2_mem, write_bank)
 Test(apple2_mem, read_bank_switch)
 {
     vm_segment_get(mach->main, 0xC080);
-    cr_assert_eq(mach->bank_switch, MEMORY_RAM2);
+    cr_assert_eq(mach->bank_switch, BANK_RAM | BANK_RAM2);
 
     // This (and a few others) are trickier to test, as they require
     // consecutive reads to trigger.
     vm_segment_get(mach->main, 0xC081);
-    cr_assert_neq(mach->bank_switch, MEMORY_ROM | MEMORY_WRITE | MEMORY_RAM2);
+    cr_assert_neq(mach->bank_switch, BANK_WRITE | BANK_RAM2);
     mach->cpu->last_addr = 0xC081;
     vm_segment_get(mach->main, 0xC081);
-    cr_assert_eq(mach->bank_switch, MEMORY_ROM | MEMORY_WRITE | MEMORY_RAM2);
+    cr_assert_eq(mach->bank_switch, BANK_WRITE | BANK_RAM2);
 
     vm_segment_get(mach->main, 0xC082);
-    cr_assert_eq(mach->bank_switch, MEMORY_ROM | MEMORY_RAM2);
+    cr_assert_eq(mach->bank_switch, BANK_RAM2);
 
     // Another that needs consecutives
     vm_segment_get(mach->main, 0xC083);
-    cr_assert_neq(mach->bank_switch, MEMORY_WRITE | MEMORY_RAM2);
+    cr_assert_neq(mach->bank_switch, BANK_RAM | BANK_WRITE | BANK_RAM2);
     mach->cpu->last_addr = 0xC083;
     vm_segment_get(mach->main, 0xC083);
-    cr_assert_eq(mach->bank_switch, MEMORY_WRITE | MEMORY_RAM2);
+    cr_assert_eq(mach->bank_switch, BANK_RAM | BANK_WRITE | BANK_RAM2);
 
     vm_segment_get(mach->main, 0xC088);
-    cr_assert_eq(mach->bank_switch, 0);
+    cr_assert_eq(mach->bank_switch, BANK_RAM);
 
     // You get the idea
     vm_segment_get(mach->main, 0xC089);
-    cr_assert_neq(mach->bank_switch, MEMORY_ROM | MEMORY_WRITE);
+    cr_assert_neq(mach->bank_switch, BANK_WRITE);
     mach->cpu->last_addr = 0xC089;
     vm_segment_get(mach->main, 0xC089);
-    cr_assert_eq(mach->bank_switch, MEMORY_ROM | MEMORY_WRITE);
+    cr_assert_eq(mach->bank_switch, BANK_WRITE);
 
     vm_segment_get(mach->main, 0xC08A);
-    cr_assert_eq(mach->bank_switch, MEMORY_ROM);
+    cr_assert_eq(mach->bank_switch, BANK_DEFAULT);
 
     vm_segment_get(mach->main, 0xC08B);
-    cr_assert_neq(mach->bank_switch, MEMORY_WRITE);
+    cr_assert_neq(mach->bank_switch, BANK_RAM | BANK_WRITE);
     mach->cpu->last_addr = 0xC08B;
     vm_segment_get(mach->main, 0xC08B);
-    cr_assert_eq(mach->bank_switch, MEMORY_WRITE);
+    cr_assert_eq(mach->bank_switch, BANK_RAM | BANK_WRITE);
 
-    mach->bank_switch = MEMORY_RAM2;
+    mach->bank_switch = BANK_RAM | BANK_RAM2;
     cr_assert_eq(vm_segment_get(mach->main, 0xC011), 0x80);
-    mach->bank_switch = 0;
+    mach->bank_switch = BANK_DEFAULT;
     cr_assert_eq(vm_segment_get(mach->main, 0xC011), 0x00);
-    mach->bank_switch = 0;
+    mach->bank_switch = BANK_RAM;
     cr_assert_eq(vm_segment_get(mach->main, 0xC012), 0x80);
-    mach->bank_switch = MEMORY_ROM;
+    mach->bank_switch = BANK_DEFAULT;
     cr_assert_eq(vm_segment_get(mach->main, 0xC012), 0x00);
-    mach->bank_switch = MEMORY_AUX;
+    mach->bank_switch = BANK_ALTZP;
     cr_assert_eq(vm_segment_get(mach->main, 0xC016), 0x80);
-    mach->bank_switch = 0;
+    mach->bank_switch = BANK_DEFAULT;
     cr_assert_eq(vm_segment_get(mach->main, 0xC016), 0x00);
 }
 
 Test(apple2_mem, write_bank_switch)
 {
     vm_segment_set(mach->main, 0xC008, 1);
-    cr_assert_eq(mach->bank_switch & MEMORY_AUX, MEMORY_AUX);
+    cr_assert_eq(mach->bank_switch & BANK_ALTZP, BANK_ALTZP);
     vm_segment_set(mach->main, 0xC009, 1);
-    cr_assert_eq(mach->bank_switch & MEMORY_AUX, 0);
+    cr_assert_eq(mach->bank_switch & BANK_ALTZP, 0);
 }
 
 Test(apple2_mem, init_peripheral_rom)

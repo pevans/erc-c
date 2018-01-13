@@ -121,29 +121,26 @@ Test(apple2, set_bank_switch)
 {
     apple2_set_bank_switch(mach, 0);
     cr_assert_eq(mach->bank_switch, 0);
-    apple2_set_bank_switch(mach, MEMORY_ROM | MEMORY_WRITE | MEMORY_RAM2);
-    cr_assert_eq(mach->bank_switch, MEMORY_ROM | MEMORY_WRITE | MEMORY_RAM2);
+    apple2_set_bank_switch(mach, BANK_WRITE | BANK_RAM2);
+    cr_assert_eq(mach->bank_switch, BANK_WRITE | BANK_RAM2);
 
     mos6502_set(mach->cpu, 0x1, 111);
     mos6502_set(mach->cpu, 0x101, 222);
 
-    apple2_set_bank_switch(mach, MEMORY_AUX);
-    cr_assert_eq(mach->cpu->rmem, mach->aux);
+    apple2_set_bank_switch(mach, BANK_ALTZP);
     cr_assert_eq(mos6502_get(mach->cpu, 0x1), 111);
     cr_assert_eq(mos6502_get(mach->cpu, 0x101), 222);
 
     mos6502_set(mach->cpu, 0x1, 222);
     mos6502_set(mach->cpu, 0x101, 101);
 
-    apple2_set_bank_switch(mach, 0);
-    cr_assert_eq(mach->cpu->rmem, mach->main);
+    apple2_set_bank_switch(mach, BANK_DEFAULT);
     cr_assert_eq(mos6502_get(mach->cpu, 0x1), 222);
     cr_assert_eq(mos6502_get(mach->cpu, 0x101), 101);
 }
 
 Test(apple2, reset)
 {
-    apple2_set_bank_switch(mach, MEMORY_ROM);
     vm_segment_set(mach->rom, 0x2FFC, 0x34);
     vm_segment_set(mach->rom, 0x2FFD, 0x12);
     apple2_reset(mach);
