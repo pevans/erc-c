@@ -2,9 +2,10 @@
  * apple2.mem.c
  */
 
+#include "apple2.bank.h"
+#include "apple2.dbuf.h"
 #include "apple2.h"
 #include "apple2.mem.h"
-#include "apple2.bank.h"
 #include "objstore.h"
 
 /*
@@ -20,6 +21,9 @@ apple2_mem_map(apple2 *mach, vm_segment *segment)
     // Set up all of the bank-switch-related mapping. Well--almost all
     // of it.
     apple2_bank_map(segment);
+
+    // Here we handle the 80STORE bit for our display buffers.
+    apple2_dbuf_map(segment);
 
     // We will do the mapping for the zero page and stack addresses.
     // Accessing those addresses can be affected by bank-switching, but
