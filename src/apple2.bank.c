@@ -3,15 +3,41 @@
  */
 
 #include "apple2.h"
-#include "apple2.mem.h"
 #include "apple2.bank.h"
+#include "apple2.mem.h"
 #include "objstore.h"
+
+/*
+ * These are the addresses that need to be mapped to the
+ * bank_switch_read function.
+ */
+static size_t switch_reads[] = {
+    0xC080,
+    0xC081,
+    0xC082,
+    0xC083,
+    0xC088,
+    0xC089,
+    0xC08A,
+    0xC08B,
+    0xC011,
+    0xC012,
+    0xC016,
+};
+
+/*
+ * These will be mapped to the bank_switch_write function.
+ */
+static size_t switch_writes[] = {
+    0xC008,
+    0xC009,
+};
 
 /*
  * Return a byte of memory from a bank-switchable address. This may be
  * from ROM, from main memory, or from the "extra" 4k bank of RAM.
  */
-SEGMENT_READER(apple2_mem_read_bank)
+SEGMENT_READER(apple2_bank_read)
 {
     apple2 *mach;
 
@@ -48,7 +74,7 @@ SEGMENT_READER(apple2_mem_read_bank)
  * Write a byte into bank-switchable memory. Many of the same cautions,
  * notes, etc. written for the read function apply here as well.
  */
-SEGMENT_WRITER(apple2_mem_write_bank)
+SEGMENT_WRITER(apple2_bank_write)
 {
     apple2 *mach;
 
@@ -84,73 +110,32 @@ SEGMENT_WRITER(apple2_mem_write_bank)
 }
 
 /*
- * Set the memory map functions for main memory in an apple2 machine
+ * This function will establish all of the mapper functions to handle
+ * the soft switches for memory bank-switching.
  */
 void
-apple2_mem_map(apple2 *mach, vm_segment *segment)
+apple2_bank_map(vm_segment *segment)
 {
     size_t addr;
+    int i, rlen, wlen;
 
-    vm_segment_set_map_machine(mach);
-
-    apple2_bank_map(segment);
-}
-
-/*
- * Initialize the peripheral ROM ($C100 - $C7FF).
- */
-int
-apple2_mem_init_peripheral_rom(apple2 *mach)
-{
-    int err;
-
-    // Let's copy beginning at the 1-slot offset in memory, but going
-    // all the way as far as the length of all peripheral ROM in memory.
-    err = vm_segment_copy_buf(mach->main, 
-                              objstore_apple2_peripheral_rom(),
-                              APPLE2_PERIPHERAL_SLOT(1), 0, 
-                              APPLE2_PERIPHERAL_SIZE);
-    if (err != OK) {
-        log_critical("Could not copy apple2 peripheral rom");
-        return ERR_BADFILE;
+    for (addr = APPLE2_BANK_OFFSET; addr < MOS6502_MEMSIZE; addr++) {
+        vm_segment_read_map(segment, addr, apple2_bank_read);
+        vm_segment_write_map(segment, addr, apple2_bank_write);
     }
 
-    return OK;
-}
+    rlen = sizeof(switch_reads) / sizeof(size_t);
+    wlen = sizeof(switch_writes) / sizeof(size_t);
 
-/*
- * I'm still a bit hazy on how this _should_ work, but this function
- * will copy as much as we can from the system rom into both main memory
- * and into the rom segment.
- */
-int
-apple2_mem_init_sys_rom(apple2 *mach)
-{
-    int err;
-    const vm_8bit *sysrom;
-    
-    sysrom = objstore_apple2_sys_rom();
-
-    // The first two kilobytes of system rom are copied into memory
-    // beginning at $C800 (which is just after all of the peripheral ROM
-    // locations).
-    err = vm_segment_copy_buf(mach->main, sysrom,
-                              0xC800, 0x800, 0x800);
-    if (err != OK) {
-        log_critical("Could not copy apple2 system rom");
-        return ERR_BADFILE;
+    for (i = 0; i < rlen; i++) {
+        vm_segment_read_map(segment, switch_reads[i],
+                            apple2_bank_switch_read);
     }
 
-    // The last 12k of sysrom (which is APPLE2_ROM_SIZE) are copied into
-    // the rom segment.
-    err = vm_segment_copy_buf(mach->rom, sysrom, 
-                              0, 0x1000, APPLE2_ROM_SIZE);
-    if (err != OK) {
-        log_critical("Could not copy apple2 system rom");
-        return ERR_BADFILE;
+    for (i = 0; i < wlen; i++) {
+        vm_segment_write_map(segment, switch_writes[i], 
+                             apple2_bank_switch_write);
     }
-
-    return OK;
 }
 
 /*
@@ -159,7 +144,7 @@ apple2_mem_init_sys_rom(apple2 *mach)
  * between ROM, RAM, or bank 2 RAM. Sorry about that -- it's just the
  * way it worked on the Apple II.
  */
-SEGMENT_READER(apple2_mem_read_bank_switch)
+SEGMENT_READER(apple2_bank_switch_read)
 {
     apple2 *mach;
     vm_16bit last_addr;
@@ -246,7 +231,7 @@ SEGMENT_READER(apple2_mem_read_bank_switch)
  * Handle writes to the soft switches that modify bank-switching
  * behavior.
  */
-SEGMENT_WRITER(apple2_mem_write_bank_switch)
+SEGMENT_WRITER(apple2_bank_switch_write)
 {
     apple2 *mach = (apple2 *)_mach;
 

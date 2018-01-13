@@ -1,5 +1,6 @@
 set(erc_sources
 	apple2.c
+	apple2.bank.c
 	apple2.dd.c
 	apple2.draw.c
 	apple2.mem.c
