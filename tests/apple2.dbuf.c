@@ -63,7 +63,3 @@ Test(apple2_dbuf, read)
     cr_assert_eq(mach->main->memory[0x2000], 234);
     cr_assert_eq(mach->aux->memory[0x2000], 234);
 }
-
-Test(apple2_dbuf, write)
-{
-}
