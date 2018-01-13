@@ -188,3 +188,24 @@ Test(mos6502, set_memory)
     cr_assert_eq(cpu->rmem, rmem);
     cr_assert_eq(cpu->wmem, wmem);
 }
+
+Test(mos6502, last_executed)
+{
+    vm_8bit opcode, operand;
+    vm_16bit addr;
+
+    mos6502_set(cpu, 0, 0xA9);      // LDA #$EE
+    mos6502_set(cpu, 1, 0xEE);
+    mos6502_set(cpu, 2, 0x8D);      // STA $1234
+    mos6502_set16(cpu, 3, 0x1234);
+
+    mos6502_execute(cpu);
+    mos6502_last_executed(cpu, &opcode, &operand, NULL);
+    cr_assert_eq(opcode, 0xA9);
+    cr_assert_eq(operand, 0xEE);
+
+    mos6502_execute(cpu);
+    mos6502_last_executed(cpu, &opcode, NULL, &addr);
+    cr_assert_eq(opcode, 0x8D);
+    cr_assert_eq(addr, 0x1234);
+}

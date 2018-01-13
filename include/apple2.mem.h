@@ -56,6 +56,8 @@
  */
 #define APPLE2_BANK_OFFSET 0xD000
 
+extern SEGMENT_READER(apple2_mem_zp_read);
+extern SEGMENT_WRITER(apple2_mem_zp_write);
 extern int apple2_mem_init_peripheral_rom(apple2 *);
 extern int apple2_mem_init_sys_rom(apple2 *);
 extern void apple2_mem_map(apple2 *, vm_segment *);

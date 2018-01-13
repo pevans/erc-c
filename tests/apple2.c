@@ -149,3 +149,16 @@ Test(apple2, reset)
     cr_assert_eq(mach->cpu->P, MOS_INTERRUPT);
     cr_assert_eq(mach->cpu->S, 0);
 }
+
+Test(apple2, set_memory_mode)
+{
+    apple2_set_memory_mode(mach, MEMORY_READ_AUX);
+    cr_assert_eq(mach->memory_mode, MEMORY_READ_AUX);
+    cr_assert_eq(mach->cpu->rmem, mach->aux);
+    cr_assert_eq(mach->cpu->wmem, mach->main);
+
+    apple2_set_memory_mode(mach, MEMORY_WRITE_AUX);
+    cr_assert_eq(mach->memory_mode, MEMORY_WRITE_AUX);
+    cr_assert_eq(mach->cpu->rmem, mach->main);
+    cr_assert_eq(mach->cpu->wmem, mach->aux);
+}
