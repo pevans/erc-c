@@ -67,25 +67,23 @@ apple2_mem_init_sys_rom(apple2 *mach)
 {
     int err;
     const vm_8bit *sysrom;
+    const vm_8bit *prom;
     
     sysrom = objstore_apple2_sys_rom();
+    prom = objstore_apple2_peripheral_rom();
 
-    // The first two kilobytes of system rom are copied into memory
-    // beginning at $C800 (which is just after all of the peripheral ROM
-    // locations).
-    err = vm_segment_copy_buf(mach->main, sysrom,
-                              0xC800, 0x800, 0x800);
+    err = vm_segment_copy_buf(mach->rom, sysrom, 
+                              0, 0, APPLE2_SYSROM_SIZE);
     if (err != OK) {
         log_critical("Could not copy apple2 system rom");
         return ERR_BADFILE;
     }
 
-    // The last 12k of sysrom (which is APPLE2_ROM_SIZE) are copied into
-    // the rom segment.
-    err = vm_segment_copy_buf(mach->rom, sysrom, 
-                              0, 0x1000, APPLE2_ROM_SIZE);
+    err = vm_segment_copy_buf(mach->rom, prom,
+                              APPLE2_SYSROM_SIZE, 0, 
+                              APPLE2_PERIPHERAL_SIZE);
     if (err != OK) {
-        log_critical("Could not copy apple2 system rom");
+        log_critical("Could not copy apple2 peripheral rom");
         return ERR_BADFILE;
     }
 

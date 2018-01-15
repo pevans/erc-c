@@ -13,22 +13,13 @@ data = 'hope'
 
 # These must be appended in the exact order indicated by the struct definition
 # in objstore.h
-data += file_data('./data/print.rom')           # $C100
-data += file_data('./data/serial.rom')          # $C200
-data += file_data('./data/zeropad0x100.rom')    # $C300
-data += file_data('./data/zeropad0x100.rom')    # $C400
-data += file_data('./data/zeropad0x100.rom')    # $C500
-data += file_data('./data/disk2.rom')           # $C600
-data += file_data('./data/disk2.rom')           # $C700
-data += file_data('./data/apple2.rom')          # $D000
+data += file_data('./data/apple2.rom')          # Internal ROM ($C000..$FFFF)
+data += file_data('./data/peripheral.rom')      # $C000..$CFFF
 data += file_data('./fonts/apple2-system.bmp')
 
 # Let's not keep calling len(data) since we know it won't change over our
 # iterations
 data_len = len(data)
-
-print data_len
-exit(0)
 
 # This just defines the variable name for the store data
 sys.stdout.write("static unsigned char store_data[] =\n")

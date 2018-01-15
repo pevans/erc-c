@@ -23,10 +23,13 @@
     (0xC000 + (n << 8))
 
 /*
- * This is the size of any peripheral's ROM that we can hold in memory
- * (which is any page from $C100 - $C700).
+ * This is the total size of the ROM we hold devoted to peripherals. It
+ * is meant to be mapped directly to the entire $C000..$CFFF space; it's
+ * zero-padded for the $C0 page, and is also zero-padded in $C8..$CF;
+ * the latter being reserved for expansion peripheral ROM usage, and the
+ * former for the I/O soft switches that the Apple II has.
  */
-#define APPLE2_PERIPHERAL_SIZE 0x700
+#define APPLE2_PERIPHERAL_SIZE 0x1000
 
 /*
  * Peripheral ROM can only occupy a single page in memory.
@@ -40,9 +43,10 @@
 #define APPLE2_SYSROM_SIZE 0x4000
 
 /*
- * The size of our block of ROM is 12k
+ * The size of our block of ROM is 20k; 16k for internal ROM, 4k to
+ * contain all of the peripheral ROM above.
  */
-#define APPLE2_ROM_SIZE 0x3000
+#define APPLE2_ROM_SIZE 0x5000
 
 /*
  * At the highest point (with the IIe extended 80 column text card), you
