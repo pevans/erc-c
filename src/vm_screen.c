@@ -163,7 +163,7 @@ vm_screen_free(vm_screen *screen)
 bool
 vm_screen_active(vm_screen *screen)
 {
-    static int counter = 50;
+    static int counter = 100;
 
     if (counter--) {
         return true;
