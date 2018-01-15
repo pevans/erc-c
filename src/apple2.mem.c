@@ -36,28 +36,6 @@ apple2_mem_map(apple2 *mach, vm_segment *segment)
 }
 
 /*
- * Initialize the peripheral ROM ($C100 - $C7FF).
- */
-int
-apple2_mem_init_peripheral_rom(apple2 *mach)
-{
-    int err;
-
-    // Let's copy beginning at the 1-slot offset in memory, but going
-    // all the way as far as the length of all peripheral ROM in memory.
-    err = vm_segment_copy_buf(mach->main, 
-                              objstore_apple2_peripheral_rom(),
-                              APPLE2_PERIPHERAL_SLOT(1), 0, 
-                              APPLE2_PERIPHERAL_SIZE);
-    if (err != OK) {
-        log_critical("Could not copy apple2 peripheral rom");
-        return ERR_BADFILE;
-    }
-
-    return OK;
-}
-
-/*
  * I'm still a bit hazy on how this _should_ work, but this function
  * will copy as much as we can from the system rom into both main memory
  * and into the rom segment.

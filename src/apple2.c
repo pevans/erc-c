@@ -87,12 +87,6 @@ apple2_create(int width, int height)
     apple2_mem_map(mach, mach->main);
     apple2_mem_map(mach, mach->aux);
 
-    if (apple2_mem_init_peripheral_rom(mach) != OK) {
-        log_critical("Could not initialize disk2 ROM");
-        apple2_free(mach);
-        return NULL;
-    }
-
     if (apple2_mem_init_sys_rom(mach) != OK) {
         log_critical("Could not initialize apple2 ROM");
         apple2_free(mach);
