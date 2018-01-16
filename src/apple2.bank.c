@@ -52,7 +52,7 @@ SEGMENT_READER(apple2_bank_read)
     if (~mach->bank_switch & BANK_RAM) {
         // We need to account for the difference in address location
         // before we can successfully get any data from ROM.
-        return vm_segment_get(mach->rom, addr - APPLE2_BANK_OFFSET);
+        return vm_segment_get(mach->rom, addr - APPLE2_SYSROM_OFFSET);
     }
 
     // Each memory bank (main or auxiliary) have an additional 4k of RAM

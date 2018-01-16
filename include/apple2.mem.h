@@ -56,7 +56,12 @@
 #define APPLE2_AUX_SIZE 0x10000
 
 /*
- * This is the base address (or offset) for all bank-switched memory
+ * This is the base address for system / internal ROM.
+ */
+#define APPLE2_SYSROM_OFFSET 0xC000
+
+/*
+ * This defines the base address for bank-switchable memory
  */
 #define APPLE2_BANK_OFFSET 0xD000
 

@@ -141,8 +141,8 @@ Test(apple2, set_bank_switch)
 
 Test(apple2, reset)
 {
-    vm_segment_set(mach->rom, 0x2FFC, 0x34);
-    vm_segment_set(mach->rom, 0x2FFD, 0x12);
+    vm_segment_set(mach->rom, 0x3FFC, 0x34);
+    vm_segment_set(mach->rom, 0x3FFD, 0x12);
     apple2_reset(mach);
 
     cr_assert_eq(mach->cpu->PC, 0x1234);
