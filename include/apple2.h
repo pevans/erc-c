@@ -35,15 +35,6 @@
  */
 #define APPLE2_APPLESOFT_MAIN 0xE000
 
-enum video_modes {
-    VIDEO_40COL_TEXT,
-    VIDEO_LORES,
-    VIDEO_HIRES,
-    VIDEO_80COL_TEXT,
-    VIDEO_DOUBLE_LORES,
-    VIDEO_DOUBLE_HIRES,
-};
-
 enum color_modes {
     COLOR_GREEN,
     COLOR_AMBER,
@@ -154,6 +145,50 @@ enum memory_mode {
     MEMORY_SLOTC3ROM = 0x80,
 };
 
+enum display_mode {
+    DISPLAY_DEFAULT = 0x0,
+
+    /*
+     * Display text in the "alternate" character set
+     */
+    DISPLAY_ALTCHAR = 0x1,
+
+    /*
+     * Show text in 80 columns, rather than the default 40 columns
+     */
+    DISPLAY_80COL = 0x2,
+
+    /*
+     * Display only text. By default, we display lo-res graphics and
+     * perhaps mixed graphics and text if the MIXED bit is high.
+     */
+    DISPLAY_TEXT = 0x4,
+
+    /*
+     * If TEXT is not high, then we are directed to display both text
+     * and graphics.
+     */
+    DISPLAY_MIXED = 0x8,
+
+    /*
+     * If this is high, we will show high-resolution graphics; if not,
+     * low-resolution. This bit is overridden by TEXT; if TEXT is high,
+     * we will only show text.
+     */
+    DISPLAY_HIRES = 0x10,
+
+    /*
+     * Enable IOU access for $C058..$C05F when this bit is on; NOTE: the
+     * tech ref says that this is left on by the firmware
+     */
+    DISPLAY_IOUDIS = 0x20,
+
+    /*
+     * Display double-high-resolution graphics
+     */
+    DISPLAY_DHIRES = 0x40,
+};
+
 enum bank_switch {
     /*
      * In nominal bank-switch mode, reads in the bank-switchable address
@@ -243,9 +278,9 @@ typedef struct {
     /*
      * This is the mode in which we must interpret graphics. This will
      * tell us not only if we're in lo- or hi-res, but also if we are in
-     * single or double view mode.
+     * single or double view mode. Among other things!
      */
-    int video_mode;
+    vm_8bit display_mode;
 
     /*
      * This is the color mode we want to emulate. You can have a few
@@ -288,6 +323,6 @@ extern void apple2_run_loop(apple2 *);
 extern void apple2_set_bank_switch(apple2 *, vm_8bit);
 extern void apple2_set_color(apple2 *, int);
 extern void apple2_set_memory_mode(apple2 *, vm_8bit);
-extern void apple2_set_video(apple2 *, int);
+extern void apple2_set_display(apple2 *, vm_8bit);
 
 #endif

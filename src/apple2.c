@@ -125,7 +125,7 @@ apple2_create(int width, int height)
     apple2_set_color(mach, COLOR_FULL);
 
     // We default to lo-res mode.
-    apple2_set_video(mach, VIDEO_LORES);
+    apple2_set_display(mach, DISPLAY_DEFAULT);
 
     // Let's install our bitmap font.
     mach->sysfont = vm_bitfont_create(mach->screen,
@@ -193,9 +193,7 @@ bool
 apple2_is_double_video(apple2 *mach)
 {
     return 
-        mach->video_mode == VIDEO_DOUBLE_HIRES ||
-        mach->video_mode == VIDEO_DOUBLE_LORES ||
-        mach->video_mode == VIDEO_80COL_TEXT;
+        mach->display_mode & DISPLAY_DHIRES;
 }
 
 /*
@@ -255,7 +253,7 @@ apple2_reset(apple2 *mach)
     mach->cpu->S = 0;
 
     // Switch video mode back to 40 column text
-    apple2_set_video(mach, VIDEO_40COL_TEXT);
+    apple2_set_display(mach, DISPLAY_DEFAULT);
 
     // Switch us back to defaults
     apple2_set_bank_switch(mach, BANK_DEFAULT);
@@ -388,15 +386,15 @@ apple2_set_color(apple2 *mach, int mode)
 }
 
 /*
- * Set the video mode of the display. This would be the type of
+ * Set the display mode of the display. This would be the type of
  * resolution (text by which number of columns, lo-res, hi-res, etc.)
  */
 void
-apple2_set_video(apple2 *mach, int mode)
+apple2_set_display(apple2 *mach, vm_8bit mode)
 {
     int width, height;
 
-    mach->video_mode = mode;
+    mach->display_mode = mode;
 
     // In the traditional video modes that Apple II first came in, you
     // would have a maximum width of 280 pixels. (In lo-res, you have
@@ -407,9 +405,7 @@ apple2_set_video(apple2 *mach, int mode)
 
     // In double video modes, the width is effectively doubled, but the
     // height is untouched.
-    if (mach->video_mode == VIDEO_DOUBLE_LORES ||
-        mach->video_mode == VIDEO_DOUBLE_HIRES
-       ) {
+    if (apple2_is_double_video(mach)) {
         width = 560;
     }
 

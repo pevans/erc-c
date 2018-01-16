@@ -34,29 +34,10 @@ Test(apple2, create)
 
 Test(apple2, is_double_video)
 {
-    for (int i = 0; i <= VIDEO_DOUBLE_HIRES; i++) {
-        mach->video_mode = i;
-        switch (i) {
-            case VIDEO_40COL_TEXT:
-                cr_assert_eq(apple2_is_double_video(mach), false);
-                break;
-            case VIDEO_LORES:
-                cr_assert_eq(apple2_is_double_video(mach), false);
-                break;
-            case VIDEO_HIRES:
-                cr_assert_eq(apple2_is_double_video(mach), false);
-                break;
-            case VIDEO_80COL_TEXT:
-                cr_assert_eq(apple2_is_double_video(mach), true);
-                break;
-            case VIDEO_DOUBLE_LORES:
-                cr_assert_eq(apple2_is_double_video(mach), true);
-                break;
-            case VIDEO_DOUBLE_HIRES:
-                cr_assert_eq(apple2_is_double_video(mach), true);
-                break;
-        }
-    }
+    mach->display_mode = DISPLAY_DEFAULT;
+    cr_assert_eq(apple2_is_double_video(mach), false);
+    mach->display_mode = DISPLAY_DHIRES;
+    cr_assert_eq(apple2_is_double_video(mach), true);
 }
 
 Test(apple2, boot)
@@ -109,12 +90,12 @@ Test(apple2, set_color)
     cr_assert_eq(mach->color_mode, COLOR_FULL);
 }
 
-Test(apple2, set_video)
+Test(apple2, set_display)
 {
-    apple2_set_video(mach, VIDEO_DOUBLE_HIRES);
-    cr_assert_eq(mach->video_mode, VIDEO_DOUBLE_HIRES);
-    apple2_set_video(mach, VIDEO_LORES);
-    cr_assert_eq(mach->video_mode, VIDEO_LORES);
+    apple2_set_display(mach, DISPLAY_DHIRES);
+    cr_assert_eq(mach->display_mode, DISPLAY_DHIRES);
+    apple2_set_display(mach, DISPLAY_TEXT);
+    cr_assert_eq(mach->display_mode, DISPLAY_TEXT);
 }
 
 Test(apple2, set_bank_switch)
