@@ -82,3 +82,12 @@ apple2_dbuf_map(vm_segment *segment)
         vm_segment_write_map(segment, addr, apple2_dbuf_write);
     }
 }
+
+/*
+ * Handle all read switches for display buffer code. Some switches
+ * respond to either reads _or_ writes, so you may see some cases
+ * duplicated in the write map.
+ */
+SEGMENT_READER(apple2_dbuf_switch_read)
+{
+}

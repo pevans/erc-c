@@ -9,6 +9,28 @@
 #include "apple2.mem.h"
 #include "objstore.h"
 
+static size_t switch_reads[] = {
+    0xC013,
+    0xC014,
+    0xC018,
+    0xC01C,
+    0xC01D,
+};
+
+static size_t switch_writes[] = {
+    0xC000,
+    0xC001,
+    0xC002,
+    0xC003,
+    0xC004,
+    0xC005,
+    0xC054,
+    0xC055,
+    0xC056,
+    0xC057,
+    0xC059,
+};
+
 /*
  * Set the memory map functions for main memory in an apple2 machine
  */
@@ -16,6 +38,7 @@ void
 apple2_mem_map(apple2 *mach, vm_segment *segment)
 {
     size_t addr;
+    int i, rlen, wlen;
 
     vm_segment_set_map_machine(mach);
 
@@ -35,6 +58,17 @@ apple2_mem_map(apple2 *mach, vm_segment *segment)
     for (addr = 0x0; addr < 0x200; addr++) {
         vm_segment_read_map(segment, addr, apple2_mem_zp_read);
         vm_segment_write_map(segment, addr, apple2_mem_zp_write);
+    }
+
+    rlen = sizeof(switch_reads) / sizeof(size_t);
+    wlen = sizeof(switch_writes) / sizeof(size_t);
+
+    for (i = 0; i < rlen; i++) {
+        vm_segment_read_map(segment, switch_reads[i], apple2_mem_switch_read);
+    }
+
+    for (i = 0; i < wlen; i++) {
+        vm_segment_write_map(segment, switch_writes[i], apple2_mem_switch_write);
     }
 }
 
@@ -108,4 +142,111 @@ SEGMENT_WRITER(apple2_mem_zp_write)
         : mach->main;
 
     segment->memory[addr] = value;
+}
+
+/*
+ * Handle all soft switches that ask for the status of certain memory
+ * conditions.
+ */
+SEGMENT_READER(apple2_mem_switch_read)
+{
+    apple2 *mach = (apple2 *)_mach;
+
+    switch (addr) {
+        case 0xC013:
+            return mach->memory_mode & MEMORY_READ_AUX
+                ? 0x80
+                : 0x00;
+
+        case 0xC014:
+            return mach->memory_mode & MEMORY_WRITE_AUX
+                ? 0x80
+                : 0x00;
+
+        case 0xC018:
+            return mach->memory_mode & MEMORY_80STORE
+                ? 0x80
+                : 0x00;
+
+        case 0xC01C:
+            return mach->memory_mode & MEMORY_PAGE2
+                ? 0x80
+                : 0x00;
+
+        case 0xC01D:
+            return mach->memory_mode & MEMORY_HIRES
+                ? 0x80
+                : 0x00;
+    }
+
+    // ???
+    return 0;
+}
+
+/*
+ * Change memory settings based on the soft switches defined in the tech
+ * reference
+ */
+SEGMENT_WRITER(apple2_mem_switch_write)
+{
+    apple2 *mach = (apple2 *)_mach;
+
+    switch (addr) {
+        case 0xC003:
+            apple2_set_memory_mode(mach,
+                                   mach->memory_mode | MEMORY_READ_AUX);
+            break;
+
+        case 0xC002:
+            apple2_set_memory_mode(mach,
+                                   mach->memory_mode & ~MEMORY_READ_AUX);
+            break;
+
+        case 0xC005:
+            apple2_set_memory_mode(mach,
+                                   mach->memory_mode & MEMORY_WRITE_AUX);
+            break;
+
+        case 0xC004:
+            apple2_set_memory_mode(mach,
+                                   mach->memory_mode & ~MEMORY_WRITE_AUX);
+            break;
+
+        case 0xC001:
+            apple2_set_memory_mode(mach,
+                                   mach->memory_mode & MEMORY_80STORE);
+            break;
+
+        case 0xC000:
+            apple2_set_memory_mode(mach,
+                                   mach->memory_mode & ~MEMORY_80STORE);
+            break;
+
+        case 0xC055:
+            apple2_set_memory_mode(mach,
+                                   mach->memory_mode & MEMORY_PAGE2);
+            break;
+
+        case 0xC054:
+            apple2_set_memory_mode(mach,
+                                   mach->memory_mode & ~MEMORY_PAGE2);
+            break;
+
+        // NOTE: in one place, the technical reference says $C057 is the
+        // soft switch to enable HIRES. In one other place, it says
+        // $C059. I'm assuming it's either one... It's otherwise
+        // consistent when mentioning soft switches in more than one
+        // table.
+        case 0xC059:
+        case 0xC057:
+            apple2_set_memory_mode(mach,
+                                   mach->memory_mode & MEMORY_HIRES);
+            break;
+
+        case 0xC056:
+            apple2_set_memory_mode(mach,
+                                   mach->memory_mode & ~MEMORY_HIRES);
+            break;
+
+    }
 }
