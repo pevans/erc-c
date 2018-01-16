@@ -56,3 +56,53 @@ Test(apple2_pc, rom_addr)
     cr_assert_eq(apple2_pc_rom_addr(0xC732, MEMORY_SLOTCXROM), 0x4732);
     cr_assert_eq(apple2_pc_rom_addr(0xC332, MEMORY_SLOTC3ROM), 0x4332);
 }
+
+/*
+ * This function doesn't do _too_ much outside of calling rom_addr,
+ * which we test elsewhere.
+ */
+Test(apple2_pc, read)
+{
+    vm_8bit rombyte;
+
+    rombyte = vm_segment_get(mach->rom, 0x100);
+    cr_assert_eq(vm_segment_get(mach->main, 0xC100), rombyte);
+}
+
+/*
+ * The write map function should actually do nothing, since the memory
+ * it works with is ROM. The test code is just looking to see if that is
+ * the case.
+ */
+Test(apple2_pc, write)
+{
+    vm_8bit rombyte;
+
+    rombyte = vm_segment_get(mach->rom, 0x100);
+    vm_segment_set(mach->main, 0xC100, rombyte + 1);
+    cr_assert_neq(vm_segment_get(mach->main, 0xC100), rombyte + 1);
+}
+
+Test(apple2_pc, switch_read)
+{
+    cr_assert_eq(vm_segment_get(mach->main, 0xC015), 0);
+    mach->memory_mode = MEMORY_SLOTCXROM;
+    cr_assert_eq(vm_segment_get(mach->main, 0xC015), 0x80);
+
+    cr_assert_eq(vm_segment_get(mach->main, 0xC017), 0);
+    mach->memory_mode = MEMORY_SLOTC3ROM;
+    cr_assert_eq(vm_segment_get(mach->main, 0xC017), 0x80);
+}
+
+Test(apple2_pc, switch_write)
+{
+    vm_segment_set(mach->main, 0xC00B, 1);
+    cr_assert_eq(mach->memory_mode, MEMORY_SLOTC3ROM);
+    vm_segment_set(mach->main, 0xC00A, 1);
+    cr_assert_eq(mach->memory_mode, MEMORY_DEFAULT);
+
+    vm_segment_set(mach->main, 0xC006, 1);
+    cr_assert_eq(mach->memory_mode, MEMORY_SLOTCXROM);
+    vm_segment_set(mach->main, 0xC007, 1);
+    cr_assert_eq(mach->memory_mode, MEMORY_DEFAULT);
+}
