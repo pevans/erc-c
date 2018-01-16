@@ -128,6 +128,30 @@ enum memory_mode {
      */
     MEMORY_PAGE2 = 0x8,
     MEMORY_HIRES = 0x10,
+
+    /*
+     * When this is high, expansion ROM is considered in use. That means
+     * that the $C800..$CFFF range will be mapped to the expansion ROM
+     * area of the rom segment (which is at the end), vs. the internal
+     * ROM area, which is at the $0800..$0FFF range within the rom
+     * segment.
+     */
+    MEMORY_EXPROM = 0x20,
+
+    /*
+     * When SLOTCXROM is high, the entire range of $C100..$C7FF will be
+     * mapped to the peripheral ROM area of the rom segment (which is in
+     * the $4100..$47FF address range there); otherwise, $C100...$C7FF
+     * is mapped to internal ROM, located at $0100..$07FF within the
+     * same rom segment.
+     *
+     * It's not possible to map a single peripheral ROM page, with the
+     * exception of slot 3 (via SLOTC3ROM). That page is special because
+     * of its use by the 80-column text card. You can have SLOTC3ROM
+     * high but SLOTCXROM low.
+     */
+    MEMORY_SLOTCXROM = 0x40,
+    MEMORY_SLOTC3ROM = 0x80,
 };
 
 enum bank_switch {
