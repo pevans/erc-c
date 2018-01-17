@@ -42,6 +42,10 @@ apple2_create(int width, int height)
         return NULL;
     }
 
+    // By default, we have no strobe set; it should only be set when a
+    // key is pressed
+    mach->strobe = false;
+
     // Forward set these to NULL in case we fail to build the machine
     // properly; that way, we won't try to free garbage data
     mach->rom = NULL;
