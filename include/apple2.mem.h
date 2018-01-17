@@ -69,5 +69,7 @@ extern SEGMENT_READER(apple2_mem_zp_read);
 extern SEGMENT_WRITER(apple2_mem_zp_write);
 extern int apple2_mem_init_sys_rom(apple2 *);
 extern void apple2_mem_map(apple2 *, vm_segment *);
+extern SEGMENT_READER(apple2_mem_switch_read);
+extern SEGMENT_WRITER(apple2_mem_switch_write);
 
 #endif
