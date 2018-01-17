@@ -68,3 +68,18 @@ Test(vm_screen, ycoords)
     cr_assert_eq(screen->ycoords, 234);
 }
 
+Test(vm_screen, key_pressed)
+{
+    screen->key_pressed = true;
+    cr_assert_eq(vm_screen_key_pressed(screen), true);
+    screen->key_pressed = false;
+    cr_assert_eq(vm_screen_key_pressed(screen), false);
+}
+
+Test(vm_screen, last_key)
+{
+    screen->last_key = 'e';
+    cr_assert_eq(vm_screen_last_key(screen), 'e');
+    screen->last_key = 'y';
+    cr_assert_eq(vm_screen_last_key(screen), 'y');
+}
