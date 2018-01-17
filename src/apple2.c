@@ -261,20 +261,6 @@ apple2_reset(apple2 *mach)
 }
 
 /*
- * This function will clear the 8th bit, which is the "strobe" bit, from
- * the position in memory where the value of the last key that was
- * pressed is held.
- */
-void
-apple2_clear_strobe(apple2 *mach)
-{
-    vm_8bit ch;
-
-    ch = vm_segment_get(mach->main, LAST_KEY);
-    vm_segment_set(mach->main, LAST_KEY, ch & 0x7F);
-}
-
-/*
  * Free the memory reserved for an apple2 struct.
  */
 void
@@ -316,40 +302,6 @@ apple2_free(apple2 *mach)
     // co-owned with the cpu struct that we just freed above.
 
     free(mach);
-}
-
-/*
- * Emulate the notion of a pressed key in the apple2 with a given
- * character.
- */
-void
-apple2_press_key(apple2 *mach, vm_8bit ch)
-{
-    // The apple2 can only handle ASCII values of 0 through 127.
-    // However, the eigth bit is called the "strobe" bit, and is treated
-    // specially. In particular, the strobe bit is 1 if a key was
-    // pressed down, and remains 1 until you reset it by reading from
-    // the clear-strobe location.
-    ch = ch | 0x80;
-
-    // This is the location in memory where a program will expect to
-    // find the value of the last key that was pressed.
-    vm_segment_set(mach->main, LAST_KEY, ch);
-
-    // This area is a combination of flags; the eighth bit here is the
-    // "any-key-down" flag, which is a bit of a mouthful. It's 1 if a
-    // key is pressed, and 0 if not. The effect of reading this bit will
-    // also _clear_ the strobe bit in the $C000 address (above).
-    vm_segment_set(mach->main, ANY_KEY_DOWN, 0x80);
-}
-
-/*
- * This function will clear the value of the any-key-down switch/flag.
- */
-void
-apple2_release_key(apple2 *mach)
-{
-    vm_segment_set(mach->main, ANY_KEY_DOWN, 0);
 }
 
 /*
