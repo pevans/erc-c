@@ -59,6 +59,8 @@ vm_screen_create()
 
     screen->xcoords = 0;
     screen->ycoords = 0;
+    screen->last_key = '\0';
+    screen->key_pressed = false;
 
     screen->window = NULL;
     screen->render = NULL;
