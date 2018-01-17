@@ -19,6 +19,39 @@ In particular, it's a goal of mine to ensure that erc:
 * is modular, allowing as much code reuse within the application as is practical;
 * is unit-testable, to the extent that C allows, and maintains a high level of code coverage.
 
+## Updates (Jan 18, 2018)
+
+I thought I'd write something on the state of the emulator. Here's
+what's done so far:
+
+* We have fully implemented the MOS 6502 processor support for the Apple
+	II, and we have much of the infrastructure to emulate an Apple II
+	machine in place now.
+* Memory organization is principally complete. There's a lot of memory
+	in the Apple II! You have main memory, auxiliary memory,
+	bank-switchable memory, read-only memory. Early on, we implemented
+	memory map support for vm_segments, which is something that has
+	been flexible enough to support all of the types of soft-switches
+	that the Apple II has to control access to said memory (as well as
+	for many other functions).
+* There's a basic disassembler in place for the 6502 support, which has
+	been incredibly helpful in identifying where we have had functional
+	breakdowns in terms of proper execution and bootstrapping of the
+	"machine".
+* We're up to 169 tests as of the time of this writing, which is
+	awesome! 
+
+We do have a lot of stuff done for the graphics system, but there's a
+lot more to go; getting graphics and text working as intended is my next
+goal. I'm hopeful this will lead us to a point where erc is usable with
+general disk images of software.
+
+Some ideas for the future:
+
+* An assembler that could splice a program into multiple disk images
+* Commadore 64 support (which will be difficult, as I've used a
+	Commadore maybe...one time? Two times?)
+
 ## Running
 
 Right now, erc is mostly unusable; large components of it are still being built out. However, if you do run it, you will see a string that reads:
