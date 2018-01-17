@@ -29,9 +29,17 @@ typedef struct {
      */
     int xcoords;
     int ycoords;
+
+    /*
+     * This is true when a key is pressed, and false if not. We
+     * determine this from an SDL_PollEvent() call.
+     */
+    bool key_pressed;
 } vm_screen;
 
 extern bool vm_screen_active(vm_screen *);
+extern bool vm_screen_key_pressed(vm_screen *);
+extern char vm_screen_last_key(vm_screen *);
 extern int vm_screen_add_window(vm_screen *, int, int);
 extern int vm_screen_init();
 extern int vm_screen_xcoords(vm_screen *);

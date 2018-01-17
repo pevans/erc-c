@@ -6,6 +6,7 @@
  * program, which only knows to call the functions here.
  */
 
+#include <ctype.h>
 #include <stdbool.h>
 #include <stdlib.h>
 
@@ -163,7 +164,44 @@ vm_screen_free(vm_screen *screen)
 bool
 vm_screen_active(vm_screen *screen)
 {
+    SDL_Event event;
+    char ch;
     static int counter = 100;
+
+    // There may be _many_ events in the queue; for example, you may be
+    // facerolling on Zork because it feels good. And good for you if
+    // so--but still we have to handle all those keyboard events!
+    while (SDL_PollEvent(&event)) {
+        ch = '\0';
+
+        // It seems we may have pressed a key...
+        if (event.key) {
+            // The sym field is of type SDL_Keycode; this type, however,
+            // maps roughly to Unicode, which of course maps roughly to
+            // ASCII in the low range.
+            ch = (char)event.key->keysym.sym;
+
+            // If we had shift pressed, we need to uppercase the
+            // character.
+            if (event.key->keysym.mod & KMOD_LSHIFT ||
+                event.key->keysym.mod & KMOD_RSHIFT
+               ) {
+                ch = toupper(ch);
+            }
+        }
+
+        switch (event.type) {
+            case SDL_KEYDOWN:
+                screen->key_pressed = true;
+                screen->last_key = ch;
+                break;
+
+            case SDL_KEYUP:
+                // Note we do not erase the last_key value.
+                screen->key_pressed = false;
+                break;
+        }
+    }
 
     if (counter--) {
         return true;
@@ -209,4 +247,25 @@ vm_screen_draw_rect(vm_screen *screen, vm_area *area)
     MAKE_SDL_RECT(rect, *area);
 
     SDL_RenderFillRect(screen->render, &rect);
+}
+
+/*
+ * Just a simple wrapper around the key pressed state (mostly in case we
+ * ever switch from SDL to something else, and a field stops making
+ * sense).
+ */
+bool
+vm_screen_key_pressed(vm_screen *scr)
+{
+    return scr->key_pressed;
+}
+
+/*
+ * Similar logic as for key_pressed; this is just a dumb getter for the
+ * last_key field.
+ */
+char
+vm_screen_last_key(vm_screen *scr)
+{
+    return scr->last_key;
 }
