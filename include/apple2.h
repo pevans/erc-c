@@ -305,12 +305,10 @@ typedef struct {
     vm_8bit memory_mode;
 
     /*
-     * The last_key field is the ASCII value of the last key that was
-     * pressed. We also have a simple boolean value to determine if the
-     * strobe is set (it always is when the key is pressed, and stays
-     * that way until someone reads the "any-key-down" soft switch).
+     * We have a simple boolean value to determine if the strobe is set
+     * (it always is when the key is pressed, and stays that way until
+     * someone reads the "any-key-down" soft switch).
      */
-    vm_8bit last_key;
     bool strobe;
 
     /*

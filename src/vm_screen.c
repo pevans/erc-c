@@ -175,16 +175,16 @@ vm_screen_active(vm_screen *screen)
         ch = '\0';
 
         // It seems we may have pressed a key...
-        if (event.key) {
+        if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) {
             // The sym field is of type SDL_Keycode; this type, however,
             // maps roughly to Unicode, which of course maps roughly to
             // ASCII in the low range.
-            ch = (char)event.key->keysym.sym;
+            ch = (char)event.key.keysym.sym;
 
             // If we had shift pressed, we need to uppercase the
             // character.
-            if (event.key->keysym.mod & KMOD_LSHIFT ||
-                event.key->keysym.mod & KMOD_RSHIFT
+            if (event.key.keysym.mod & KMOD_LSHIFT ||
+                event.key.keysym.mod & KMOD_RSHIFT
                ) {
                 ch = toupper(ch);
             }

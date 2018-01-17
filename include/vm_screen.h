@@ -5,6 +5,7 @@
 #include <SDL.h>
 
 #include "vm_area.h"
+#include "vm_bits.h"
 
 typedef struct {
     /*
@@ -31,10 +32,12 @@ typedef struct {
     int ycoords;
 
     /*
-     * This is true when a key is pressed, and false if not. We
-     * determine this from an SDL_PollEvent() call.
+     * Hang onto the last key pressed and the status of whether a key
+     * is pressed right now or not.
      */
+    vm_8bit last_key;
     bool key_pressed;
+
 } vm_screen;
 
 extern bool vm_screen_active(vm_screen *);

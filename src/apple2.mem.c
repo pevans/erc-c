@@ -4,9 +4,10 @@
 
 #include "apple2.bank.h"
 #include "apple2.dbuf.h"
-#include "apple2.pc.h"
 #include "apple2.h"
+#include "apple2.kb.h"
 #include "apple2.mem.h"
+#include "apple2.pc.h"
 #include "objstore.h"
 
 static size_t switch_reads[] = {
@@ -49,7 +50,12 @@ apple2_mem_map(apple2 *mach, vm_segment *segment)
     // Here we handle the 80STORE bit for our display buffers.
     apple2_dbuf_map(segment);
 
+    // All of our peripheral card (PC) mapper functions are handled
+    // here.
     apple2_pc_map(segment);
+
+    // And this handles our keyboard soft switches
+    apple2_kb_map(segment);
 
     // We will do the mapping for the zero page and stack addresses.
     // Accessing those addresses can be affected by bank-switching, but

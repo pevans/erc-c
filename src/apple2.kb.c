@@ -4,6 +4,23 @@
 
 #include "apple2.kb.h"
 
+/*
+ * This mapper is considerably simpler than most, because it handles
+ * only two addresses and only read maps. It merely performs the mapping
+ * for keyboard switches.
+ */
+void
+apple2_kb_map(vm_segment *seg)
+{
+    vm_segment_read_map(seg, 0xC000, apple2_kb_switch_read);
+    vm_segment_read_map(seg, 0xC010, apple2_kb_switch_read);
+}
+
+/*
+ * This mapper handles reads to switches that report info on the
+ * keyboard state. Note that there is no write switch function; there
+ * are only reads that need to be handled.
+ */
 SEGMENT_READER(apple2_kb_switch_read)
 {
     apple2 *mach = (apple2 *)_mach;
@@ -50,4 +67,8 @@ SEGMENT_READER(apple2_kb_switch_read)
             // pressed down.
             return 0;
     }
+
+    // This can only happen if we were mapped to an address we weren't
+    // prepared to handle
+    return 0;
 }
