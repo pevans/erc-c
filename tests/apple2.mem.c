@@ -1,24 +1,9 @@
 #include <criterion/criterion.h>
 
+#include "apple2.bank.h"
 #include "apple2.h"
 #include "apple2.mem.h"
-#include "apple2.bank.h"
-
-static apple2 *mach = NULL;
-
-static void
-setup()
-{
-    mach = apple2_create(100, 100);
-    vm_segment_set_map_machine(mach);
-}
-
-static void
-teardown()
-{
-    apple2_free(mach);
-    vm_segment_set_map_machine(NULL);
-}
+#include "apple2.tests.h"
 
 TestSuite(apple2_mem, .init = setup, .fini = teardown);
 
