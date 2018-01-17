@@ -204,7 +204,7 @@ SEGMENT_WRITER(apple2_mem_switch_write)
 
         case 0xC005:
             apple2_set_memory_mode(mach,
-                                   mach->memory_mode & MEMORY_WRITE_AUX);
+                                   mach->memory_mode | MEMORY_WRITE_AUX);
             break;
 
         case 0xC004:
@@ -214,7 +214,7 @@ SEGMENT_WRITER(apple2_mem_switch_write)
 
         case 0xC001:
             apple2_set_memory_mode(mach,
-                                   mach->memory_mode & MEMORY_80STORE);
+                                   mach->memory_mode | MEMORY_80STORE);
             break;
 
         case 0xC000:
@@ -224,7 +224,7 @@ SEGMENT_WRITER(apple2_mem_switch_write)
 
         case 0xC055:
             apple2_set_memory_mode(mach,
-                                   mach->memory_mode & MEMORY_PAGE2);
+                                   mach->memory_mode | MEMORY_PAGE2);
             break;
 
         case 0xC054:
@@ -240,7 +240,7 @@ SEGMENT_WRITER(apple2_mem_switch_write)
         case 0xC059:
         case 0xC057:
             apple2_set_memory_mode(mach,
-                                   mach->memory_mode & MEMORY_HIRES);
+                                   mach->memory_mode | MEMORY_HIRES);
             break;
 
         case 0xC056:
