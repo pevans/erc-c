@@ -6,5 +6,6 @@
 
 extern void apple2_draw_pixel(apple2 *, vm_16bit);
 extern void apple2_draw_text(apple2 *, vm_16bit);
+extern void apple2_draw_40col(apple2 *);
 
 #endif

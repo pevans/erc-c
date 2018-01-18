@@ -159,3 +159,17 @@ apple2_draw_text(apple2 *mach, vm_16bit addr)
     // Now show the goddamned thing
     vm_bitfont_render(mach->sysfont, mach->screen, &dest, ch);
 }
+
+void
+apple2_draw_40col(apple2 *mach)
+{
+    size_t addr;
+
+    for (addr = 0x400; addr < 0x800; addr++) {
+        if ((addr & 0xFF) == 0x39) {
+            addr += 0x40;
+        }
+
+        apple2_draw_text(mach, addr);
+    }
+}
