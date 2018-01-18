@@ -168,7 +168,7 @@ vm_screen_active(vm_screen *screen)
 {
     SDL_Event event;
     char ch;
-    static int counter = 100;
+    static int counter = 300;
 
     // There may be _many_ events in the queue; for example, you may be
     // facerolling on Zork because it feels good. And good for you if
