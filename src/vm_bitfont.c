@@ -112,8 +112,6 @@ vm_bitfont_render(vm_bitfont *font,
     // Get the spot in the bitmap where the glyph is found
     vm_bitfont_offset(font, ch, &src);
 
-    log_critical("src.xoff = %d, src.yoff = %d", src.xoff, src.yoff);
-
     // Bring the destination attributes into the SDL_Rect we need to
     // pass into SDL_RenderCopy(). Also bring in the src attributes
     // we've built earlier.
