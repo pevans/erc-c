@@ -352,7 +352,7 @@ mos6502_execute(mos6502 *cpu)
 
     // First, we need to know how to resolve our effective address and
     // how to execute anything.
-    resolver = mos6502_get_address_resolver(opcode);
+    resolver = mos6502_get_address_resolver(mos6502_addr_mode(opcode));
     handler = mos6502_get_instruction_handler(opcode);
 
     // The operand is the effective operand, the value that the
@@ -454,9 +454,9 @@ mos6502_would_jump(int inst_code)
  * cpu) that an instruction will use.
  */
 mos6502_address_resolver
-mos6502_get_address_resolver(vm_8bit opcode)
+mos6502_get_address_resolver(int addr_mode)
 {
-    switch (mos6502_addr_mode(opcode)) {
+    switch (addr_mode) {
         case ACC: return mos6502_resolve_acc;
         case ABS: return mos6502_resolve_abs;
         case ABX: return mos6502_resolve_abx;

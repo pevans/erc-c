@@ -12,6 +12,7 @@
 
 static char s_inst[4],
             s_oper[10],
+            s_value[3],
             s_label[13],
             s_state[51],
             s_bytes[12];
@@ -94,38 +95,53 @@ mos6502_dis_operand(mos6502 *cpu,
 {
     int rel_address;
     int ind_address;
+    vm_8bit eff_value;
+    mos6502_address_resolver resolv;
+
+    resolv = mos6502_get_address_resolver(addr_mode);
+    eff_value = resolv(cpu);
 
     switch (addr_mode) {
         case ACC:
             break;
         case ABS:
             snprintf(str, len, "$%04X", value);
+            snprintf(s_value, sizeof(s_value), "%02x", eff_value);
             break;
         case ABX:
             snprintf(str, len, "$%04X,X", value);
+            eff_value = resolv(cpu);
+            snprintf(s_value, sizeof(s_value), "%02x", eff_value);
             break;
         case ABY:
             snprintf(str, len, "$%04X,Y", value);
+            snprintf(s_value, sizeof(s_value), "%02x", eff_value);
             break;
         case IMM:
             snprintf(str, len, "#$%02X", value);
+            snprintf(s_value, sizeof(s_value), "%02x", eff_value);
             break;
         case IMP:
+            snprintf(s_value, sizeof(s_value), "%02X", 0);
             break;
         case IND:
             ind_address = mos6502_get(cpu, value + 1) << 8;
             ind_address |= mos6502_get(cpu, value);
             if (jump_table[ind_address]) {
                 mos6502_dis_label(str, len, ind_address);
+                snprintf(s_value, sizeof(s_value), "%02X", 0);
             } else {
                 snprintf(str, len, "($%04X)", value);
+                snprintf(s_value, sizeof(s_value), "%02x", eff_value);
             }
             break;
         case IDX:
             snprintf(str, len, "($%02X,X)", value);
+            snprintf(s_value, sizeof(s_value), "%02x", eff_value);
             break;
         case IDY:
             snprintf(str, len, "($%02X),Y", value);
+            snprintf(s_value, sizeof(s_value), "%02x", eff_value);
             break;
         case REL:
             rel_address = address + value;
@@ -134,17 +150,21 @@ mos6502_dis_operand(mos6502 *cpu,
             }
 
             mos6502_dis_label(str, len, rel_address);
+            snprintf(s_value, sizeof(s_value), "%02x", eff_value);
             break;
         case ZPG:
             // We add a couple of spaces here to help our output
             // comments line up.
             snprintf(str, len, "$%02X", value);
+            snprintf(s_value, sizeof(s_value), "%02x", eff_value);
             break;
         case ZPX:
             snprintf(str, len, "$%02X,X", value);
+            snprintf(s_value, sizeof(s_value), "%02x", eff_value);
             break;
         case ZPY:
             snprintf(str, len, "$%02X,Y", value);
+            snprintf(s_value, sizeof(s_value), "%02x", eff_value);
             break;
     }
 }
@@ -301,9 +321,9 @@ mos6502_dis_opcode(mos6502 *cpu, FILE *stream, int address)
         // what the PC was at the point of this opcode sequence; two,
         // the opcode;
         snprintf(s_state, sizeof(s_state) - 1, 
-                 "pc:%02x%02x cy:%02d val:%04x a:%02x x:%02x y:%02x p:%02x s:%02x", 
+                 "pc:%02x%02x cy:%02d val:%2s a:%02x x:%02x y:%02x p:%02x s:%02x", 
                 cpu->PC >> 8, cpu->PC & 0xff,
-                mos6502_cycles(cpu, opcode), operand,
+                mos6502_cycles(cpu, opcode), s_value,
                 cpu->A, cpu->X, cpu->Y, cpu->P, cpu->S);
 
         // And three, the operand, if any. Remembering that the operand

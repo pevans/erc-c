@@ -149,7 +149,7 @@ extern void mos6502_set_status(mos6502 *, vm_8bit);
  * Below are some functions that are defined in mos6502.addr.c
  */
 extern int mos6502_addr_mode(vm_8bit);
-extern mos6502_address_resolver mos6502_get_address_resolver(vm_8bit);
+extern mos6502_address_resolver mos6502_get_address_resolver(int);
 
 /*
  * All of our address modes
