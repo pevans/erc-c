@@ -74,13 +74,13 @@ TestSuite(mos6502_dis, .init = setup, .fini = teardown);
 
 Test(mos6502_dis, operand)
 {
-    mos6502_dis_operand(cpu, stream, 0, ABS, 0x1234);
+    mos6502_dis_operand(cpu, buf, sizeof(buf), 0, ABS, 0x1234);
     assert_buf("$1234");
-    mos6502_dis_operand(cpu, stream, 0, ABX, 0x1234);
+    mos6502_dis_operand(cpu, buf, sizeof(buf), 0, ABX, 0x1234);
     assert_buf("$1234,X");
-    mos6502_dis_operand(cpu, stream, 0, ABY, 0x1234);
+    mos6502_dis_operand(cpu, buf, sizeof(buf), 0, ABY, 0x1234);
     assert_buf("$1234,Y");
-    mos6502_dis_operand(cpu, stream, 0, IMM, 0x12);
+    mos6502_dis_operand(cpu, buf, sizeof(buf), 0, IMM, 0x12);
     assert_buf("#$12");
 
     mos6502_set(cpu, 0x1234, 0x48);
@@ -89,45 +89,45 @@ Test(mos6502_dis, operand)
     // For JMPs and JSRs (and BRKs), this should be a label and not a
     // literal value. So we need to test both the literal and
     // jump-labeled version.
-    mos6502_dis_operand(cpu, stream, 0, IND, 0x1234);
+    mos6502_dis_operand(cpu, buf, sizeof(buf), 0, IND, 0x1234);
     assert_buf("($1234)");
     mos6502_dis_jump_label(cpu, 0x1234, 0, IND);
-    mos6502_dis_operand(cpu, stream, 0, IND, 0x1234);
+    mos6502_dis_operand(cpu, buf, sizeof(buf), 0, IND, 0x1234);
     assert_buf("ADDR_3448");
 
     // Let's undo our label above...
     mos6502_dis_jump_unlabel(0x1234);
 
-    mos6502_dis_operand(cpu, stream, 0, IDX, 0x12);
+    mos6502_dis_operand(cpu, buf, sizeof(buf), 0, IDX, 0x12);
     assert_buf("($12,X)");
-    mos6502_dis_operand(cpu, stream, 0, IDY, 0x34);
+    mos6502_dis_operand(cpu, buf, sizeof(buf), 0, IDY, 0x34);
     assert_buf("($34),Y");
-    mos6502_dis_operand(cpu, stream, 0, ZPG, 0x34);
-    assert_buf("$34  ");
-    mos6502_dis_operand(cpu, stream, 0, ZPX, 0x34);
+    mos6502_dis_operand(cpu, buf, sizeof(buf), 0, ZPG, 0x34);
+    assert_buf("$34");
+    mos6502_dis_operand(cpu, buf, sizeof(buf), 0, ZPX, 0x34);
     assert_buf("$34,X");
-    mos6502_dis_operand(cpu, stream, 0, ZPY, 0x34);
+    mos6502_dis_operand(cpu, buf, sizeof(buf), 0, ZPY, 0x34);
     assert_buf("$34,Y");
     
     // These should both end up printing nothing
-    mos6502_dis_operand(cpu, stream, 0, ACC, 0);
+    mos6502_dis_operand(cpu, buf, sizeof(buf), 0, ACC, 0);
     assert_buf("");
-    mos6502_dis_operand(cpu, stream, 0, IMP, 0);
+    mos6502_dis_operand(cpu, buf, sizeof(buf), 0, IMP, 0);
     assert_buf("");
 
     // Test a forward jump (operand < 128)
-    mos6502_dis_operand(cpu, stream, 500, REL, 52);
-    assert_buf("ADDR_228");
+    mos6502_dis_operand(cpu, buf, sizeof(buf), 500, REL, 52);
+    assert_buf("ADDR_0228");
 
     // Test a backward jump (operand >= 128)
-    mos6502_dis_operand(cpu, stream, 500, REL, 152);
-    assert_buf("ADDR_18c");
+    mos6502_dis_operand(cpu, buf, sizeof(buf), 500, REL, 152);
+    assert_buf("ADDR_018c");
 }
 
 Test(mos6502_dis, instruction)
 {
 #define TEST_INST(x) \
-    mos6502_dis_instruction(stream, x); \
+    mos6502_dis_instruction(buf, sizeof(buf) - 1, x); \
     assert_buf(#x)
 
     TEST_INST(ADC);
@@ -216,7 +216,7 @@ Test(mos6502_dis, opcode)
     mos6502_set(cpu, 1, 0x38);
 
     bytes = mos6502_dis_opcode(cpu, stream, 0);
-    assert_buf("    AND     #$38	; pc=$0000 cy=02: 29 38\n");
+    assert_buf("     AND #$38      ; pc:0000 cy:02 val:0038 a:00 x:00 y:00 p:00 s:00     | 29 38\n");
     cr_assert_eq(bytes, 2);
 }
 
@@ -235,9 +235,10 @@ Test(mos6502_dis, scan)
     // I'm honestly not sure. There are definitely times (e.g. during
     // runtime operation) when you don't want it to, but as a standalone
     // disassembler, it feels less useful when PC isn't emulated.
-    assert_buf("    AND     #$38	; pc=$0000 cy=02: 29 38\n"
-               "    DEY     		; pc=$0000 cy=02: 88\n"
-               "    JMP     ($1234)	; pc=$0000 cy=05: 6c 34 12\n"
+    assert_buf("     AND #$38      ; pc:0000 cy:02 val:0038 a:00 x:00 y:00 p:00 s:00     | 29 38\n"
+               "     DEY           ; pc:0000 cy:02 val:0000 a:00 x:00 y:00 p:00 s:00     | 88\n"
+               "     JMP ($1234)   ; pc:0000 cy:05 val:1234 a:00 x:00 y:00 p:00 s:00     | 6c 34 12\n"
+               ";;;\n"
                );
 }
 
@@ -271,6 +272,6 @@ Test(mos6502_dis, jump_label)
 
 Test(mos6502_dis, label)
 {
-    mos6502_dis_label(stream, 123);
-    assert_buf("ADDR_7b");
+    mos6502_dis_label(buf, sizeof(buf) - 1, 123);
+    assert_buf("ADDR_007b");
 }
