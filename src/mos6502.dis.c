@@ -351,7 +351,7 @@ mos6502_dis_opcode(mos6502 *cpu, FILE *stream, int address)
             s_label, s_inst, s_oper, s_state, s_bytes);
 
     if (mos6502_would_jump(inst_code)) {
-        fprintf(stream, ";;;\n");
+        fprintf(stream, ";;;\n\n");
     }
 
     // The expected number of bytes here is for the operand, but we need
