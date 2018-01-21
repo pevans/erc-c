@@ -97,8 +97,17 @@ DEFINE_INST(lsr)
 {
     SET_RESULT(oper >> 1);
 
-    // MOS_NEGATIVE is intentionally not included here.
-    mos6502_modify_status(cpu, MOS_ZC, oper, result);
+    // Set ZERO if it should apply
+    mos6502_modify_status(cpu, MOS_ZERO, oper, result);
+
+    // However, we handle carry a bit differently here. The carry bit
+    // should be 1 if oper & 0x1; that is, when we shift right, we want
+    // the right-most bit to be captured in carry, in just the same way
+    // we want the left-most bit to be captured in carry for ASL.
+    cpu->P &= ~MOS_CARRY;
+    if (oper & 0x1) {
+        cpu->P |= MOS_CARRY;
+    }
 
     if (cpu->eff_addr) {
         mos6502_set(cpu, cpu->eff_addr, result & 0xff);
