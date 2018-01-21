@@ -23,6 +23,7 @@ static char *instruction_strings[] = {
     "ADC",
     "AND",
     "ASL",
+    "BAD",
     "BCC",
     "BCS",
     "BEQ",

@@ -5,8 +5,16 @@
  * BRK, and so forth.
  */
 
+#include "log.h"
 #include "mos6502.h"
 #include "mos6502.enums.h"
+
+DEFINE_INST(bad)
+{
+    log_critical("Invalid instruction: %2x @ %4x",
+                  mos6502_get(cpu, cpu->PC), cpu->PC);
+    exit(1);
+}
 
 /*
  * The BRK instruction will set the interrupt bit; will push the current

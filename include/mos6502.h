@@ -177,6 +177,7 @@ DECL_ADDR_MODE(zpy);
 DECL_INST(adc);
 DECL_INST(and);
 DECL_INST(asl);
+DECL_INST(bad);
 DECL_INST(bcc);
 DECL_INST(bcs);
 DECL_INST(beq);

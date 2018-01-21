@@ -65,6 +65,7 @@ enum instruction {
     ADC,    // ADd with Carry
     AND,    // bitwise AND
     ASL,    // Arithmetic Shift Left
+    BAD,    // bad instruction
     BCC,    // Branch on Carry Clear
     BCS,    // Branch on Carry Set
     BEQ,    // Branch on EQual to zero
