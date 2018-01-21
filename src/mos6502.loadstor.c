@@ -14,7 +14,7 @@
  */
 DEFINE_INST(lda)
 {
-    mos6502_modify_status(cpu, MOS_ZERO | MOS_NEGATIVE, oper);
+    mos6502_modify_status(cpu, MOS_NZ, cpu->A, oper);
     cpu->A = oper;
 }
 
@@ -23,7 +23,7 @@ DEFINE_INST(lda)
  */
 DEFINE_INST(ldx)
 {
-    mos6502_modify_status(cpu, MOS_ZERO | MOS_NEGATIVE, oper);
+    mos6502_modify_status(cpu, MOS_NZ, cpu->X, oper);
     cpu->X = oper;
 }
 
@@ -32,7 +32,7 @@ DEFINE_INST(ldx)
  */
 DEFINE_INST(ldy)
 {
-    mos6502_modify_status(cpu, MOS_ZERO | MOS_NEGATIVE, oper);
+    mos6502_modify_status(cpu, MOS_NZ, cpu->Y, oper);
     cpu->Y = oper;
 }
 
@@ -57,8 +57,10 @@ DEFINE_INST(php)
  */
 DEFINE_INST(pla)
 {
-    cpu->A = mos6502_pop_stack(cpu);
-    mos6502_modify_status(cpu, MOS_NEGATIVE | MOS_ZERO, cpu->A);
+    SET_RESULT(mos6502_pop_stack(cpu));
+
+    mos6502_modify_status(cpu, MOS_NZ, cpu->A, result);
+    cpu->A = result;
 }
 
 /*
@@ -100,7 +102,7 @@ DEFINE_INST(sty)
  */
 DEFINE_INST(tax)
 {
-    mos6502_modify_status(cpu, MOS_ZERO | MOS_NEGATIVE, cpu->A);
+    mos6502_modify_status(cpu, MOS_NZ, cpu->X, cpu->A);
     cpu->X = cpu->A;
 }
 
@@ -109,7 +111,7 @@ DEFINE_INST(tax)
  */
 DEFINE_INST(tay)
 {
-    mos6502_modify_status(cpu, MOS_ZERO | MOS_NEGATIVE, cpu->A);
+    mos6502_modify_status(cpu, MOS_NZ, cpu->Y, cpu->A);
     cpu->Y = cpu->A;
 }
 
@@ -118,7 +120,7 @@ DEFINE_INST(tay)
  */
 DEFINE_INST(tsx)
 {
-    mos6502_modify_status(cpu, MOS_ZERO | MOS_NEGATIVE, cpu->S);
+    mos6502_modify_status(cpu, MOS_NZ, cpu->X, cpu->S);
     cpu->X = cpu->S;
 }
 
@@ -127,7 +129,7 @@ DEFINE_INST(tsx)
  */
 DEFINE_INST(txa)
 {
-    mos6502_modify_status(cpu, MOS_ZERO | MOS_NEGATIVE, cpu->X);
+    mos6502_modify_status(cpu, MOS_NZ, cpu->A, cpu->X);
     cpu->A = cpu->X;
 }
 
@@ -136,7 +138,7 @@ DEFINE_INST(txa)
  */
 DEFINE_INST(txs)
 {
-    mos6502_modify_status(cpu, MOS_ZERO | MOS_NEGATIVE, cpu->X);
+    mos6502_modify_status(cpu, MOS_NZ, cpu->S, cpu->X);
     cpu->S = cpu->X;
 }
 
@@ -145,6 +147,6 @@ DEFINE_INST(txs)
  */
 DEFINE_INST(tya)
 {
-    mos6502_modify_status(cpu, MOS_ZERO | MOS_NEGATIVE, cpu->Y);
+    mos6502_modify_status(cpu, MOS_NZ, cpu->A, cpu->Y);
     cpu->A = cpu->Y;
 }

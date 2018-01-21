@@ -14,8 +14,10 @@
  */
 DEFINE_INST(and)
 {
-    cpu->A &= oper;
-    mos6502_modify_status(cpu, MOS_NEGATIVE | MOS_ZERO, cpu->A);
+    SET_RESULT(cpu->A & oper);
+
+    mos6502_modify_status(cpu, MOS_NZ, cpu->A, result);
+    cpu->A = result & 0xff;
 }
 
 /*
@@ -31,20 +33,15 @@ DEFINE_INST(and)
  */
 DEFINE_INST(asl)
 {
-    cpu->P &= ~MOS_CARRY;
-    if (oper & 0x80) {
-        cpu->P |= MOS_CARRY;
-    }
+    SET_RESULT(oper << 1);
 
-    oper <<= 1;
+    mos6502_modify_status(cpu, MOS_NZC, oper, result);
 
     if (cpu->eff_addr) {
-        mos6502_set(cpu, cpu->eff_addr, oper);
+        mos6502_set(cpu, cpu->eff_addr, result & 0xff);
     } else {
-        cpu->A = oper;
+        cpu->A = result & 0xff;
     }
-
-    mos6502_modify_status(cpu, MOS_NEGATIVE | MOS_CARRY | MOS_ZERO, oper);
 }
 
 /*
@@ -54,21 +51,7 @@ DEFINE_INST(asl)
  */
 DEFINE_INST(bit)
 {
-    cpu->P &= ~MOS_NEGATIVE;
-    if (oper & MOS_NEGATIVE) {
-        cpu->P |= MOS_NEGATIVE;
-    }
-
-    cpu->P &= ~MOS_OVERFLOW;
-    if (oper & MOS_OVERFLOW) {
-        cpu->P |= MOS_OVERFLOW;
-    }
-
-    if (oper & cpu->A) {
-        cpu->P &= ~MOS_ZERO;
-    } else {
-        cpu->P |= MOS_ZERO;
-    }
+    mos6502_modify_status(cpu, MOS_NVZ, oper, oper);
 }
 
 /*
@@ -77,8 +60,10 @@ DEFINE_INST(bit)
  */
 DEFINE_INST(eor)
 {
-    cpu->A ^= oper;
-    mos6502_modify_status(cpu, MOS_NEGATIVE | MOS_ZERO, cpu->A);
+    SET_RESULT(cpu->A ^ oper);
+
+    mos6502_modify_status(cpu, MOS_NZ, cpu->A, result);
+    cpu->A = result & 0xff;
 }
 
 /*
@@ -90,21 +75,16 @@ DEFINE_INST(eor)
  */
 DEFINE_INST(lsr)
 {
-    cpu->P &= ~MOS_CARRY;
-    if (oper & 0x01) {
-        cpu->P |= MOS_CARRY;
-    }
-
-    oper >>= 1;
-
-    if (cpu->eff_addr) {
-        mos6502_set(cpu, cpu->eff_addr, oper);
-    } else {
-        cpu->A = oper;
-    }
+    SET_RESULT(oper >> 1);
 
     // MOS_NEGATIVE is intentionally not included here.
-    mos6502_modify_status(cpu, MOS_CARRY | MOS_ZERO, oper);
+    mos6502_modify_status(cpu, MOS_ZC, oper, result);
+
+    if (cpu->eff_addr) {
+        mos6502_set(cpu, cpu->eff_addr, result & 0xff);
+    } else {
+        cpu->A = result & 0xff;
+    }
 }
 
 /*
@@ -113,8 +93,10 @@ DEFINE_INST(lsr)
  */
 DEFINE_INST(ora)
 {
-    cpu->A |= oper;
-    mos6502_modify_status(cpu, MOS_NEGATIVE | MOS_ZERO, cpu->A);
+    SET_RESULT(cpu->A | oper);
+
+    mos6502_modify_status(cpu, MOS_NZ, cpu->A, result);
+    cpu->A = result & 0xff;
 }
 
 /*
@@ -125,24 +107,23 @@ DEFINE_INST(ora)
 DEFINE_INST(rol)
 {
     MOS_CARRY_BIT();
+    SET_RESULT(oper << 1);
 
     if (oper & 0x80) {
         carry = 1;
     }
 
-    oper <<= 1;
-
     if (carry) {
-        oper |= 0x01;
+        result |= 0x01;
     }
+
+    mos6502_modify_status(cpu, MOS_NZC, oper, result);
 
     if (cpu->eff_addr) {
-        mos6502_set(cpu, cpu->eff_addr, oper);
+        mos6502_set(cpu, cpu->eff_addr, result & 0xff);
     } else {
-        cpu->A = oper;
+        cpu->A = result & 0xff;
     }
-
-    mos6502_modify_status(cpu, MOS_NEGATIVE | MOS_CARRY | MOS_ZERO, oper);
 }
 
 /*
@@ -152,22 +133,21 @@ DEFINE_INST(rol)
 DEFINE_INST(ror)
 {
     MOS_CARRY_BIT();
+    SET_RESULT(oper >> 1);
 
     if (oper & 0x01) {
         carry = 1;
     }
 
-    oper >>= 1;
-
     if (carry) {
-        oper |= 0x80;
+        result |= 0x80;
     }
+
+    mos6502_modify_status(cpu, MOS_NZC, oper, result);
 
     if (cpu->eff_addr) {
-        mos6502_set(cpu, cpu->eff_addr, oper);
+        mos6502_set(cpu, cpu->eff_addr, result & 0xff);
     } else {
-        cpu->A = oper;
+        cpu->A = result & 0xff;
     }
-
-    mos6502_modify_status(cpu, MOS_NEGATIVE | MOS_CARRY | MOS_ZERO, oper);
 }

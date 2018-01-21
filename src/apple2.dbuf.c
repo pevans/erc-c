@@ -9,6 +9,12 @@ static size_t switch_reads[] = {
     0xC01B,
     0xC01E,
     0xC01F,
+    0xC050,
+    0xC051,
+    0xC052,
+    0xC053,
+    0xC05E,
+    0xC05F,
     0xC07E,
     0xC07F,
 };
@@ -167,6 +173,40 @@ SEGMENT_READER(apple2_dbuf_switch_read)
             return mach->display_mode & DISPLAY_DHIRES
                 ? 0x80
                 : 0x00;
+
+        // As in apple2.mem.c, the following switch cases are duplicated
+        // from the switch_write function because the Apple II expects
+        // both reads and writes to have the same effect at these
+        // addresses.
+        case 0xC050:
+            apple2_set_display(mach,
+                               mach->display_mode | DISPLAY_TEXT);
+            break;
+
+        case 0xC051:
+            apple2_set_display(mach,
+                               mach->display_mode & ~DISPLAY_TEXT);
+            break;
+
+        case 0xC052:
+            apple2_set_display(mach,
+                               mach->display_mode | DISPLAY_MIXED);
+            break;
+
+        case 0xC053:
+            apple2_set_display(mach,
+                               mach->display_mode & ~DISPLAY_MIXED);
+            break;
+
+        case 0xC05E:
+            apple2_set_display(mach,
+                               mach->display_mode | DISPLAY_DHIRES);
+            break;
+
+        case 0xC05F:
+            apple2_set_display(mach,
+                               mach->display_mode & ~DISPLAY_DHIRES);
+            break;
     }
 
     // ???

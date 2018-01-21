@@ -16,6 +16,11 @@ static size_t switch_reads[] = {
     0xC018,
     0xC01C,
     0xC01D,
+    0xC054,
+    0xC055,
+    0xC056,
+    0xC057,
+    0xC059,
 };
 
 static size_t switch_writes[] = {
@@ -183,6 +188,30 @@ SEGMENT_READER(apple2_mem_switch_read)
             return mach->memory_mode & MEMORY_HIRES
                 ? 0x80
                 : 0x00;
+
+        // Note the following are intentionally duplicated from the
+        // write switch function. Apple II allows both reads and writes
+        // to have the same behavior here.
+        case 0xC055:
+            apple2_set_memory_mode(mach,
+                                   mach->memory_mode | MEMORY_PAGE2);
+            break;
+
+        case 0xC054:
+            apple2_set_memory_mode(mach,
+                                   mach->memory_mode & ~MEMORY_PAGE2);
+            break;
+
+        case 0xC059:
+        case 0xC057:
+            apple2_set_memory_mode(mach,
+                                   mach->memory_mode | MEMORY_HIRES);
+            break;
+
+        case 0xC056:
+            apple2_set_memory_mode(mach,
+                                   mach->memory_mode & ~MEMORY_HIRES);
+            break;
     }
 
     // ???

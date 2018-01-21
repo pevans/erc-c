@@ -26,6 +26,12 @@ enum status_flags {
     MOS_NEGATIVE = 128,
 };
 
+#define MOS_NVZ (MOS_NEGATIVE | MOS_OVERFLOW | MOS_ZERO)
+#define MOS_NVZC (MOS_NEGATIVE | MOS_OVERFLOW | MOS_ZERO | MOS_CARRY)
+#define MOS_NZ (MOS_NEGATIVE | MOS_ZERO)
+#define MOS_NZC (MOS_NEGATIVE | MOS_ZERO | MOS_CARRY)
+#define MOS_ZC (MOS_ZERO | MOS_CARRY)
+
 /*
  * Here we define the various address modes that are possible. These do
  * not map to any significant numbers that are documented for the 6502

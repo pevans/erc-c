@@ -236,32 +236,42 @@ mos6502_set_status(mos6502 *cpu, vm_8bit status)
  * bits are the negative, overflow, carry, and zero flags.
  */
 void
-mos6502_modify_status(mos6502 *cpu, vm_8bit status, vm_8bit oper)
+mos6502_modify_status(mos6502 *cpu, vm_8bit status, int orig, int result)
 {
     if (status & MOS_NEGATIVE) {
         cpu->P &= ~MOS_NEGATIVE;
-        if (oper & 0x80) {
+        if (result & 0x80) {
             cpu->P |= MOS_NEGATIVE;
         }
     }
 
     if (status & MOS_OVERFLOW) {
         cpu->P &= ~MOS_OVERFLOW;
-        if (oper & MOS_OVERFLOW) {
+
+        // If the result of the operation is such that the sign bit,
+        // that is to say bit 7, changes, then we have overflowed. E.g.:
+        // 90 + 40 = 130, but that's actually -124 in two's complement.
+        // So if you are paying attention to the sign, you have
+        // overflowed from a positive into a negative result.
+        if (orig < 0x80 && result >= 0x80) {
             cpu->P |= MOS_OVERFLOW;
         }
     }
 
     if (status & MOS_CARRY) {
         cpu->P &= ~MOS_CARRY;
-        if (oper > 0) {
+
+        // The result of the operation requires 9 bits to hold, but we
+        // can only hold 8 bits; rather than lose that bit's value, it
+        // is held in the carry bit of the P register.
+        if (result > 0xFF) {
             cpu->P |= MOS_CARRY;
         }
     }
 
     if (status & MOS_ZERO) {
         cpu->P &= ~MOS_ZERO;
-        if (oper == 0) {
+        if (result == 0) {
             cpu->P |= MOS_ZERO;
         }
     }
