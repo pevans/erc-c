@@ -232,6 +232,8 @@ mos6502_set_status(mos6502 *cpu, vm_8bit status)
 void
 mos6502_modify_status(mos6502 *cpu, vm_8bit status, int orig, int result)
 {
+    int bit7o, bit7r;
+
     if (status & MOS_NEGATIVE) {
         cpu->P &= ~MOS_NEGATIVE;
         if (result & 0x80) {
@@ -242,12 +244,15 @@ mos6502_modify_status(mos6502 *cpu, vm_8bit status, int orig, int result)
     if (status & MOS_OVERFLOW) {
         cpu->P &= ~MOS_OVERFLOW;
 
+        bit7o = orig & 0x80;
+        bit7r = result & 0x80;
+
         // If the result of the operation is such that the sign bit,
         // that is to say bit 7, changes, then we have overflowed. E.g.:
         // 90 + 40 = 130, but that's actually -124 in two's complement.
         // So if you are paying attention to the sign, you have
         // overflowed from a positive into a negative result.
-        if (orig < 0x80 && result >= 0x80) {
+        if (bit7o ^ bit7r) {
             cpu->P |= MOS_OVERFLOW;
         }
     }
