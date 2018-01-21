@@ -32,7 +32,14 @@ DEFINE_INST(adc)
  */
 DEFINE_INST(cmp)
 {
-    mos6502_modify_status(cpu, MOS_NZC, cpu->A, cpu->A - oper);
+    mos6502_modify_status(cpu, MOS_NZ, cpu->A, cpu->A - oper);
+
+    // Carry works slightly different with the cmp-style instructions;
+    // it's set if A >= oper.
+    cpu->P &= ~MOS_CARRY;
+    if (cpu->A >= oper) {
+        cpu->P |= MOS_CARRY;
+    }
 }
 
 /*
@@ -41,7 +48,12 @@ DEFINE_INST(cmp)
  */
 DEFINE_INST(cpx)
 {
-    mos6502_modify_status(cpu, MOS_NZC, cpu->X, cpu->X - oper);
+    mos6502_modify_status(cpu, MOS_NZ, cpu->X, cpu->X - oper);
+
+    cpu->P &= ~MOS_CARRY;
+    if (cpu->X >= oper) {
+        cpu->P |= MOS_CARRY;
+    }
 }
 
 /*
@@ -50,7 +62,12 @@ DEFINE_INST(cpx)
  */
 DEFINE_INST(cpy)
 {
-    mos6502_modify_status(cpu, MOS_NZC, cpu->Y, cpu->Y - oper);
+    mos6502_modify_status(cpu, MOS_NZ, cpu->Y, cpu->Y - oper);
+
+    cpu->P &= ~MOS_CARRY;
+    if (cpu->Y >= oper) {
+        cpu->P |= MOS_CARRY;
+    }
 }
 
 /*
