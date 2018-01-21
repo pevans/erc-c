@@ -51,10 +51,18 @@ DEFINE_INST(asl)
  */
 DEFINE_INST(bit)
 {
-    // We're just relying on the modify_status function to do negative
-    // and zero; we also need to do overflow, but overflow is checked in
-    // a slightly different way with BIT...
-    mos6502_modify_status(cpu, MOS_NZ, oper, cpu->A & oper);
+    // Zero is set if the accumulator AND the operand results in zero.
+    cpu->P &= ~MOS_ZERO;
+    if (!(cpu->A & oper)) {
+        cpu->P |= MOS_ZERO;
+    }
+
+    // But negative is set not by any operation on the accumulator; it
+    // is, rather, set by evaluating the operand itself.
+    cpu->P &= ~MOS_NEGATIVE;
+    if (oper & 0x80) {
+        cpu->P |= MOS_NEGATIVE;
+    }
 
     // Normally, overflow is handled by checking if bit 7 flipped from 0
     // to 1 or vice versa, and that's done by comparing the result to
