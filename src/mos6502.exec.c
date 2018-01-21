@@ -37,7 +37,7 @@ DEFINE_INST(jmp)
  */
 DEFINE_INST(jsr)
 {
-    vm_16bit pc3 = cpu->PC + 3;
+    vm_16bit pc3 = cpu->PC + 2;
 
     mos6502_push_stack(cpu, pc3 >> 8);
     mos6502_push_stack(cpu, pc3 & 0xff);
@@ -72,4 +72,5 @@ DEFINE_INST(rts)
 {
     cpu->PC = mos6502_pop_stack(cpu);
     cpu->PC |= mos6502_pop_stack(cpu) << 8;
+    cpu->PC++;
 }
