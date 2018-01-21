@@ -163,7 +163,7 @@ mos6502_create(vm_segment *rmem, vm_segment *wmem)
     cpu->X = 0;
     cpu->Y = 0;
     cpu->P = 0;
-    cpu->S = 0;
+    cpu->S = 0xff;
 
     return cpu;
 }
@@ -189,29 +189,29 @@ mos6502_free(mos6502 *cpu)
  * 256, addresses.
  */
 void
-mos6502_push_stack(mos6502 *cpu, vm_16bit addr)
+mos6502_push_stack(mos6502 *cpu, vm_8bit addr)
 {
-    mos6502_set16(cpu, 0x100 + cpu->S, addr);
+    mos6502_set(cpu, 0x100 + cpu->S, addr);
 
     // And finally we need to increment S by 2 (since we've used two
     // bytes in the stack).
-    cpu->S += 2;
+    cpu->S--;
 }
 
 /*
  * Pop an address from the stack and return that.
  */
-vm_16bit
+vm_8bit
 mos6502_pop_stack(mos6502 *cpu)
 {
     // The first thing we want to do here is to decrement S by 2, since
     // the value we want to return is two positions back.
-    cpu->S -= 2;
+    cpu->S++;
 
     // We need to use a bitwise-or operation to combine the hi and lo
     // bytes we retrieve from the stack into the actual position we
     // would use for the PC register.
-    return mos6502_get16(cpu, 0x0100 + cpu->S);
+    return mos6502_get(cpu, 0x0100 + cpu->S);
 }
 
 /*

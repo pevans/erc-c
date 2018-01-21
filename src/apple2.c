@@ -254,7 +254,7 @@ apple2_reset(apple2 *mach)
 {
     mach->cpu->P = MOS_INTERRUPT;
     mach->cpu->PC = vm_segment_get16(mach->main, 0xFFFC);
-    mach->cpu->S = 0;
+    mach->cpu->S = 0xff;
 
     // Switch video mode back to 40 column text
     apple2_set_display(mach, DISPLAY_DEFAULT);

@@ -14,7 +14,8 @@
  */
 DEFINE_INST(brk)
 {
-    mos6502_push_stack(cpu, cpu->PC);
+    mos6502_push_stack(cpu, cpu->PC >> 8);
+    mos6502_push_stack(cpu, cpu->PC & 0xff);
     mos6502_push_stack(cpu, cpu->P);
     cpu->P |= MOS_INTERRUPT;
     cpu->PC += 2;
@@ -36,7 +37,10 @@ DEFINE_INST(jmp)
  */
 DEFINE_INST(jsr)
 {
-    mos6502_push_stack(cpu, cpu->PC + 3);
+    vm_16bit pc3 = cpu->PC + 3;
+
+    mos6502_push_stack(cpu, pc3 >> 8);
+    mos6502_push_stack(cpu, pc3 & 0xff);
     cpu->PC = cpu->eff_addr;
 }
 
@@ -57,6 +61,7 @@ DEFINE_INST(rti)
 {
     cpu->P = mos6502_pop_stack(cpu);
     cpu->PC = mos6502_pop_stack(cpu);
+    cpu->PC |= mos6502_pop_stack(cpu) << 8;
 }
 
 /*
@@ -66,4 +71,5 @@ DEFINE_INST(rti)
 DEFINE_INST(rts)
 {
     cpu->PC = mos6502_pop_stack(cpu);
+    cpu->PC |= mos6502_pop_stack(cpu) << 8;
 }
