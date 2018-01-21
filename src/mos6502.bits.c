@@ -142,11 +142,13 @@ DEFINE_INST(rol)
         carry = 1;
     }
 
+    cpu->P &= ~MOS_CARRY;
     if (carry) {
         result |= 0x01;
+        cpu->P |= MOS_CARRY;
     }
 
-    mos6502_modify_status(cpu, MOS_NZC, oper, result);
+    mos6502_modify_status(cpu, MOS_NZ, oper, result);
 
     if (cpu->eff_addr) {
         mos6502_set(cpu, cpu->eff_addr, result & 0xff);
@@ -168,11 +170,13 @@ DEFINE_INST(ror)
         carry = 1;
     }
 
+    cpu->P &= ~MOS_CARRY;
     if (carry) {
         result |= 0x80;
+        cpu->P |= MOS_CARRY;
     }
 
-    mos6502_modify_status(cpu, MOS_NZC, oper, result);
+    mos6502_modify_status(cpu, MOS_NZ, oper, result);
 
     if (cpu->eff_addr) {
         mos6502_set(cpu, cpu->eff_addr, result & 0xff);
