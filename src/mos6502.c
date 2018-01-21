@@ -191,13 +191,7 @@ mos6502_free(mos6502 *cpu)
 void
 mos6502_push_stack(mos6502 *cpu, vm_16bit addr)
 {
-    // First we need to set the hi byte, by shifting the address right 8
-    // positions and using the base offset of the S register.
-    mos6502_set(cpu, 0x0100 + cpu->S, addr & 0xff);
-
-    // Next we must record the lo byte, this time by using a bitmask to
-    // capture just the low end of addr, but recording it in S + 1.
-    mos6502_set(cpu, 0x0100 + cpu->S + 1, addr >> 8);
+    mos6502_set16(cpu, 0x100 + cpu->S, addr);
 
     // And finally we need to increment S by 2 (since we've used two
     // bytes in the stack).
