@@ -322,13 +322,12 @@ mos6502_dis_opcode(mos6502 *cpu, FILE *stream, int address)
         // what the PC was at the point of this opcode sequence; two,
         // the opcode;
         snprintf(s_state, sizeof(s_state) - 1, 
-                 "pc:%02x%02x cy:%02d val:%2s a:%02x x:%02x y:%02x p:%c%c-%c%c%c%c%c s:%02x", 
+                 "pc:%02x%02x cy:%02d val:%2s a:%02x x:%02x y:%02x p:%c%c-%c%c%c%c s:%02x", 
                 cpu->PC >> 8, cpu->PC & 0xff,
                 mos6502_cycles(cpu, opcode), s_value,
                 cpu->A, cpu->X, cpu->Y, 
                 cpu->P & MOS_NEGATIVE ? 'N' : 'n',
                 cpu->P & MOS_OVERFLOW ? 'O' : 'o',
-                cpu->P & MOS_BREAK ? 'B' : 'b',
                 cpu->P & MOS_DECIMAL ? 'D' : 'd',
                 cpu->P & MOS_INTERRUPT ? 'I' : 'i',
                 cpu->P & MOS_ZERO ? 'Z' : 'z',
@@ -348,7 +347,7 @@ mos6502_dis_opcode(mos6502 *cpu, FILE *stream, int address)
         }
     }
 
-    fprintf(stream, "%s    %4s %-9s ; %-54s | %s\n",
+    fprintf(stream, "%s  %4s %-9s ; %-51s | %s\n",
             s_label, s_inst, s_oper, s_state, s_bytes);
 
     if (mos6502_would_jump(inst_code)) {
