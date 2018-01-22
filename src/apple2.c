@@ -252,7 +252,7 @@ apple2_boot(apple2 *mach)
 void
 apple2_reset(apple2 *mach)
 {
-    mach->cpu->P = MOS_INTERRUPT;
+    mach->cpu->P = MOS_STATUS_DEFAULT;
     mach->cpu->PC = vm_segment_get16(mach->main, 0xFFFC);
     mach->cpu->S = 0xff;
 
@@ -261,7 +261,7 @@ apple2_reset(apple2 *mach)
 
     // Switch us back to defaults
     apple2_set_bank_switch(mach, BANK_DEFAULT);
-    apple2_set_memory_mode(mach, MEMORY_DEFAULT);
+    apple2_set_memory_mode(mach, MEMORY_DEFAULT | MEMORY_SLOTCXROM);
 }
 
 /*

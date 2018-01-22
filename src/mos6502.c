@@ -163,7 +163,7 @@ mos6502_create(vm_segment *rmem, vm_segment *wmem)
     cpu->A = 0;
     cpu->X = 0;
     cpu->Y = 0;
-    cpu->P = 0;
+    cpu->P = MOS_STATUS_DEFAULT;
     cpu->S = 0xff;
 
     return cpu;
