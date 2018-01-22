@@ -199,13 +199,17 @@ SEGMENT_READER(apple2_dbuf_switch_read)
             break;
 
         case 0xC05E:
-            apple2_set_display(mach,
-                               mach->display_mode | DISPLAY_DHIRES);
+            if (mach->display_mode & DISPLAY_IOUDIS) {
+                apple2_set_display(mach,
+                                   mach->display_mode | DISPLAY_DHIRES);
+            }
             break;
 
         case 0xC05F:
-            apple2_set_display(mach,
-                               mach->display_mode & ~DISPLAY_DHIRES);
+            if (mach->display_mode & DISPLAY_IOUDIS) {
+                apple2_set_display(mach,
+                                   mach->display_mode & ~DISPLAY_DHIRES);
+            }
             break;
     }
 
