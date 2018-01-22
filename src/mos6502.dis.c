@@ -297,6 +297,7 @@ mos6502_dis_opcode(mos6502 *cpu, FILE *stream, int address)
     if (stream) {
         s_label[0] = '\0';
         s_oper[0] = '\0';
+        s_value[0] = '\0';
 
         // Hey! We might have a label at this position in the code. If
         // so, let's print out the label.
