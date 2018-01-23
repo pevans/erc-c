@@ -10,9 +10,9 @@ Test(mos6502_arith, adc)
 {
     cpu->A = 5;
     mos6502_handle_adc(cpu, 3);
-    cr_assert_eq(cpu->A, 8);
+    cr_assert_eq(cpu->A, 9);
 
-    cpu->P |= MOS_CARRY;
+    cpu->P &= ~MOS_CARRY;
     mos6502_handle_adc(cpu, 64);
     cr_assert_eq(cpu->A, 73);
 }
