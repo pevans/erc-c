@@ -187,4 +187,6 @@ SEGMENT_WRITER(apple2_pc_switch_write)
                                    mach->memory_mode & ~MEMORY_SLOTCXROM);
             break;
     }
+
+    log_critical("; memory_mode = %x", mach->memory_mode);
 }

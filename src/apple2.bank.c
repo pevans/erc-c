@@ -164,44 +164,44 @@ SEGMENT_READER(apple2_bank_switch_read)
         // but simply to change the bank switch mode.
         case 0xC080:
             apple2_set_bank_switch(mach, BANK_RAM | BANK_RAM2);
-            return 0;
+            break;
 
         case 0xC081:
             if (last_addr == addr) {
                 apple2_set_bank_switch(mach, BANK_WRITE | BANK_RAM2);
             }
-            return 0;
+            break;
         case 0xC082:
             apple2_set_bank_switch(mach, BANK_RAM2);
-            return 0;
+            break;
 
         case 0xC083:
             if (last_addr == addr) {
                 apple2_set_bank_switch(mach, BANK_RAM | BANK_WRITE | BANK_RAM2);
             }
-            return 0;
+            break;
 
         // Conversely, the $C088 - $C08B range control memory access
         // while using bank 1 RAM.
         case 0xC088:
             apple2_set_bank_switch(mach, BANK_RAM);
-            return 0;
+            break;
 
         case 0xC089:
             if (last_addr == addr) {
                 apple2_set_bank_switch(mach, BANK_WRITE);
             }
-            return 0;
+            break;
 
         case 0xC08A:
             apple2_set_bank_switch(mach, BANK_DEFAULT);
-            return 0;
+            break;
 
         case 0xC08B:
             if (last_addr == addr) {
                 apple2_set_bank_switch(mach, BANK_RAM | BANK_WRITE);
             }
-            return 0;
+            break;
 
         // Return high on the 7th bit if we're using bank 2 memory
         case 0xC011:
@@ -223,7 +223,7 @@ SEGMENT_READER(apple2_bank_switch_read)
                 : 0x00;
     }
 
-    log_critical("Bank switch read mapper called with an unexpected address: %x", addr);
+    log_critical("; bank_switch = %x", mach->bank_switch);
     return 0;
 }
 
@@ -240,14 +240,14 @@ SEGMENT_WRITER(apple2_bank_switch_write)
         case 0xC008:
             apple2_set_bank_switch(mach,
                                    mach->bank_switch | BANK_ALTZP);
-            return;
+            break;
 
         // Disable auxiliary memory for zero page + stack
         case 0xC009:
             apple2_set_bank_switch(mach,
                                    mach->bank_switch & ~BANK_ALTZP);
-            return;
+            break;
     }
 
-    log_critical("Bank switch write mapper called with an unexpected address: %x", addr);
+    log_critical("; bank_switch = %x", mach->bank_switch);
 }

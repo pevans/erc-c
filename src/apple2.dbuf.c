@@ -213,6 +213,8 @@ SEGMENT_READER(apple2_dbuf_switch_read)
             break;
     }
 
+    log_critical("; display_mode = %x", mach->display_mode);
+
     // ???
     return 0;
 }
@@ -286,4 +288,6 @@ SEGMENT_WRITER(apple2_dbuf_switch_write)
                                mach->display_mode & ~DISPLAY_DHIRES);
             break;
     }
+
+    log_critical("; display_mode = %x", mach->display_mode);
 }

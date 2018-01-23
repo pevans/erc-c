@@ -214,6 +214,8 @@ SEGMENT_READER(apple2_mem_switch_read)
             break;
     }
 
+    log_critical("; memory_mode = %x", mach->memory_mode);
+
     // ???
     return 0;
 }
@@ -284,4 +286,6 @@ SEGMENT_WRITER(apple2_mem_switch_write)
             break;
 
     }
+
+    log_critical("; memory_mode = %x", mach->memory_mode);
 }
