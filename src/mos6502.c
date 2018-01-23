@@ -400,7 +400,7 @@ mos6502_execute(mos6502 *cpu)
 
     // FIXME: uh this probably isn't right, but I wanted to do
     // something.
-    usleep(cycles * 10000);
+    //usleep(cycles);
 
     // We need to record the opcode and the effective address for
     // anything which might need to reference it.
