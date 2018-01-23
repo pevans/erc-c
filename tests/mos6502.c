@@ -47,7 +47,7 @@ Test(mos6502, modify_status)
     mos6502_modify_status(cpu, MOS_OVERFLOW, 44, 44);
     cr_assert_neq(cpu->P & MOS_OVERFLOW, MOS_OVERFLOW);
 
-    mos6502_modify_status(cpu, MOS_CARRY, 230, 230);
+    mos6502_modify_status(cpu, MOS_CARRY, 230, 260);
     cr_assert_eq(cpu->P & MOS_CARRY, MOS_CARRY);
     mos6502_modify_status(cpu, MOS_CARRY, 30, 190);
     cr_assert_neq(cpu->P & MOS_CARRY, MOS_CARRY);
