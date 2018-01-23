@@ -95,8 +95,6 @@ SEGMENT_WRITER(apple2_dbuf_write)
 
     if (mach->display_mode & DISPLAY_TEXT) {
         apple2_draw_40col(mach);
-    } else {
-        apple2_draw_40col(mach);
     }
 }
 
@@ -187,22 +185,22 @@ SEGMENT_READER(apple2_dbuf_switch_read)
         // addresses.
         case 0xC050:
             apple2_set_display(mach,
-                               mach->display_mode | DISPLAY_TEXT);
+                               mach->display_mode & ~DISPLAY_TEXT);
             break;
 
         case 0xC051:
             apple2_set_display(mach,
-                               mach->display_mode & ~DISPLAY_TEXT);
+                               mach->display_mode | DISPLAY_TEXT);
             break;
 
         case 0xC052:
             apple2_set_display(mach,
-                               mach->display_mode | DISPLAY_MIXED);
+                               mach->display_mode & ~DISPLAY_MIXED);
             break;
 
         case 0xC053:
             apple2_set_display(mach,
-                               mach->display_mode & ~DISPLAY_MIXED);
+                               mach->display_mode | DISPLAY_MIXED);
             break;
 
         case 0xC05E:
@@ -235,22 +233,22 @@ SEGMENT_WRITER(apple2_dbuf_switch_write)
     switch (addr) {
         case 0xC00E:
             apple2_set_display(mach,
-                               mach->display_mode | DISPLAY_ALTCHAR);
+                               mach->display_mode & ~DISPLAY_ALTCHAR);
             break;
 
         case 0xC00F:
             apple2_set_display(mach,
-                               mach->display_mode & ~DISPLAY_ALTCHAR);
+                               mach->display_mode | DISPLAY_ALTCHAR);
             break;
 
         case 0xC00C:
             apple2_set_display(mach,
-                               mach->display_mode | DISPLAY_80COL);
+                               mach->display_mode & ~DISPLAY_80COL);
             break;
 
         case 0xC00D:
             apple2_set_display(mach,
-                               mach->display_mode & ~DISPLAY_80COL);
+                               mach->display_mode | DISPLAY_80COL);
             break;
 
         case 0xC050:
@@ -265,12 +263,12 @@ SEGMENT_WRITER(apple2_dbuf_switch_write)
 
         case 0xC052:
             apple2_set_display(mach,
-                               mach->display_mode | DISPLAY_MIXED);
+                               mach->display_mode & ~DISPLAY_MIXED);
             break;
 
         case 0xC053:
             apple2_set_display(mach,
-                               mach->display_mode & ~DISPLAY_MIXED);
+                               mach->display_mode | DISPLAY_MIXED);
             break;
 
         case 0xC07E:

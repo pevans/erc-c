@@ -129,7 +129,7 @@ apple2_create(int width, int height)
     apple2_set_color(mach, COLOR_FULL);
 
     // We default to lo-res mode.
-    apple2_set_display(mach, DISPLAY_DEFAULT);
+    apple2_set_display(mach, DISPLAY_TEXT);
 
     // Let's install our bitmap font.
     mach->sysfont = vm_bitfont_create(mach->screen,
@@ -257,7 +257,7 @@ apple2_reset(apple2 *mach)
     mach->cpu->S = 0xff;
 
     // Switch video mode back to 40 column text
-    apple2_set_display(mach, DISPLAY_DEFAULT);
+    apple2_set_display(mach, DISPLAY_TEXT);
 
     // Switch us back to defaults
     apple2_set_bank_switch(mach, BANK_DEFAULT);
