@@ -26,7 +26,7 @@ Test(mos6502, create)
 Test(mos6502, push_stack)
 {
     mos6502_push_stack(cpu, 0x34);
-    cr_assert_eq(mos6502_get(cpu, 0x0100), 0x34);
+    cr_assert_eq(mos6502_get(cpu, 0x01ff), 0x34);
 }
 
 Test(mos6502, pop_stack)
