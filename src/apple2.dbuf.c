@@ -3,6 +3,7 @@
  */
 
 #include "apple2.dbuf.h"
+#include "apple2.draw.h"
 
 static size_t switch_reads[] = {
     0xC01A,
@@ -91,6 +92,12 @@ SEGMENT_WRITER(apple2_dbuf_write)
     // Again, segment is allowed to be that which was passed in if
     // 80STORE is low. 
     segment->memory[addr] = value;
+
+    if (mach->display_mode & DISPLAY_TEXT) {
+        apple2_draw_40col(mach);
+    } else {
+        apple2_draw_40col(mach);
+    }
 }
 
 /*
@@ -213,8 +220,6 @@ SEGMENT_READER(apple2_dbuf_switch_read)
             break;
     }
 
-    log_critical("; display_mode = %x", mach->display_mode);
-
     // ???
     return 0;
 }
@@ -288,6 +293,4 @@ SEGMENT_WRITER(apple2_dbuf_switch_write)
                                mach->display_mode & ~DISPLAY_DHIRES);
             break;
     }
-
-    log_critical("; display_mode = %x", mach->display_mode);
 }

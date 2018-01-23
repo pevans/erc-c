@@ -38,9 +38,16 @@ typedef struct {
     vm_8bit last_key;
     bool key_pressed;
 
+    /*
+     * Is the screen dirty? That is to say, has something about it
+     * changed that now requires we redraw the screen?
+     */
+    bool dirty;
+
 } vm_screen;
 
 extern bool vm_screen_active(vm_screen *);
+extern bool vm_screen_dirty(vm_screen *);
 extern bool vm_screen_key_pressed(vm_screen *);
 extern char vm_screen_last_key(vm_screen *);
 extern int vm_screen_add_window(vm_screen *, int, int);

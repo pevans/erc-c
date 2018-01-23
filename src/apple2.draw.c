@@ -88,10 +88,9 @@ apple2_draw_pixel_lores(apple2 *mach, vm_16bit addr)
 void
 apple2_draw_text(apple2 *mach, vm_16bit addr)
 {
-    vm_8bit lsb;
+    vm_8bit lsb, ch;
     vm_16bit page_base;
     vm_area dest;
-    char ch;
 
     // The text display buffers are located at "Page 1" and "Page 2",
     // which are at byte 1024-2047 (0x0400-0x07FF) and byte 2048-3071
@@ -151,7 +150,7 @@ apple2_draw_text(apple2 *mach, vm_16bit addr)
     dest.height = mach->sysfont->height;
 
     // And...lastly...what's in the address?
-    ch = (char)vm_segment_get(mach->main, addr);
+    ch = mos6502_get(mach->cpu, addr);
 
     // Let's firstly blank out that space on screen.
     vm_bitfont_render(mach->sysfont, mach->screen, &dest, ' ');

@@ -61,6 +61,7 @@ vm_screen_create()
     screen->ycoords = 0;
     screen->last_key = '\0';
     screen->key_pressed = false;
+    screen->dirty = false;
 
     screen->window = NULL;
     screen->render = NULL;
@@ -209,6 +210,7 @@ vm_screen_active(vm_screen *screen)
         return true;
     }
 
+    SDL_Delay(2000);
     return false;
 }
 
@@ -220,6 +222,7 @@ void
 vm_screen_refresh(vm_screen *screen)
 {
     SDL_RenderPresent(screen->render);
+    screen->dirty = false;
 }
 
 /*
@@ -249,6 +252,7 @@ vm_screen_draw_rect(vm_screen *screen, vm_area *area)
     MAKE_SDL_RECT(rect, *area);
 
     SDL_RenderFillRect(screen->render, &rect);
+    screen->dirty = true;
 }
 
 /*
@@ -270,4 +274,10 @@ char
 vm_screen_last_key(vm_screen *scr)
 {
     return scr->last_key;
+}
+
+bool
+vm_screen_dirty(vm_screen *scr)
+{
+    return scr->dirty;
 }

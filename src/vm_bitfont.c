@@ -123,5 +123,6 @@ vm_bitfont_render(vm_bitfont *font,
         return ERR_GFXOP;
     }
 
+    screen->dirty = true;
     return OK;
 }

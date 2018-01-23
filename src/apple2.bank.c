@@ -223,7 +223,6 @@ SEGMENT_READER(apple2_bank_switch_read)
                 : 0x00;
     }
 
-    log_critical("; bank_switch = %x", mach->bank_switch);
     return 0;
 }
 
@@ -248,6 +247,4 @@ SEGMENT_WRITER(apple2_bank_switch_write)
                                    mach->bank_switch & ~BANK_ALTZP);
             break;
     }
-
-    log_critical("; bank_switch = %x", mach->bank_switch);
 }
