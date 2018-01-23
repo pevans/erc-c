@@ -113,10 +113,10 @@ Test(mos6502_arith, sbc)
 {
     cpu->A = 5;
     mos6502_handle_sbc(cpu, 3);
-    cr_assert_eq(cpu->A, 2);
+    cr_assert_eq(cpu->A, 1);
 
-    cpu->P |= MOS_CARRY;
+    cpu->P &= ~MOS_CARRY;
     cpu->A = 16;
     mos6502_handle_sbc(cpu, 8);
-    cr_assert_eq(cpu->A, 7);
+    cr_assert_eq(cpu->A, 8);
 }
