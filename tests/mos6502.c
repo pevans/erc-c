@@ -19,21 +19,20 @@ Test(mos6502, create)
     cr_assert_eq(cpu->A, 0);
     cr_assert_eq(cpu->X, 0);
     cr_assert_eq(cpu->Y, 0);
-    cr_assert_eq(cpu->P, 0);
-    cr_assert_eq(cpu->S, 0);
+    cr_assert_eq(cpu->P, MOS_STATUS_DEFAULT);
+    cr_assert_eq(cpu->S, 0xff);
 }
 
 Test(mos6502, push_stack)
 {
-    mos6502_push_stack(cpu, 0x1234);
+    mos6502_push_stack(cpu, 0x34);
     cr_assert_eq(mos6502_get(cpu, 0x0100), 0x34);
-    cr_assert_eq(mos6502_get(cpu, 0x0101), 0x12);
 }
 
 Test(mos6502, pop_stack)
 {
-    mos6502_push_stack(cpu, 0x1234);
-    cr_assert_eq(mos6502_pop_stack(cpu), 0x1234);
+    mos6502_push_stack(cpu, 0x34);
+    cr_assert_eq(mos6502_pop_stack(cpu), 0x34);
 }
 
 Test(mos6502, modify_status)
@@ -101,6 +100,10 @@ Test(mos6502, execute)
     mos6502_set(cpu, 11, 34);
     mos6502_set(cpu, 10, 0x69);
     cpu->PC = 10;
+
+    // Make sure we don't have carry turned on, or else we'll get 35!
+    cpu->P &= ~MOS_CARRY;
+
     mos6502_execute(cpu);
     cr_assert_eq(cpu->A, 34);
 }
