@@ -26,7 +26,7 @@ Test(mos6502_arith, cmp)
     cr_assert_eq(cpu->P & MOS_ZERO, 0);
 
     cpu->A = 3;
-    mos6502_handle_cmp(cpu, 3);
+    mos6502_handle_cmp(cpu, 4);
     cr_assert_eq(cpu->P & MOS_CARRY, 0);
     cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
     cr_assert_eq(cpu->P & MOS_ZERO, MOS_ZERO);
