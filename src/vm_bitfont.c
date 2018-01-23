@@ -118,9 +118,13 @@ vm_bitfont_render(vm_bitfont *font,
     MAKE_SDL_RECT(dest_rect, *dest);
     MAKE_SDL_RECT(src_rect, src);
 
-    if (SDL_RenderCopy(screen->render, font->texture, &src_rect, &dest_rect) < 0) {
-        log_critical("Failed to render glyph: %s", SDL_GetError());
-        return ERR_GFXOP;
+    if (screen->render) {
+        if (SDL_RenderCopy(screen->render, font->texture, 
+                           &src_rect, &dest_rect) < 0
+           ) {
+            log_critical("Failed to render glyph: %s", SDL_GetError());
+            return ERR_GFXOP;
+        }
     }
 
     screen->dirty = true;
