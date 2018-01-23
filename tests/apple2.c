@@ -100,8 +100,8 @@ Test(apple2, reset)
     apple2_reset(mach);
 
     cr_assert_eq(mach->cpu->PC, 0x1234);
-    cr_assert_eq(mach->cpu->P, MOS_INTERRUPT);
-    cr_assert_eq(mach->cpu->S, 0);
+    cr_assert_eq(mach->cpu->P, MOS_STATUS_DEFAULT);
+    cr_assert_eq(mach->cpu->S, 0xff);
 }
 
 Test(apple2, set_memory_mode)
