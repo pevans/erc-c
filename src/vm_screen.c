@@ -169,7 +169,6 @@ vm_screen_active(vm_screen *screen)
 {
     SDL_Event event;
     char ch;
-    static int counter = 300000;
 
     // There may be _many_ events in the queue; for example, you may be
     // facerolling on Zork because it feels good. And good for you if
@@ -202,16 +201,16 @@ vm_screen_active(vm_screen *screen)
             case SDL_KEYUP:
                 // Note we do not erase the last_key value.
                 screen->key_pressed = false;
+
+                if (ch == SDLK_ESCAPE) {
+                    return false;
+                }
+
                 break;
         }
     }
 
-    if (counter--) {
-        return true;
-    }
-
-    SDL_Delay(2000);
-    return false;
+    return true;
 }
 
 /*
