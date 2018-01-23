@@ -88,6 +88,7 @@ Test(mos6502_addr, addr_mode_idy)
 
     SET_PC_BYTE(cpu, 1, 0x12);
     cpu->Y = 5;
+    cpu->P &= ~MOS_CARRY;
     cr_assert_eq(mos6502_resolve_idy(cpu), 123);
 }
 
