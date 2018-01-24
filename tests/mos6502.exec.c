@@ -36,7 +36,7 @@ Test(mos6502_exec, jsr)
 
     cr_assert_eq(cpu->PC, 235);
     
-    cr_assert_eq(mos6502_pop_stack(cpu), 126);
+    cr_assert_eq(mos6502_pop_stack(cpu), 125);
 }
 
 Test(mos6502_exec, nop)
@@ -57,8 +57,8 @@ Test(mos6502_exec, rti)
 
 Test(mos6502_exec, rts)
 {
-    mos6502_push_stack(cpu, 333);
+    mos6502_push_stack(cpu, 233);
     mos6502_handle_rts(cpu, 0);
 
-    cr_assert_eq(cpu->PC, 333);
+    cr_assert_eq(cpu->PC, 234);
 }
