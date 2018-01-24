@@ -29,8 +29,7 @@ Test(mos6502_loadstor, pha)
     cpu->A = 0x24;
     mos6502_handle_pha(cpu, 0);
 
-    cr_assert_eq(mos6502_get(cpu, 0x0100), 0x24);
-    cr_assert_eq(mos6502_get(cpu, 0x0101), 0x00);
+    cr_assert_eq(mos6502_get(cpu, 0x01ff), 0x24);
 }
 
 Test(mos6502_loadstor, php)
@@ -38,8 +37,7 @@ Test(mos6502_loadstor, php)
     cpu->P = 0x43;
     mos6502_handle_php(cpu, 0);
 
-    cr_assert_eq(mos6502_get(cpu, 0x0100), 0x43);
-    cr_assert_eq(mos6502_get(cpu, 0x0101), 0x00);
+    cr_assert_eq(mos6502_get(cpu, 0x01ff), 0x43);
 }
 
 Test(mos6502_loadstor, pla)
