@@ -96,11 +96,13 @@ mos6502_dis_operand(mos6502 *cpu,
 {
     int rel_address;
     int ind_address;
-    vm_8bit eff_value;
+    vm_8bit eff_value = 0;
     mos6502_address_resolver resolv;
 
     resolv = mos6502_get_address_resolver(addr_mode);
-    eff_value = resolv(cpu);
+    if (resolv) {
+        eff_value = resolv(cpu);
+    }
 
     switch (addr_mode) {
         case ACC:
@@ -123,7 +125,7 @@ mos6502_dis_operand(mos6502 *cpu,
             snprintf(s_value, sizeof(s_value), "%02x", eff_value);
             break;
         case IMP:
-            snprintf(s_value, sizeof(s_value), "%02X", 0);
+            snprintf(s_value, sizeof(s_value), "%02x", 0);
             break;
         case IND:
             ind_address = mos6502_get(cpu, value + 1) << 8;
