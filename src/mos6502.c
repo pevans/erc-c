@@ -348,7 +348,7 @@ void
 mos6502_execute(mos6502 *cpu)
 {
     vm_8bit opcode, operand = 0;
-    int cycles, bytes;
+    int /*cycles,*/ bytes;
     mos6502_address_resolver resolver;
     mos6502_instruction_handler handler;
 
@@ -390,7 +390,7 @@ mos6502_execute(mos6502 *cpu)
     // with the idea that certain instructions -- in certain address
     // modes -- were more expensive than others, and you want those
     // programs to feel faster or slower in relation to that.
-    cycles = mos6502_cycles(cpu, opcode);
+    //cycles = mos6502_cycles(cpu, opcode);
 
     // If we need to jump, then the handler has to take care of updating
     // PC. If not, then we need to do it. 
