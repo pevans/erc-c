@@ -15,7 +15,10 @@ data = 'hope'
 # in objstore.h
 data += file_data('./data/apple2.rom')          # Internal ROM ($C000..$FFFF)
 data += file_data('./data/peripheral.rom')      # $C000..$CFFF
+
+# The apple2 fonts
 data += file_data('./fonts/apple2-system.bmp')
+data += file_data('./fonts/apple2-inverse.bmp')
 
 # Let's not keep calling len(data) since we know it won't change over our
 # iterations

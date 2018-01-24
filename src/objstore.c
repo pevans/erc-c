@@ -96,3 +96,4 @@ objstore_ready()
 OBJSTORE_DEFN(apple2_peripheral_rom);   // ignore docblock
 OBJSTORE_DEFN(apple2_sys_rom);          // ignore docblock
 OBJSTORE_DEFN(apple2_sysfont);          // ignore docblock
+OBJSTORE_DEFN(apple2_invfont);          // ignore docblock

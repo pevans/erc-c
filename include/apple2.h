@@ -270,10 +270,14 @@ typedef struct {
     vm_screen *screen;
 
     /*
-     * This is the system font (the only font the Apple II knows about,
-     * really); anywhere we render text, we have to use this font.
+     * Here are the system and inverse fonts. The system font is the
+     * normal (I suppose?) bitmap font for all text on the Apple II. The
+     * inverse font is the system font, but with black inversed to
+     * white. Both fonts also contain the so-called "MouseText"
+     * glyphs--or, at least, my interpretation of them.
      */
     vm_bitfont *sysfont;
+    vm_bitfont *invfont;
 
     /*
      * This is the mode in which we must interpret graphics. This will

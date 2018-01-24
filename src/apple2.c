@@ -53,6 +53,7 @@ apple2_create(int width, int height)
     mach->aux = NULL;
     mach->main = NULL;
     mach->sysfont = NULL;
+    mach->invfont = NULL;
     mach->screen = NULL;
     mach->drive1 = NULL;
     mach->drive2 = NULL;
@@ -137,7 +138,12 @@ apple2_create(int width, int height)
                                       APPLE2_SYSFONT_SIZE,
                                       7, 8,         // 7 pixels wide, 8 pixels tall
                                       0x7f);        // 7-bit values only
-    if (mach->sysfont == NULL) {
+    mach->invfont = vm_bitfont_create(mach->screen,
+                                      objstore_apple2_invfont(),
+                                      APPLE2_SYSFONT_SIZE,
+                                      7, 8,
+                                      0x7f);
+    if (mach->sysfont == NULL || mach->invfont == NULL) {
         apple2_free(mach);
         log_critical("Could not initialize apple2: bad font");
         return NULL;
