@@ -7,6 +7,7 @@ set(erc_sources
 	apple2.kb.c
 	apple2.mem.c
 	apple2.pc.c
+	apple2.text.c
 	log.c
 	mos6502.c
 	mos6502.addr.c
