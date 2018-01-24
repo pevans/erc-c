@@ -92,7 +92,7 @@ glyphmap = {
         "nl": "n",
         "nu": "N",
         "ol": "o",
-        "open-apple": 32,
+        "open-apple": 0,
         "ou": "O",
         "percent": "%",
         "perfcurs": 10,
@@ -145,7 +145,7 @@ def build_font(name, path, gridfiles):
     img.save('./fonts/' + name + '.bmp')
 
 def name_to_char(name):
-    if not glyphmap[name]:
+    if not glyphmap[name] and glyphmap[name] is not 0:
         raise Exception('unknown glyph')
     return glyphmap[name]
 
