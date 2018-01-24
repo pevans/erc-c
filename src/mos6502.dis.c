@@ -113,7 +113,6 @@ mos6502_dis_operand(mos6502 *cpu,
             break;
         case ABX:
             snprintf(str, len, "$%04X,X", value);
-            eff_value = resolv(cpu);
             snprintf(s_value, sizeof(s_value), "%02x", eff_value);
             break;
         case ABY:
