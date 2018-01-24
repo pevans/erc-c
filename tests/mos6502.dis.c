@@ -108,7 +108,7 @@ Test(mos6502_dis, operand)
     assert_buf("$34,X");
     mos6502_dis_operand(cpu, buf, sizeof(buf), 0, ZPY, 0x34);
     assert_buf("$34,Y");
-    
+
     // These should both end up printing nothing
     mos6502_dis_operand(cpu, buf, sizeof(buf), 0, ACC, 0);
     assert_buf("");
@@ -216,7 +216,7 @@ Test(mos6502_dis, opcode)
     mos6502_set(cpu, 1, 0x38);
 
     bytes = mos6502_dis_opcode(cpu, stream, 0);
-    assert_buf("     AND #$38      ; pc:0000 cy:02 val:0038 a:00 x:00 y:00 p:00 s:00     | 29 38\n");
+    assert_buf("   AND #$38      ; pc:0000 cy:02 val:38 a:00 x:00 y:00 p:NO-dIZC s:ff  | 29 38\n");
     cr_assert_eq(bytes, 2);
 }
 
@@ -235,10 +235,10 @@ Test(mos6502_dis, scan)
     // I'm honestly not sure. There are definitely times (e.g. during
     // runtime operation) when you don't want it to, but as a standalone
     // disassembler, it feels less useful when PC isn't emulated.
-    assert_buf("     AND #$38      ; pc:0000 cy:02 val:0038 a:00 x:00 y:00 p:00 s:00     | 29 38\n"
-               "     DEY           ; pc:0000 cy:02 val:0000 a:00 x:00 y:00 p:00 s:00     | 88\n"
-               "     JMP ($1234)   ; pc:0000 cy:05 val:1234 a:00 x:00 y:00 p:00 s:00     | 6c 34 12\n"
-               ";;;\n"
+    assert_buf("   AND #$38      ; pc:0000 cy:02 val:38 a:00 x:00 y:00 p:NO-dIZC s:ff  | 29 38\n"
+               "   DEY           ; pc:0000 cy:02 val:   a:00 x:00 y:00 p:NO-dIZC s:ff  | 88\n"
+               "   JMP ($1234)   ; pc:0000 cy:05 val:29 a:00 x:00 y:00 p:NO-dIZC s:ff  | 6c 34 12\n"
+               ";;;\n\n"
                );
 }
 
