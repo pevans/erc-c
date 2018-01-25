@@ -58,6 +58,7 @@ extern vm_screen *vm_screen_create();
 extern void vm_screen_draw_rect(vm_screen *, vm_area *);
 extern void vm_screen_finish();
 extern void vm_screen_free(vm_screen *);
+extern void vm_screen_prepare(vm_screen *);
 extern void vm_screen_refresh(vm_screen *);
 extern void vm_screen_set_color(vm_screen *, uint8_t, uint8_t, uint8_t, uint8_t);
 extern void vm_screen_set_logical_coords(vm_screen *, int, int);
