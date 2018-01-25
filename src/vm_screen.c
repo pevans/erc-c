@@ -14,8 +14,6 @@
 #include "log.h"
 #include "vm_screen.h"
 
-static struct timeval _time;
-
 /*
  * Initialize the video of the vm_screen abstraction. This ends up being
  * something that depends on our third-party graphics library; in other
@@ -30,8 +28,6 @@ vm_screen_init()
         log_critical("Could not initialize video: %s", SDL_GetError());
         return ERR_GFXINIT;
     }
-
-    gettimeofday(&_time, NULL);
 
     return OK;
 }
@@ -128,7 +124,7 @@ vm_screen_add_window(vm_screen *screen, int width, int height)
     vm_screen_set_logical_coords(screen, width, height);
 
     vm_screen_set_color(screen, 0, 0, 0, 0);
-    SDL_RenderClear(screen->render);
+    vm_screen_prepare(screen);
 
     return OK;
 }
@@ -173,7 +169,6 @@ bool
 vm_screen_active(vm_screen *scr)
 {
     SDL_Event event;
-    struct timeval curtime;
     char ch;
 
     // There may be _many_ events in the queue; for example, you may be
@@ -217,18 +212,13 @@ vm_screen_active(vm_screen *scr)
         }
     }
 
-    gettimeofday(&curtime, NULL);
-
-    // If it's been more than 1/30th of a second since our last update,
-    // mark the screen dirty
-    if (curtime.tv_sec > _time.tv_sec ||
-        curtime.tv_usec > _time.tv_usec + 33333
-       ) {
-        memcpy(&_time, &curtime, sizeof(struct timeval));
-        scr->dirty = true;
-    }
-
     return true;
+}
+
+void
+vm_screen_prepare(vm_screen *scr)
+{
+    SDL_RenderClear(scr->render);
 }
 
 /*

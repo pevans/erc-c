@@ -88,6 +88,8 @@ apple2_draw_40col(apple2 *mach)
 {
     size_t addr;
 
+    vm_screen_prepare(mach->screen);
+
     for (addr = 0x400; addr < 0x800; addr++) {
         if ((addr & 0xFF) == 0x39) {
             addr += 0x40;
