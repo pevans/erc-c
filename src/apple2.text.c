@@ -14,6 +14,9 @@
 
 #include "apple2.text.h"
 
+/*
+ * Draw a text character at the given address.
+ */
 void
 apple2_text_draw(apple2 *mach, size_t addr)
 {
@@ -84,6 +87,10 @@ apple2_text_draw(apple2 *mach, size_t addr)
     vm_bitfont_render(font, mach->screen, &dest, ch);
 }
 
+/*
+ * This function will fill in the width, height, and x and y offsets for
+ * a character at the given address using the given font.
+ */
 int
 apple2_text_area(vm_area *area, vm_bitfont *font, size_t addr)
 {
