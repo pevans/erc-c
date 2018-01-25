@@ -10,12 +10,14 @@
  * implemented as part of both fonts.
  */
 
+#include <ctype.h>
+
 #include "apple2.text.h"
 
 void
 apple2_text_draw(apple2 *mach, size_t addr)
 {
-    int err;
+    int err, bit7, bit6;
     vm_8bit ch;
     vm_area dest;
     vm_bitfont *font;
@@ -38,10 +40,43 @@ apple2_text_draw(apple2 *mach, size_t addr)
     // What are we working with?
     ch = mos6502_get(mach->cpu, addr);
 
+    // Bit 7 and bit 6 mean different things in ALTCHAR
+    // and...non-ALTCHAR. 
+    bit7 = ch & 0x80;
+    bit6 = ch & 0x40;
+
+    // The ASCII code we will use is only that which is composed of the
+    // first 6 bits.
+    ch = ch & 0x7f;
+
     // We treat special characters as spaces for display purposes.
     if (ch < 0x20) {
         vm_bitfont_render(font, mach->screen, &dest, ' ');
         return;
+    }
+
+    // If bit 7 is high, then we want to show inverse video. This is
+    // mostly true regardless of character set.
+    if (bit7) {
+        font = mach->invfont;
+    }
+
+    if (mach->display_mode & DISPLAY_ALTCHAR) {
+        // The character here should be MouseText, so we'll need to use
+        // the _non_ inverted font for that.
+        if (ch >= 0x40 && ch <= 0x5F) {
+            font = mach->sysfont;
+        }
+
+        if (bit6) {
+            ch = tolower(ch);
+        }
+    } else {
+        // FIXME: we should turn on flashing text here, but that's not
+        // yet implemented
+        if (bit6) {
+            // do something with flashing text
+        }
     }
 
     // Blank out the space on the screen, then show the character
