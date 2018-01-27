@@ -145,12 +145,14 @@ Test(apple2_dd, write)
 {
     drive->data = vm_segment_create(_140K_);
 
-    apple2_dd_write(drive, 123);
+    drive->latch = 123;
+    apple2_dd_write(drive);
     cr_assert_eq(vm_segment_get(drive->data, 0), 123);
     cr_assert_eq(drive->track_pos, 0);
     cr_assert_eq(drive->sector_pos, 1);
 
-    apple2_dd_write(drive, 234);
+    drive->latch = 234;
+    apple2_dd_write(drive);
     cr_assert_eq(vm_segment_get(drive->data, 1), 234);
     cr_assert_eq(drive->track_pos, 0);
     cr_assert_eq(drive->sector_pos, 2);
