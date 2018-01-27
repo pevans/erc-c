@@ -1,6 +1,13 @@
 #ifndef _APPLE2_H_
 #define _APPLE2_H_
 
+/*
+ * A forward declaration is needed to avoid some errors in dd.h where we
+ * need to define a function that accepts an apple2 pointer.
+ */
+struct apple2;
+typedef struct apple2 apple2;
+
 #include "apple2.dd.h"
 #include "mos6502.h"
 #include "vm_bitfont.h"
@@ -236,7 +243,7 @@ enum bank_switch {
     BANK_ALTZP = 0x8,
 };
 
-typedef struct {
+struct apple2 {
     /*
      * The apple 2 hardware used an MOS-6502 processor.
      */
@@ -320,7 +327,13 @@ typedef struct {
      */
     apple2dd *drive1;
     apple2dd *drive2;
-} apple2;
+
+    /*
+     * The Apple II machine allows you to "select" a drive, and the
+     * operations you perform are (mostly) targeting that drive.
+     */
+    apple2dd *selected_drive;
+};
 
 extern apple2 *apple2_create(int, int);
 extern bool apple2_is_double_video(apple2 *);

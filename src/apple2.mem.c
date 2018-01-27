@@ -4,6 +4,7 @@
 
 #include "apple2.bank.h"
 #include "apple2.dbuf.h"
+#include "apple2.dd.h"
 #include "apple2.h"
 #include "apple2.kb.h"
 #include "apple2.mem.h"
@@ -61,6 +62,9 @@ apple2_mem_map(apple2 *mach, vm_segment *segment)
 
     // And this handles our keyboard soft switches
     apple2_kb_map(segment);
+
+    // Map our disk drive switches
+    apple2_dd_map(segment);
 
     // We will do the mapping for the zero page and stack addresses.
     // Accessing those addresses can be affected by bank-switching, but
