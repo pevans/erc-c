@@ -106,14 +106,13 @@ DEFINE_ADDR(abs)
 /*
  * The absolute x-indexed address mode is a slight modification of the
  * absolute mode. Here, we consume two bytes, but add the X register
- * value to what we read -- plus one if we have the carry bit set. This
- * is a mode you would use if you were scanning a table, for instance.
+ * value to what we read. This is a mode you would use if you were
+ * scanning a table, for instance.
  */
 DEFINE_ADDR(abx)
 {
     ADDR_HILO(cpu);
-    MOS_CARRY_BIT();
-    EFF_ADDR(addr + cpu->X + carry);
+    EFF_ADDR(addr + cpu->X);
 
     return mos6502_get(cpu, eff_addr);
 }
@@ -125,8 +124,7 @@ DEFINE_ADDR(abx)
 DEFINE_ADDR(aby)
 {
     ADDR_HILO(cpu);
-    MOS_CARRY_BIT();
-    EFF_ADDR(addr + cpu->Y + carry);
+    EFF_ADDR(addr + cpu->Y);
 
     return mos6502_get(cpu, eff_addr);
 }
@@ -166,8 +164,7 @@ DEFINE_ADDR(ind)
  * The indirect x-indexed address mode, as well as the y-indexed mode,
  * are a bit complicated. The single, next byte we read is a zero-page
  * address to the base of _another_ zero-page address in memory; we add
- * X to it, which is the address of what we next dereference. Carry does
- * not factor into the arithmetic.
+ * X to it, which is the address of what we next dereference.
  */
 DEFINE_ADDR(idx)
 {
@@ -183,13 +180,12 @@ DEFINE_ADDR(idx)
  * In significant contrast, the y-indexed indirect mode will read a
  * zero-page address from the next byte, and dereference it immediately.
  * The ensuing address will then have Y added to it, and then
- * dereferenced for the final time. Carry _is_ factored in here.
+ * dereferenced for the final time.
  */
 DEFINE_ADDR(idy)
 {
     ADDR_LO(cpu);
-    MOS_CARRY_BIT();
-    EFF_ADDR(mos6502_get(cpu, addr) + cpu->Y + carry);
+    EFF_ADDR(mos6502_get(cpu, addr) + cpu->Y);
 
     return mos6502_get(cpu, eff_addr);
 }
@@ -235,7 +231,7 @@ DEFINE_ADDR(zpg)
 
 /*
  * In zero-page x-indexed mode, we read the next byte; add X to that;
- * and dereference the result. Carry is not a factor here.
+ * and dereference the result.
  */
 DEFINE_ADDR(zpx)
 {
@@ -247,8 +243,7 @@ DEFINE_ADDR(zpx)
 
 /*
  * This is, as with absolute y-indexed mode, the mirror opposite of the
- * zero-page x-indexed mode. We simply use the Y register and not the X,
- * and here as well, we do not factor in the carry bit.
+ * zero-page x-indexed mode. We simply use the Y register and not the X.
  */
 DEFINE_ADDR(zpy)
 {
