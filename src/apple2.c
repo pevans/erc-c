@@ -63,7 +63,7 @@ apple2_create(int width, int height)
     // assumes that the bank_switch variable has been initialized
     // before, which to this point, it hasn't!
     mach->bank_switch = BANK_DEFAULT;
-    mach->memory_mode = MEMORY_DEFAULT;
+    mach->memory_mode = MEMORY_DEFAULT | MEMORY_SLOTCXROM;
 
     mach->main = vm_segment_create(APPLE2_MEMORY_SIZE);
     if (mach->main == NULL) {
