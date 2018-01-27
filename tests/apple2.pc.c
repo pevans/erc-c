@@ -50,6 +50,7 @@ Test(apple2_pc, read)
 {
     vm_8bit rombyte;
 
+    apple2_set_memory_mode(mach, MEMORY_DEFAULT);
     rombyte = vm_segment_get(mach->rom, 0x100);
     cr_assert_eq(vm_segment_get(mach->main, 0xC100), rombyte);
 }
@@ -70,6 +71,7 @@ Test(apple2_pc, write)
 
 Test(apple2_pc, switch_read)
 {
+    mach->memory_mode = MEMORY_DEFAULT;
     cr_assert_eq(vm_segment_get(mach->main, 0xC015), 0);
     mach->memory_mode = MEMORY_SLOTCXROM;
     cr_assert_eq(vm_segment_get(mach->main, 0xC015), 0x80);
@@ -81,6 +83,7 @@ Test(apple2_pc, switch_read)
 
 Test(apple2_pc, switch_write)
 {
+    mach->memory_mode = MEMORY_DEFAULT;
     vm_segment_set(mach->main, 0xC00B, 1);
     cr_assert_eq(mach->memory_mode, MEMORY_SLOTC3ROM);
     vm_segment_set(mach->main, 0xC00A, 1);
