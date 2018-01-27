@@ -168,12 +168,14 @@ DEFINE_ADDR(ind)
  */
 DEFINE_ADDR(idx)
 {
-    ADDR_LO(cpu);
-    EFF_ADDR(addr + cpu->X);
+    vm_8bit addr;
 
-    return mos6502_get(
-        cpu, 
-        mos6502_get(cpu, eff_addr));
+    addr = mos6502_get(cpu, cpu->PC + 1);
+    addr = mos6502_get(cpu, addr + cpu->X);
+
+    EFF_ADDR(addr);
+
+    return mos6502_get(cpu, eff_addr);
 }
 
 /*
@@ -184,8 +186,12 @@ DEFINE_ADDR(idx)
  */
 DEFINE_ADDR(idy)
 {
-    ADDR_LO(cpu);
-    EFF_ADDR(mos6502_get(cpu, addr) + cpu->Y);
+    vm_8bit addr;
+
+    addr = mos6502_get(cpu, cpu->PC + 1);
+    addr = mos6502_get(cpu, addr);
+
+    EFF_ADDR(addr + cpu->Y);
 
     return mos6502_get(cpu, eff_addr);
 }
