@@ -33,7 +33,6 @@ Test(mos6502_addr, addr_mode_abx_carry0)
     SET_PC_BYTE(cpu, 1, 0x30);
     SET_PC_BYTE(cpu, 2, 0x12);
     cpu->X = 4;
-    cpu->P = cpu->P & ~MOS_CARRY;
     cr_assert_eq(mos6502_resolve_abx(cpu), 111);
 }
 
@@ -52,7 +51,6 @@ Test(mos6502_addr, addr_mode_aby_carry0)
     SET_PC_BYTE(cpu, 1, 0x30);
     SET_PC_BYTE(cpu, 2, 0x12);
     cpu->Y = 4;
-    cpu->P = cpu->P & ~MOS_CARRY;
     cr_assert_eq(mos6502_resolve_aby(cpu), 111);
 }
 
@@ -88,7 +86,6 @@ Test(mos6502_addr, addr_mode_idy)
 
     SET_PC_BYTE(cpu, 1, 0x12);
     cpu->Y = 5;
-    cpu->P &= ~MOS_CARRY;
     cr_assert_eq(mos6502_resolve_idy(cpu), 123);
 }
 
