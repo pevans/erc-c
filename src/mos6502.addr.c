@@ -169,11 +169,19 @@ DEFINE_ADDR(ind)
 DEFINE_ADDR(idx)
 {
     vm_8bit addr;
+    vm_16bit caddr;
 
-    addr = mos6502_get(cpu, cpu->PC + 1);
-    addr = mos6502_get(cpu, addr + cpu->X);
+    // The address we are given as an operand must be immediately
+    // incremented by the content of the X register.
+    addr = mos6502_get(cpu, cpu->PC + 1) + cpu->X;
 
-    EFF_ADDR(addr);
+    // And the combined address will then be the point of the LSB to a
+    // 16-bit pointer; so addr+1 holds the MSB, and we combined it in
+    // the usual, little-endian way.
+    caddr = (mos6502_get(cpu, addr + 1) << 8) | mos6502_get(cpu, addr);
+
+    // And that's really it--that's our effective address.
+    EFF_ADDR(caddr);
 
     return mos6502_get(cpu, eff_addr);
 }
@@ -187,11 +195,21 @@ DEFINE_ADDR(idx)
 DEFINE_ADDR(idy)
 {
     vm_8bit addr;
+    vm_16bit caddr;     // combined address
 
+    // The immediate address we know is the operand following the
+    // opcode.
     addr = mos6502_get(cpu, cpu->PC + 1);
-    addr = mos6502_get(cpu, addr);
 
-    EFF_ADDR(addr + cpu->Y);
+    // But that's just the first part of the combined pointer address we
+    // care about; caddr therefore is the combined address pointed at by
+    // addr and addr + 1, with respect to little-endian order (ergo
+    // mem[addr+1] is the MSB, mem[addr] is the LSB).
+    caddr = (mos6502_get(cpu, addr + 1) << 8) | mos6502_get(cpu, addr);
+
+    // But that's not all! We also need to increment that combined
+    // address by the content of the Y register.
+    EFF_ADDR(caddr + cpu->Y);
 
     return mos6502_get(cpu, eff_addr);
 }
