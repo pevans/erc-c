@@ -13,7 +13,7 @@ data = 'hope'
 
 # These must be appended in the exact order indicated by the struct definition
 # in objstore.h
-data += file_data('./data/apple2.rom')          # Internal ROM ($C000..$FFFF)
+data += file_data('./data/apple2e.rom')         # Internal ROM ($C000..$FFFF)
 data += file_data('./data/peripheral.rom')      # $C000..$CFFF
 
 # The apple2 fonts
