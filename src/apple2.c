@@ -57,6 +57,7 @@ apple2_create(int width, int height)
     mach->screen = NULL;
     mach->drive1 = NULL;
     mach->drive2 = NULL;
+    mach->selected_drive = NULL;
 
     // This is more-or-less the same setup you do in apple2_reset(). We
     // need to hard-set these values because apple2_set_bank_switch
@@ -108,6 +109,9 @@ apple2_create(int width, int height)
         apple2_free(mach);
         return NULL;
     }
+
+    // By default, the selected drive should be drive1
+    mach->selected_drive = mach->drive1;
 
     // Let's build our screen abstraction!
     mach->screen = vm_screen_create();
