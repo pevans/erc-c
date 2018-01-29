@@ -144,6 +144,15 @@ struct apple2dd {
      * that you can enable or disable on the drive.
      */
     bool write_protect;
+
+    /*
+     * This is not a technical part of the Disk II drive. When this
+     * field is true, we will not shift the head after a read or a
+     * write; when false, we will. This is mainly useful for code like
+     * the disassembler which just wants to look at data and not apply
+     * other side-effects.
+     */
+    bool locked;
 };
 
 extern SEGMENT_READER(apple2_dd_switch_read);
