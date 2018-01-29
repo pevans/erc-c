@@ -26,6 +26,7 @@ apple2_dd_create()
     // ProDOS disk will have 140k, but a NIB file would have more.
     drive->data = NULL;
 
+    drive->locked = false;
     drive->track_pos = 0;
     drive->sector_pos = 0;
     drive->online = false;
@@ -216,6 +217,12 @@ apple2_dd_set_mode(apple2dd *drive, int mode)
 void
 apple2_dd_shift(apple2dd *drive, int pos)
 {
+    // When locked is true, we shouldn't shift our position by any
+    // number.
+    if (drive->locked) {
+        return;
+    }
+
     drive->sector_pos += pos;
 
     while (drive->sector_pos > MAX_SECTOR_POS) {

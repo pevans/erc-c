@@ -332,7 +332,12 @@ apple2_run_loop(apple2 *mach)
     }
 
     while (vm_screen_active(mach->screen)) {
-        //mos6502_dis_opcode(mach->cpu, stdout, mach->cpu->PC);
+        mach->drive1->locked = true;
+        mach->drive2->locked = true;
+        mos6502_dis_opcode(mach->cpu, stdout, mach->cpu->PC);
+        mach->drive1->locked = false;
+        mach->drive2->locked = false;
+
         mos6502_execute(mach->cpu);
 
         if (vm_screen_dirty(mach->screen)) {
