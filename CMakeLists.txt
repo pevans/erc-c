@@ -5,6 +5,8 @@ project(erc)
 
 include(sources.cmake)
 
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
+
 if(DEFINED ENV{STATIC_ANALYSIS})
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --analyze")
 endif()
