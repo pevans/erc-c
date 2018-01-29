@@ -142,8 +142,8 @@ SEGMENT_READER(apple2_pc_switch_read)
     switch (addr) {
         case 0xC015:
             return (mach->memory_mode & MEMORY_SLOTCXROM)
-                ? 0x80
-                : 0x00;
+                ? 0x00
+                : 0x80;
         case 0xC017:
             return (mach->memory_mode & MEMORY_SLOTC3ROM)
                 ? 0x80
