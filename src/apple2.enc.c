@@ -3,6 +3,7 @@
  */
 
 #include "apple2.enc.h"
+#include "apple2.dd.h"
 #include "vm_segment.h"
 
 static vm_8bit gcr62[] = {
@@ -19,22 +20,19 @@ apple2_enc_dos(vm_segment *src)
     vm_segment *dest;
     int i, doff = 0;
 
-    // FIXME: we need to find the actual size of a nibble-ized DO/PO
-    // order file
-    dest = vm_segment_create(500000);
+    // Use the nibbilized size for a 140k image file
+    dest = vm_segment_create(_140K_NIB_);
 
     for (i = 0; i < 35; i++) {
         doff += apple2_enc_track(dest, src, doff, i);
     }
-
-    printf("len = %d\n", doff);
 
     return dest;
 }
 
 int
 apple2_enc_track(vm_segment *dest, vm_segment *src, 
-                        int doff, int track)
+                 int doff, int track)
 {
     int soff = track * 4096;
     int orig = doff;
@@ -53,7 +51,7 @@ apple2_enc_track(vm_segment *dest, vm_segment *src,
         doff += apple2_enc_sector(dest, src, doff, soff);
 
         // We're moving here in 256-byte blocks
-        soff += sect * 256;
+        soff += 256;
     }
 
     return doff - orig;
@@ -68,7 +66,7 @@ apple2_enc_track(vm_segment *dest, vm_segment *src,
  */
 int
 apple2_enc_sector(vm_segment *dest, vm_segment *src,
-                         int doff, int soff)
+                  int doff, int soff)
 {
     int i, di, orig;
     vm_8bit lastval, curval;
@@ -86,15 +84,23 @@ apple2_enc_sector(vm_segment *dest, vm_segment *src,
     // initial array.
     for (i = 0; i < 0x56; i++) {
         vm_8bit v = 0, vac, v56, v00;
+        vm_8bit offac, off56;
+
+        // We compute the offsets for the values beginning at ac and 56
+        // here, specifically in 8bit variables, because we _want_ any
+        // overflow to be handled within the offset rather than spilling
+        // beyond the border of the segment.
+        offac = i + 0xAC;
+        off56 = i + 0x56;
 
         // We do the write by working with the src segment in rough
         // thirds. vac is the value offset by 0xAC, which is 0x56 * 2.
         // v56 is offset by 0x56, and v00 has no offset. In decimal
         // terms, vac is 172 bytes offset from 0, and v56 is 86 bytes
         // offset from 0.
-        vac = vm_segment_get(src, soff+i+0xAC);
-        v56 = vm_segment_get(src, soff+i+0x56);
-        v00 = vm_segment_get(src, soff+i);
+        vac = vm_segment_get(src, soff + offac);
+        v56 = vm_segment_get(src, soff + off56);
+        v00 = vm_segment_get(src, soff + i);
 
         // The value we ultimately want to write into the dest segment
         // is then mangled a bit. v begins life as zero, of course; it's
