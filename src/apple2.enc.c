@@ -2,6 +2,7 @@
  * apple2.nib.c
  */
 
+#include "apple2.enc.h"
 #include "vm_segment.h"
 
 static vm_8bit gcr62[] = {
@@ -13,20 +14,49 @@ static vm_8bit gcr62[] = {
 };
 
 vm_segment *
-apple2_nib_decode(vm_segment *src)
+apple2_enc_dos(vm_segment *src)
 {
     vm_segment *dest;
+    int i, doff = 0;
 
     // FIXME: we need to find the actual size of a nibble-ized DO/PO
     // order file
     dest = vm_segment_create(500000);
 
+    for (i = 0; i < 35; i++) {
+        doff += apple2_enc_track(dest, src, doff, i);
+    }
+
+    printf("len = %d\n", doff);
+
     return dest;
 }
 
-void
-apple2_nib_decode_track(vm_segment *dest, vm_segment *src, int track)
+int
+apple2_enc_track(vm_segment *dest, vm_segment *src, 
+                        int doff, int track)
 {
+    int soff = track * 4096;
+    int orig = doff;
+    int sect, i;
+
+    // We'll start off with some self-sync bytes to separate this track
+    // from any other
+    for (i = 0; i < 48; i++) {
+        vm_segment_set(dest, doff++, 0xff);
+    }
+
+    for (sect = 0; sect < 16; sect++) {
+        // Each sector has a header with some metadata, plus some
+        // markers and padding.
+        doff += apple2_enc_sector_header(dest, doff, track, sect);
+        doff += apple2_enc_sector(dest, src, doff, soff);
+
+        // We're moving here in 256-byte blocks
+        soff += sect * 256;
+    }
+
+    return doff - orig;
 }
 
 /*
@@ -36,12 +66,14 @@ apple2_nib_decode_track(vm_segment *dest, vm_segment *src, int track)
  * offset, but care must be taken to ensure that dest contains enough
  * room to hold the values from src.
  */
-void
-apple2_nib_encode_sector(vm_segment *dest, vm_segment *src,
+int
+apple2_enc_sector(vm_segment *dest, vm_segment *src,
                          int doff, int soff)
 {
-    int i, di;
+    int i, di, orig;
     vm_8bit lastval, curval;
+
+    orig = doff;
     
     // The init array contains the src segment's 256 bytes converted
     // into 342 bytes, but more works needs to be done to get it into
@@ -104,10 +136,62 @@ apple2_nib_encode_sector(vm_segment *dest, vm_segment *src,
     // value from init.
     xor[i] = lastval;
 
+    // This is the marker of the beginning of sector data
+    vm_segment_set(dest, doff++, 0xd5);
+    vm_segment_set(dest, doff++, 0xaa);
+    vm_segment_set(dest, doff++, 0xad);
+
+    // Sure... let's just toss in a few self-sync bytes
+    for (i = 0; i < 6; i++) {
+        vm_segment_set(dest, doff++, 0xff);
+    }
+
     // Now we use the gcr table for 6-and-2 encoding to take the XOR'd
     // values and represent them as they should be in the destination
-    // segment.
+    // segment. This constitutes the data field of the sector.
     for (i = 0; i < 0x157; i++) {
-        vm_segment_set(dest, doff+i, gcr62[xor[i] >> 2]);
+        vm_segment_set(dest, doff++, gcr62[xor[i] >> 2]);
     }
+
+    // These three bytes mark the end of the data field
+    vm_segment_set(dest, doff++, 0xde);
+    vm_segment_set(dest, doff++, 0xaa);
+    vm_segment_set(dest, doff++, 0xeb);
+
+    // At the conclusion of a sector, we write 27 self-sync bytes.
+    for (i = 0; i < 27; i++) {
+        vm_segment_set(dest, doff++, 0xff);
+    }
+
+    return doff - orig;
+}
+
+int
+apple2_enc_4n4(vm_segment *seg, int off, vm_8bit val)
+{
+    vm_segment_set(seg, off, ((val >> 1) & 0x55) | 0xaa);
+    vm_segment_set(seg, off+1, (val & 0x55) | 0xaa);
+    return 2;
+}
+
+int
+apple2_enc_sector_header(vm_segment *seg, int off, 
+                                int track, int sect)
+{
+    int orig = off;
+
+    vm_segment_set(seg, off++, 0xd5);
+    vm_segment_set(seg, off++, 0xaa);
+    vm_segment_set(seg, off++, 0x96);
+
+    off += apple2_enc_4n4(seg, off, 0xfe);
+    off += apple2_enc_4n4(seg, off, track);
+    off += apple2_enc_4n4(seg, off, sect);
+    off += apple2_enc_4n4(seg, off, 0xfe ^ track ^ sect);
+
+    vm_segment_set(seg, off++, 0xde);
+    vm_segment_set(seg, off++, 0xaa);
+    vm_segment_set(seg, off++, 0xeb);
+
+    return off - orig;
 }
