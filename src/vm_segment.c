@@ -130,7 +130,7 @@ vm_segment_get(vm_segment *segment, size_t index)
 {
     if (!vm_segment_bounds_check(segment, index)) {
         log_critical(
-            "Attempt to set segment index (%d) greater than bounds (%d)",
+            "Attempt to get segment index (%d) greater than bounds (%d)",
             index,
             segment->size);
 
