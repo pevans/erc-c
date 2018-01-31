@@ -72,9 +72,9 @@ Test(apple2_pc, write)
 Test(apple2_pc, switch_read)
 {
     mach->memory_mode = MEMORY_DEFAULT;
-    cr_assert_eq(vm_segment_get(mach->main, 0xC015), 0);
-    mach->memory_mode = MEMORY_SLOTCXROM;
     cr_assert_eq(vm_segment_get(mach->main, 0xC015), 0x80);
+    mach->memory_mode = MEMORY_SLOTCXROM;
+    cr_assert_eq(vm_segment_get(mach->main, 0xC015), 0);
 
     cr_assert_eq(vm_segment_get(mach->main, 0xC017), 0);
     mach->memory_mode = MEMORY_SLOTC3ROM;
