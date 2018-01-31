@@ -81,8 +81,8 @@ apple2_nib_encode_sector(vm_segment *dest, vm_segment *src,
     }
 
     // The last two bytes written must be AND'd so that only the first
-    // six bits can be high. But because the bit 1 and 0 should be low,
-    // this has the effect of limiting the high bits to bits 5-2.
+    // six bits can be high. But because the bit 1 and 0 are already
+    // low, this has the effect of limiting the high bits to bits 5-2.
     init[i-2] &= 0x3F;
     init[i-1] &= 0x3F;
 
