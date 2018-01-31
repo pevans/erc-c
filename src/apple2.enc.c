@@ -30,6 +30,17 @@ apple2_enc_dos(vm_segment *src)
     return dest;
 }
 
+vm_segment *
+apple2_enc_nib(vm_segment *src)
+{
+    vm_segment *dest;
+
+    dest = vm_segment_create(src->size);
+    vm_segment_copy(dest, src, 0, 0, src->size);
+
+    return dest;
+}
+
 int
 apple2_enc_track(vm_segment *dest, vm_segment *src, 
                  int doff, int track)
@@ -177,12 +188,14 @@ apple2_enc_4n4(vm_segment *seg, int off, vm_8bit val)
 {
     vm_segment_set(seg, off, ((val >> 1) & 0x55) | 0xaa);
     vm_segment_set(seg, off+1, (val & 0x55) | 0xaa);
+
+    // 4n4 encoding always consumes two bytes
     return 2;
 }
 
 int
 apple2_enc_sector_header(vm_segment *seg, int off, 
-                                int track, int sect)
+                         int track, int sect)
 {
     int orig = off;
 
