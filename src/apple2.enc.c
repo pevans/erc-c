@@ -14,6 +14,11 @@ static vm_8bit gcr62[] = {
     0xed, 0xee, 0xef, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff,
 };
 
+/*
+ * Encode the given DOS-formatted segment with 6-and-2 encoding. This
+ * can work for both DOS 3.3 and ProDOS images, but would fail with DOS
+ * 3.2 and 3.1 (which use 5-and-3 encoding).
+ */
 vm_segment *
 apple2_enc_dos(vm_segment *src)
 {
@@ -23,6 +28,12 @@ apple2_enc_dos(vm_segment *src)
     // Use the nibbilized size for a 140k image file
     dest = vm_segment_create(_140K_NIB_);
 
+    // Each of DOS 3.3 and ProDOS have the same sizes, but they use
+    // different terminology; for example, ProDOS has a number of
+    // 512-byte blocks, and DOS 3.3 has a number of sectors and tracks.
+    // But they all add up to the same number of bytes, and we can get
+    // away with just using tracks-and-sectors. In particular, DOS 3.3
+    // has 35 tracks of 4096 bytes each.
     for (i = 0; i < 35; i++) {
         doff += apple2_enc_track(dest, src, doff, i);
     }
@@ -30,6 +41,25 @@ apple2_enc_dos(vm_segment *src)
     return dest;
 }
 
+/*
+ * Return a segment that is properly encoded given a segment containin g
+ * the data from a NIB file. 
+ *
+ * This function is almost not really necessary, but it exists to
+ * present a wrapper in case we want to do something else with NIB
+ * files. But, to the point--NIB files are essentially DOS files that
+ * have _already_ been 6-and-2 encoded. This is generally done because
+ * whatever software on the disk image has copy protection that requires
+ * certain "magic bytes" exist in the sector gaps that have self-sync
+ * bytes, that older Apple II copy programs would skip.
+ *
+ * Here we return a deep copy of the src segment; it'll be a different
+ * pointer to a different segment in memory. This is the same
+ * (necessary) behavior in the enc_dos function, even if it may not seem
+ * necessary on the surface for this function. You must, therefore, be
+ * sure you free the segment returned from this function when you are
+ * finished with it.
+ */
 vm_segment *
 apple2_enc_nib(vm_segment *src)
 {
@@ -41,6 +71,11 @@ apple2_enc_nib(vm_segment *src)
     return dest;
 }
 
+/*
+ * Encode one specific track from the src segment with 6-and-2 encoding
+ * into the dest segment, and return the number of bytes that was
+ * written into dest.
+ */
 int
 apple2_enc_track(vm_segment *dest, vm_segment *src, 
                  int doff, int track)
@@ -183,6 +218,13 @@ apple2_enc_sector(vm_segment *dest, vm_segment *src,
     return doff - orig;
 }
 
+/*
+ * Encode one byte with 4-and-4 encoding into the given segment and
+ * offset. The metadata for a track or sector, when they are encoded at
+ * all, are encoded with 4-and-4, which is much (!) simpler than 6-and-2
+ * but less space-efficient by quite a bit. The number of bytes consumed
+ * is returned, but it is always 2 bytes for every one byte given.
+ */
 int
 apple2_enc_4n4(vm_segment *seg, int off, vm_8bit val)
 {
@@ -193,21 +235,33 @@ apple2_enc_4n4(vm_segment *seg, int off, vm_8bit val)
     return 2;
 }
 
+/*
+ * Encode the header for a track sector. This has two purposes; one, it
+ * demarcates one sector from another; two, it includes metadata about
+ * the disk volume, track number, and sector number that can be checked
+ * against what the computer thinks those should be and thus help it
+ * ensure a proper reality.
+ */
 int
 apple2_enc_sector_header(vm_segment *seg, int off, 
                          int track, int sect)
 {
     int orig = off;
 
+    // This is the "prologue" for the sector header, as WinApple calls
+    // it. This is always the same hardcoded set of bytes.
     vm_segment_set(seg, off++, 0xd5);
     vm_segment_set(seg, off++, 0xaa);
     vm_segment_set(seg, off++, 0x96);
 
+    // Our metadata, all encoded in 4-and-4.
     off += apple2_enc_4n4(seg, off, 0xfe);
     off += apple2_enc_4n4(seg, off, track);
     off += apple2_enc_4n4(seg, off, sect);
     off += apple2_enc_4n4(seg, off, 0xfe ^ track ^ sect);
 
+    // Finish off with an "epilogue". Like the prologue, this is a
+    // hardcoded set of bytes.
     vm_segment_set(seg, off++, 0xde);
     vm_segment_set(seg, off++, 0xaa);
     vm_segment_set(seg, off++, 0xeb);
