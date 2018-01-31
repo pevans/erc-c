@@ -26,9 +26,11 @@ enum apple2_dd_mode {
 
 /*
  * This is the length of a typical disk that is formatted in either DOS
- * 3.3 or ProDOS.
+ * 3.3 or ProDOS. The NIB definition is the size of one such image when
+ * it is nibbilized with 6-and-2 encoding.
  */
 #define _140K_ 143360
+#define _140K_NIB_ 223440
 
 /*
  * And this is the length of a disk that has been formatted as a nibble
