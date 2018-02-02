@@ -2,7 +2,6 @@
 
 #include "apple2.dec.h"
 
-#if 0
 /*
  * Ripped from apple2.enc.c
  */
@@ -24,7 +23,6 @@ static vm_8bit f_sector[] = {
     0x1e, 0x22, 0x7a, 0x44, 0x70, 0x17, 0x44, 0x18, 0x1f, 0x31, 0x41, 0xf5, 0xa0, 0xae, 0x1b, 0xe1,
     0x4f, 0x9f, 0xdb, 0x5a, 0x74, 0x90, 0x55, 0xe1, 0x49, 0xbf, 0x2d, 0x20, 0xd6, 0x03, 0x03, 0xa2,
 };
-#endif
 
 /*
  * Same as above -- ripped from apple2.enc.c
@@ -65,9 +63,9 @@ Test(apple2_dec, sector)
 
     vm_segment_copy_buf(src, f_enc_sector, 0, 0, 382);
 
-    printf("it's %d\n", apple2_dec_sector(dest, src, 0, 9));
+    cr_assert_eq(apple2_dec_sector(dest, src, 0, 0), 256);
 
     for (int i = 0; i < 256; i++) {
-        printf("%02x\n", vm_segment_get(dest, i));
+        cr_assert_eq(vm_segment_get(dest, i), f_sector[i]);
     }
 }
