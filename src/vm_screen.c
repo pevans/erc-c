@@ -215,6 +215,10 @@ vm_screen_active(vm_screen *scr)
     return true;
 }
 
+/*
+ * Prepare the screen to be drawn and/or rendered. (Currently, this is
+ * just a RenderClear in SDL.)
+ */
 void
 vm_screen_prepare(vm_screen *scr)
 {
@@ -283,6 +287,10 @@ vm_screen_last_key(vm_screen *scr)
     return scr->last_key;
 }
 
+/*
+ * Return true if the screen is considered dirty (i.e., if the screen
+ * needs to be redrawn).
+ */
 bool
 vm_screen_dirty(vm_screen *scr)
 {

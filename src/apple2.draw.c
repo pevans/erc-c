@@ -83,6 +83,10 @@ apple2_draw_pixel_lores(apple2 *mach, vm_16bit addr)
     vm_screen_draw_rect(mach->screen, &loc);
 }
 
+/*
+ * Draw the 40-column text necessary to render everything on the screen
+ * with the machine in its current state.
+ */
 void
 apple2_draw_40col(apple2 *mach)
 {
