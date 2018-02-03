@@ -4,8 +4,15 @@
 
 #include <stdbool.h>
 
+#include "apple2.dec.h"
+#include "apple2.enc.h"
 #include "vm_segment.h"
 
+/*
+ * This table are what we convert from the 6-and-2 encoded form back
+ * into an intermediate form of data that has been XOR'd with each other
+ * byte. If that makes any sense.
+ */
 static vm_8bit conv6bit[] = {
 //  00    01    02    03    04    05    06    07    08    09    0a    0b    0c    0d    0e    0f 
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, // 00
@@ -18,26 +25,145 @@ static vm_8bit conv6bit[] = {
     0xff, 0xff, 0xcc, 0xd0, 0xd4, 0xd8, 0xdc, 0xe0, 0xff, 0xe4, 0xe8, 0xec, 0xf0, 0xf4, 0xf8, 0xfc, // 70
 };
 
+/*
+ * Decode an entire DOS 3.3-ordered disk, and copy the contents into the
+ * given segment.
+ */
+int
+apple2_dec_dos(vm_segment *dest, vm_segment *src)
+{
+    int i, doff, tracklen;
+
+    for (i = 0, doff = 0; i < ENC_NUM_TRACKS; i++) {
+        tracklen = apple2_dec_track(dest, src, doff, i);
+
+        // Something went wrong...
+        if (tracklen != ENC_DTRACK) {
+            return ERR_BADFILE;
+        }
+
+        doff += tracklen;
+    }
+
+    return OK;
+}
+
+/*
+ * NIB files are literally 6-and-2 encoded to begin with, so there's not
+ * anything we need to do to decode them (other than copy the data into
+ * the destination segment).
+ */
+int
+apple2_dec_nib(vm_segment *dest, vm_segment *src)
+{
+    return vm_segment_copy(dest, src, 0, 0, src->size);
+}
+
+/*
+ * Decode a 6-and-2 encoded track, and write the decoded data into dest.
+ * This should return ENC_DTRACK bytes; if not, something went wrong.
+ */
+int
+apple2_dec_track(vm_segment *dest, vm_segment *src, int doff, int track)
+{
+    int soff = track * ENC_ETRACK;
+    int orig = doff;
+    int sect, sectlen;
+
+    // Tracks have 48 bytes of filler... at least, as we build them
+    // (actual disk media may have more or less, it seems). Let's skip
+    // what we see.
+    soff += ENC_ETRACK_HEADER;
+
+    for (sect = 0; sect < ENC_NUM_SECTORS; sect++) {
+        // This is going to be 256, for all intents and purposes
+        sectlen = apple2_dec_sector(dest, src, doff, soff + ENC_ESECTOR_HEADER);
+
+        // If _not_, then that reflects a kind of error condition. Let's
+        // bail.
+        if (sectlen != ENC_DSECTOR) {
+            return 0;
+        }
+
+        doff += sectlen;
+        soff += ENC_ESECTOR;
+    }
+
+    // Something isn't right...
+    if (doff - orig != ENC_DTRACK) {
+        return 0;
+    }
+
+    return ENC_DTRACK;
+}
+
+/*
+ * This function may be difficult to follow, but let me outline what
+ * it's trying to do:
+ *
+ * 1. We convert the data in the src segment from the soff offset using
+ * the conv6bit lookup table into an intermediate form held in the conv
+ * buffer;
+ *
+ * 2. Which is then XOR'd with each previous byte, and finally with a
+ * checksum byte that is at the end of the conv buffer, and storing the
+ * result of that into the xor buffer;
+ *
+ * 3. Which we then loop on to recombine the 6-bit bytes at 0x56..0x156
+ * with the least significant bits that are held in the bytes from
+ * 0x00..0x56.
+ *
+ * 4. The result of which is written to the dest segment, using the doff
+ * offset.
+ *
+ * A lot of this complexity comes from technical restrictions on the
+ * floppy disk media that were used at the time--namely that there could
+ * be no more than a certain number of zero bits in a row.
+ */
 int 
 apple2_dec_sector(vm_segment *dest, vm_segment *src, int doff, int soff)
 {
+    /*
+     * This is a buffer that holds the data that we converted back from
+     * the 6-and-2 encoded form.
+     */
     vm_8bit conv[0x157];
+
+    /*
+     * This is another buffer, holding the data that we XOR'd to bring
+     * it back to the form it had before it had been XOR'd in the encode
+     * process.
+     */
     vm_8bit xor[0x156];
+
+    /*
+     * The last byte that we XOR'd (see the xor loop below).
+     */
     vm_8bit lval;
+
     int i;
 
-    int prologue = soff;
-    int epilogue = soff + 9 + 0x157;
+    /*
+     * The header_ok variable is true if the beginning byte markers are
+     * there.
+     */
+    int header = soff;
+    bool header_ok =
+        vm_segment_get(src, header) == 0xd5 &&
+        vm_segment_get(src, header + 1) == 0xaa &&
+        vm_segment_get(src, header + 2) == 0xad;
+
+    // The footer_ok variable will be true if the ending byte markers we
+    // expect to see are actually there.
+    int footer = soff + 9 + 0x157;
+    bool footer_ok =
+        vm_segment_get(src, footer) == 0xde &&
+        vm_segment_get(src, footer + 1) == 0xaa &&
+        vm_segment_get(src, footer + 2) == 0xeb;
 
     // Let's validate that there's really a sector where we think
     // there's one.
-    if (vm_segment_get(src, prologue) != 0xd5 ||
-        vm_segment_get(src, prologue + 1) != 0xaa ||
-        vm_segment_get(src, prologue + 2) != 0xad ||
-        vm_segment_get(src, epilogue) != 0xde ||
-        vm_segment_get(src, epilogue + 1) != 0xaa ||
-        vm_segment_get(src, epilogue + 2) != 0xeb
-       ) {
+    if (!header_ok || !footer_ok) {
         return 0;
     }
 
