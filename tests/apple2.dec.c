@@ -2,6 +2,7 @@
 
 #include "apple2.dec.h"
 #include "apple2.enc.h"
+#include "apple2.dd.h"
 
 /*
  * Ripped from apple2.enc.c
@@ -55,6 +56,22 @@ static vm_8bit f_enc_sector[] = {
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 };
 
+static vm_segment *seg;
+
+static void
+setup()
+{
+    seg = vm_segment_create(_140K_);
+}
+
+static void
+teardown()
+{
+    vm_segment_free(seg);
+}
+
+TestSuite(apple2_dec, .init = setup, .fini = teardown);
+
 Test(apple2_dec, sector)
 {
     vm_segment *src, *dest;
@@ -93,4 +110,27 @@ Test(apple2_dec, track)
         cr_assert_eq(vm_segment_get(dec, i),
                      vm_segment_get(orig, i));
     }
+}
+
+Test(apple2_dec, dos)
+{
+    vm_segment *enc;
+    vm_segment *dec;
+    FILE *fp = fopen("../../build/karateka.dsk", "r");
+    int i;
+
+    vm_segment_fread(seg, fp, 0, _140K_);
+    enc = apple2_enc_dos(seg);
+    dec = vm_segment_create(1000000);
+
+    apple2_dec_dos(dec, enc);
+
+    for (i = 0; i < seg->size; i++) {
+        cr_assert_eq(vm_segment_get(seg, i),
+                     vm_segment_get(dec, i));
+    }
+
+    fclose(fp);
+    vm_segment_free(enc);
+    vm_segment_free(dec);
 }
