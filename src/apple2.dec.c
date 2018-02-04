@@ -99,7 +99,7 @@ apple2_dec_track(vm_segment *dest, vm_segment *src, int doff, int track)
         }
 
         doff += sectlen;
-        soff += ENC_ESECTOR;
+        soff += ENC_ESECTOR + ENC_ESECTOR_HEADER;
     }
 
     // Something isn't right...
