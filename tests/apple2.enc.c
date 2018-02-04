@@ -155,3 +155,23 @@ Test(apple2_enc, sector)
         cr_assert_eq(vm_segment_get(dest, i), f_enc_sector[i]);
     }
 }
+
+Test(apple2_enc, nib)
+{
+    vm_segment *seg = vm_segment_create(1000);
+    vm_segment *nib;
+    int i;
+
+    for (i = 0; i < 1000; i++) {
+        vm_segment_set(seg, i, 0xff);
+    }
+
+    nib = apple2_enc_nib(seg);
+
+    for (i = 0; i < 1000; i++) {
+        cr_assert_eq(vm_segment_get(nib, i), 0xff);
+    }
+
+    vm_segment_free(nib);
+    vm_segment_free(seg);
+}
