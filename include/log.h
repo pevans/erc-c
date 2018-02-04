@@ -13,6 +13,7 @@ enum log_errcode {
     ERR_OOB,            // out of bounds
     ERR_BADFILE,
     ERR_BADOPT,         // bad option (e.g. from getopt)
+    ERR_INVALID,        // invalid operation
     ERR_GFXINIT,        // couldn't initialize graphics
     ERR_GFXOP,          // we couldn't execute a specific graphic operation
 };
