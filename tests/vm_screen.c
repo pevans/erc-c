@@ -83,3 +83,13 @@ Test(vm_screen, last_key)
     screen->last_key = 'y';
     cr_assert_eq(vm_screen_last_key(screen), 'y');
 }
+
+Test(vm_screen, dirty)
+{
+    cr_assert_eq(vm_screen_dirty(screen), false);
+    screen->dirty = true;
+    cr_assert_eq(vm_screen_dirty(screen), true);
+}
+
+// Not a ton we can do for this function; it's all SDL
+/* Test(vm_screen, prepare) */
