@@ -185,9 +185,13 @@ apple2_dd_phaser(apple2dd *drive)
     // We only want to respond to adjacent phases, so if the last phase
     // shifted in _any_ direction is not equal to the phase state, then
     // we should do nothing.
-    if (phase != (last << 1) ||
-        phase != (last >> 1)
-       ) {
+    if (phase != 0 && (phase << 1) != last && (phase >> 1) != last) {
+        return;
+    }
+
+    // The above check works for non-zero phases, but for zero phases,
+    // the logic is a bit different.
+    if (phase == 0 && last != 0x1 && last != 0x8) {
         return;
     }
 
