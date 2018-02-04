@@ -198,4 +198,24 @@ Test(apple2_dd, decode)
 // in some other capacity
 /* Test(apple2_dd, save) */
 
+Test(apple2_dd, phaser)
+{
+    drive->phase_state = 1;
+    drive->last_phase = 0;
 
+    apple2_dd_phaser(drive);
+
+    cr_assert_eq(drive->track_pos, 1);
+    cr_assert_eq(drive->last_phase, 1);
+
+    // This shouldn't work--we should stay at the track_pos we begin
+    // with
+    drive->phase_state = 0x4;
+    apple2_dd_phaser(drive);
+    cr_assert_eq(drive->track_pos, 1);
+
+    // And test that we can go backward
+    drive->phase_state = 0;
+    apple2_dd_phaser(drive);
+    cr_assert_eq(drive->track_pos, 0);
+}
