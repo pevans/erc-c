@@ -34,6 +34,10 @@ apple2_dec_dos(vm_segment *dest, vm_segment *src)
 {
     int i, doff, tracklen;
 
+    if (dest == NULL || src == NULL) {
+        return OK;
+    }
+
     for (i = 0, doff = 0; i < ENC_NUM_TRACKS; i++) {
         tracklen = apple2_dec_track(dest, src, doff, i);
 
@@ -56,6 +60,15 @@ apple2_dec_dos(vm_segment *dest, vm_segment *src)
 int
 apple2_dec_nib(vm_segment *dest, vm_segment *src)
 {
+    // It's "ok" if you pass in NULL params; the only time you ever
+    // would is in testing, because we presume you are testing some
+    // other aspect of the code there. (Good example: when your test is
+    // not actually testing apple2_dec_nib, but something that calls
+    // it.)
+    if (dest == NULL || src == NULL) {
+        return OK;
+    }
+
     return vm_segment_copy(dest, src, 0, 0, src->size);
 }
 

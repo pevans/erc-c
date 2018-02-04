@@ -25,6 +25,10 @@ apple2_enc_dos(vm_segment *src)
     vm_segment *dest;
     int i, doff = 0;
 
+    if (src == NULL) {
+        return NULL;
+    }
+
     // Use the nibbilized size for a 140k image file
     dest = vm_segment_create(_140K_NIB_);
 
@@ -64,6 +68,11 @@ vm_segment *
 apple2_enc_nib(vm_segment *src)
 {
     vm_segment *dest;
+
+    // No src segment, no return data.
+    if (src == NULL) {
+        return NULL;
+    }
 
     dest = vm_segment_create(src->size);
     vm_segment_copy(dest, src, 0, 0, src->size);
