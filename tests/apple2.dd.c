@@ -219,3 +219,26 @@ Test(apple2_dd, phaser)
     apple2_dd_phaser(drive);
     cr_assert_eq(drive->track_pos, 0);
 }
+
+Test(apple2_dd, switch_phase)
+{
+    apple2_dd_switch_phase(drive, 0x1);
+    cr_assert_eq(drive->phase_state, 0x1);
+    apple2_dd_switch_phase(drive, 0x0);
+    cr_assert_eq(drive->phase_state, 0x0);
+
+    apple2_dd_switch_phase(drive, 0x3);
+    cr_assert_eq(drive->phase_state, 0x2);
+    apple2_dd_switch_phase(drive, 0x2);
+    cr_assert_eq(drive->phase_state, 0x0);
+
+    apple2_dd_switch_phase(drive, 0x5);
+    cr_assert_eq(drive->phase_state, 0x4);
+    apple2_dd_switch_phase(drive, 0x4);
+    cr_assert_eq(drive->phase_state, 0x0);
+
+    apple2_dd_switch_phase(drive, 0x7);
+    cr_assert_eq(drive->phase_state, 0x8);
+    apple2_dd_switch_phase(drive, 0x6);
+    cr_assert_eq(drive->phase_state, 0x0);
+}
