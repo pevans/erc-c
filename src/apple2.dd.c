@@ -207,7 +207,7 @@ apple2_dd_position(apple2dd *drive)
     if (drive->data->size == _140K_) {
         int track_offset;
 
-        track_offset = (drive->track_pos % 2) * 4096;
+        track_offset = (drive->track_pos % 2) * ENC_ETRACK;
         return track_offset + drive->sector_pos;
     }
 
