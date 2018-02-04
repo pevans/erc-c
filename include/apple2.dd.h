@@ -141,6 +141,12 @@ struct apple2dd {
     int image_type;
 
     /*
+     * This is the means by which we can save the image data back to the
+     * origin stream, if possible.
+     */
+    FILE *stream;
+
+    /*
      * A disk drive may be "off" or "on", regardless of whether it's
      * been selected by the peripheral interface.
      */
@@ -182,7 +188,10 @@ extern apple2dd *apple2_dd_create();
 extern int apple2_dd_insert(apple2dd *, FILE *, int);
 extern int apple2_dd_position(apple2dd *);
 extern vm_8bit apple2_dd_read(apple2dd *);
+extern vm_8bit apple2_dd_switch_rw(apple2dd *);
 extern void apple2_dd_eject(apple2dd *);
+extern void apple2_dd_encode(apple2dd *);
+extern void apple2_dd_decode(apple2dd *);
 extern void apple2_dd_free(apple2dd *);
 extern void apple2_dd_map(vm_segment *);
 extern void apple2_dd_set_mode(apple2dd *, int);
@@ -191,7 +200,6 @@ extern void apple2_dd_step(apple2dd *, int);
 extern void apple2_dd_switch_drive(apple2 *, size_t);
 extern void apple2_dd_switch_latch(apple2dd *, vm_8bit);
 extern void apple2_dd_switch_phase(apple2dd *, size_t);
-extern vm_8bit apple2_dd_switch_rw(apple2dd *);
 extern void apple2_dd_turn_on(apple2dd *, bool);
 extern void apple2_dd_write(apple2dd *);
 extern void apple2_dd_write_protect(apple2dd *, bool);

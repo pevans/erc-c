@@ -2,8 +2,10 @@
  * apple2.disk_drive.c
  */
 
-#include "apple2.h"
 #include "apple2.dd.h"
+#include "apple2.dec.h"
+#include "apple2.enc.h"
+#include "apple2.h"
 
 /*
  * Create a new disk drive. We do not create a memory segment for the
@@ -70,19 +72,75 @@ apple2_dd_insert(apple2dd *drive, FILE *stream, int type)
     // If we have any data, get rid of it. We'll start fresh here.
     apple2_dd_eject(drive);
 
-    drive->data = vm_segment_create(finfo.st_size);
+    drive->image = vm_segment_create(finfo.st_size);
     drive->track_pos = 0;
     drive->sector_pos = 0;
 
     // Read the data from the stream and write into the memory segment
-    err = vm_segment_fread(drive->data, stream, 0, finfo.st_size);
+    err = vm_segment_fread(drive->image, stream, 0, finfo.st_size);
     if (err != OK) {
         log_critical("Could not read data into disk drive");
         return err;
     }
 
+    drive->stream = stream;
     drive->image_type = type;
+
+    // Now we need to build the data segment
+    apple2_dd_encode(drive);
+
     return OK;
+}
+
+void
+apple2_dd_encode(apple2dd *drive)
+{
+    switch (drive->image_type) {
+        case DD_NIBBLE:
+            drive->data = apple2_enc_nib(drive->image);
+            break;
+
+        case DD_DOS33:
+        case DD_PRODOS:
+            drive->data = apple2_enc_dos(drive->image);
+            break;
+
+        default:
+            log_critical("Unknown image type");
+            exit(1);
+    }
+}
+
+void
+apple2_dd_save(apple2dd *drive)
+{
+    // First bring the image segment back into sync with with the data
+    // segment.
+    apple2_dd_decode(drive);
+
+    if (drive->stream) {
+        rewind(drive->stream);
+        vm_segment_fwrite(drive->image, drive->stream, 0, drive->image->size);
+    }
+}
+
+void
+apple2_dd_decode(apple2dd *drive)
+{
+    switch (drive->image_type) {
+        case DD_NIBBLE:
+            apple2_dec_nib(drive->image, drive->data);
+            break;
+
+        case DD_DOS33:
+        case DD_PRODOS:
+            apple2_dec_dos(drive->image, drive->data);
+            break;
+
+        default:
+            log_critical("Unknown image type");
+            exit(1);
+    }
 }
 
 /*
@@ -177,8 +235,13 @@ void
 apple2_dd_eject(apple2dd *drive)
 {
     if (drive->data) {
+        // Save off anything else we have left
+        apple2_dd_save(drive);
+
         vm_segment_free(drive->data);
+        vm_segment_free(drive->image);
         drive->data = NULL;
+        drive->image = NULL;
     }
 
     drive->track_pos = 0;

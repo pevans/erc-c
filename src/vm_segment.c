@@ -176,7 +176,7 @@ vm_segment_copy(vm_segment *dest,
             size_t src_index, 
             size_t length)
 {
-    if (src_index + length >= src->size) {
+    if (src_index + length > src->size) {
         log_critical(
             "Attempt to copy beyond bounds of vm_segment (%d + %d >= %d)",
             src_index,
@@ -186,7 +186,7 @@ vm_segment_copy(vm_segment *dest,
         return ERR_OOB;
     }
 
-    if (dest_index + length >= dest->size) {
+    if (dest_index + length > dest->size) {
         log_critical(
             "Attempt to copy beyond bounds of vm_segment (%d + %d >= %d)",
             dest_index,
@@ -280,6 +280,19 @@ vm_segment_fread(vm_segment *segment, FILE *stream, size_t offset, size_t len)
     // len was not a valid length for the file to begin with).
     if (ferror(stream)) {
         log_critical("Could not read file stream: %s\n", strerror(errno));
+        return ERR_BADFILE;
+    }
+
+    return OK;
+}
+
+int
+vm_segment_fwrite(vm_segment *seg, FILE *stream, size_t off, size_t len)
+{
+    fwrite(seg->memory + off, sizeof(vm_8bit), len, stream);
+
+    if (ferror(stream)) {
+        log_critical("Could not write to the file stream: %s", strerror(errno));
         return ERR_BADFILE;
     }
 
