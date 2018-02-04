@@ -92,6 +92,11 @@ apple2_dd_insert(apple2dd *drive, FILE *stream, int type)
     return OK;
 }
 
+/*
+ * Encode the drive image segment into the drive data segment using
+ * 6-and-2 encoding, if necessary. (It is not necessary if the
+ * image_type is DD_NIBBLE.)
+ */
 void
 apple2_dd_encode(apple2dd *drive)
 {
@@ -111,6 +116,10 @@ apple2_dd_encode(apple2dd *drive)
     }
 }
 
+/*
+ * Save the contents of the drive back to the file system (given as the
+ * stream field in the drive struct).
+ */
 void
 apple2_dd_save(apple2dd *drive)
 {
@@ -124,6 +133,11 @@ apple2_dd_save(apple2dd *drive)
     }
 }
 
+/*
+ * Decode the drive data segment into the drive image segment, reversing
+ * the 6-and-2 encoding (if need be -- see note on DD_NIBBLE for the
+ * encode function).
+ */
 void
 apple2_dd_decode(apple2dd *drive)
 {

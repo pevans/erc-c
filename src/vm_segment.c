@@ -286,6 +286,11 @@ vm_segment_fread(vm_segment *segment, FILE *stream, size_t offset, size_t len)
     return OK;
 }
 
+/*
+ * Write the contents of a segment into a given file stream, using an
+ * offset and a length for the contents to write. If this operation
+ * works out, we return OK.
+ */
 int
 vm_segment_fwrite(vm_segment *seg, FILE *stream, size_t off, size_t len)
 {
