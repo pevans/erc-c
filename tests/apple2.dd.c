@@ -267,3 +267,16 @@ Test(apple2_dd, switch_drive)
 
     apple2_free(mach);
 }
+
+Test(apple2_dd, switch_latch)
+{
+    drive->latch = 0;
+    drive->mode = DD_READ;
+
+    apple2_dd_switch_latch(drive, 3);
+    cr_assert_eq(drive->latch, 0);
+
+    drive->mode = DD_WRITE;
+    apple2_dd_switch_latch(drive, 5);
+    cr_assert_eq(drive->latch, 5);
+}
