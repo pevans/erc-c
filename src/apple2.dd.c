@@ -25,6 +25,7 @@ apple2_dd_create()
     // will depend on the disk you insert. For example, a DOS 3.3 or
     // ProDOS disk will have 140k, but a NIB file would have more.
     drive->data = NULL;
+    drive->image = NULL;
 
     drive->locked = false;
     drive->track_pos = 0;
@@ -34,6 +35,7 @@ apple2_dd_create()
     drive->mode = DD_READ;
     drive->phase_state = 0;
     drive->last_phase = 0;
+    drive->image_type = DD_NOTYPE;
 
     return drive;
 }
@@ -44,7 +46,7 @@ apple2_dd_create()
  * something we cannot accept.
  */
 int
-apple2_dd_insert(apple2dd *drive, FILE *stream)
+apple2_dd_insert(apple2dd *drive, FILE *stream, int type)
 {
     struct stat finfo;
     int err;
@@ -79,6 +81,7 @@ apple2_dd_insert(apple2dd *drive, FILE *stream)
         return err;
     }
 
+    drive->image_type = type;
     return OK;
 }
 

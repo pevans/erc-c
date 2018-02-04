@@ -21,6 +21,8 @@ TestSuite(apple2_dd, .init = setup, .fini = teardown);
 Test(apple2_dd, create)
 {
     cr_assert_eq(drive->data, NULL);
+    cr_assert_eq(drive->image, NULL);
+    cr_assert_eq(drive->image_type, DD_NOTYPE);
     cr_assert_eq(drive->track_pos, 0);
     cr_assert_eq(drive->sector_pos, 0);
     cr_assert_eq(drive->online, false);
@@ -40,13 +42,14 @@ Test(apple2_dd, insert)
     drive->sector_pos = 33;
 
     stream = fopen("../data/zero.img", "r");
-    cr_assert_eq(apple2_dd_insert(drive, stream), OK);
+    cr_assert_eq(apple2_dd_insert(drive, stream, DD_DOS33), OK);
     cr_assert_eq(drive->track_pos, 0);
     cr_assert_eq(drive->sector_pos, 0);
+    cr_assert_eq(drive->image_type, DD_DOS33);
     fclose(stream);
 
     stream = fopen("../data/bad.img", "r");
-    cr_assert_eq(apple2_dd_insert(drive, stream), ERR_BADFILE);
+    cr_assert_eq(apple2_dd_insert(drive, stream, DD_DOS33), ERR_BADFILE);
     fclose(stream);
 }
 

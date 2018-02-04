@@ -213,6 +213,8 @@ apple2_is_double_video(apple2 *mach)
 /*
  * Try to "boot" the apple2 machine. Look for input sources indicated in
  * the option system and load those into our disk drives.
+ *
+ * FIXME: we need to get the image type from the file name used
  */
 int
 apple2_boot(apple2 *mach)
@@ -223,7 +225,7 @@ apple2_boot(apple2 *mach)
     // Do we have any disks?
     stream = option_get_input(1);
     if (stream) {
-        err = apple2_dd_insert(mach->drive1, stream);
+        err = apple2_dd_insert(mach->drive1, stream, DD_DOS33);
         if (err != OK) {
             log_critical("Unable to insert disk1 into drive");
             return err;
@@ -232,7 +234,7 @@ apple2_boot(apple2 *mach)
 
     stream = option_get_input(2);
     if (stream) {
-        err = apple2_dd_insert(mach->drive2, stream);
+        err = apple2_dd_insert(mach->drive2, stream, DD_DOS33);
         if (err != OK) {
             log_critical("Unable to insert disk2 into drive");
             return err;

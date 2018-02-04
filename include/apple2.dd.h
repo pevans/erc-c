@@ -17,6 +17,19 @@ typedef struct apple2dd apple2dd;
 #include "vm_segment.h"
 
 /*
+ * Define the kind of image types that our disk media currently has. The
+ * image type is something which is given to us when the disk is
+ * "inserted", and it can't be changed during machine operation.
+ * Well--it could--but we don't have a good reason to do so.
+ */
+enum apple2_dd_type {
+    DD_NOTYPE,
+    DD_DOS33,
+    DD_PRODOS,
+    DD_NIBBLE,
+};
+
+/*
  * These are the possible modes a drive can be in.
  */
 enum apple2_dd_mode {
@@ -116,10 +129,16 @@ struct apple2dd {
     int sector_pos;
 
     /*
-     * The data field is where the actual byte data for the image is
-     * kept.
+     * The data segment holds the literal data that the software running
+     * in an Apple II would expect to see when accessing the device,
+     * which is to say, data that is 6-and-2 encoded. The image segment
+     * holds the data we literally read from a disk image file, which
+     * (in most cases) is not 6-and-2 encoded. We also define an image
+     * type (see apple2_dd_type for enums).
      */
     vm_segment *data;
+    vm_segment *image;
+    int image_type;
 
     /*
      * A disk drive may be "off" or "on", regardless of whether it's
@@ -160,7 +179,7 @@ struct apple2dd {
 extern SEGMENT_READER(apple2_dd_switch_read);
 extern SEGMENT_WRITER(apple2_dd_switch_write);
 extern apple2dd *apple2_dd_create();
-extern int apple2_dd_insert(apple2dd *, FILE *);
+extern int apple2_dd_insert(apple2dd *, FILE *, int);
 extern int apple2_dd_position(apple2dd *);
 extern vm_8bit apple2_dd_read(apple2dd *);
 extern void apple2_dd_eject(apple2dd *);
