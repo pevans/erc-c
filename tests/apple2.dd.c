@@ -81,7 +81,10 @@ Test(apple2_dd, read)
 
 Test(apple2_dd, eject)
 {
+    drive->image = vm_segment_create(1000);
     drive->data = vm_segment_create(1000);
+    drive->image_type = DD_NIBBLE;
+    drive->stream = NULL;
     apple2_dd_eject(drive);
     cr_assert_eq(drive->data, NULL);
 }
