@@ -1,6 +1,7 @@
 #include <criterion/criterion.h>
 
 #include "apple2.dec.h"
+#include "apple2.enc.h"
 
 /*
  * Ripped from apple2.enc.c
@@ -67,5 +68,29 @@ Test(apple2_dec, sector)
 
     for (int i = 0; i < 256; i++) {
         cr_assert_eq(vm_segment_get(dest, i), f_sector[i]);
+    }
+}
+
+Test(apple2_dec, track)
+{
+    vm_segment *orig;
+    vm_segment *enc;
+    vm_segment *dec;
+    int i;
+
+    orig = vm_segment_create(ENC_DTRACK);
+    enc = vm_segment_create(ENC_ETRACK);
+    dec = vm_segment_create(ENC_DTRACK);
+
+    for (i = 0; i < ENC_DTRACK; i++) {
+        vm_segment_set(orig, i, 0xff);
+    }
+
+    apple2_enc_track(enc, orig, 0, 0);
+    apple2_dec_track(dec, enc, 0, 0);
+
+    for (i = 0; i < ENC_DTRACK; i++) {
+        cr_assert_eq(vm_segment_get(dec, i),
+                     vm_segment_get(orig, i));
     }
 }
