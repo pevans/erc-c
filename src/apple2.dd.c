@@ -97,7 +97,7 @@ apple2_dd_insert(apple2dd *drive, FILE *stream, int type)
  * 6-and-2 encoding, if necessary. (It is not necessary if the
  * image_type is DD_NIBBLE.)
  */
-void
+int
 apple2_dd_encode(apple2dd *drive)
 {
     switch (drive->image_type) {
@@ -112,8 +112,10 @@ apple2_dd_encode(apple2dd *drive)
 
         default:
             log_critical("Unknown image type");
-            exit(1);
+            return ERR_INVALID;
     }
+
+    return OK;
 }
 
 /*
@@ -138,7 +140,7 @@ apple2_dd_save(apple2dd *drive)
  * the 6-and-2 encoding (if need be -- see note on DD_NIBBLE for the
  * encode function).
  */
-void
+int
 apple2_dd_decode(apple2dd *drive)
 {
     switch (drive->image_type) {
@@ -153,8 +155,10 @@ apple2_dd_decode(apple2dd *drive)
 
         default:
             log_critical("Unknown image type");
-            exit(1);
+            return ERR_INVALID;
     }
+
+    return OK;
 }
 
 /*

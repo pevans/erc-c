@@ -185,15 +185,16 @@ struct apple2dd {
 extern SEGMENT_READER(apple2_dd_switch_read);
 extern SEGMENT_WRITER(apple2_dd_switch_write);
 extern apple2dd *apple2_dd_create();
+extern int apple2_dd_decode(apple2dd *);
+extern int apple2_dd_encode(apple2dd *);
 extern int apple2_dd_insert(apple2dd *, FILE *, int);
 extern int apple2_dd_position(apple2dd *);
 extern vm_8bit apple2_dd_read(apple2dd *);
 extern vm_8bit apple2_dd_switch_rw(apple2dd *);
 extern void apple2_dd_eject(apple2dd *);
-extern void apple2_dd_encode(apple2dd *);
-extern void apple2_dd_decode(apple2dd *);
 extern void apple2_dd_free(apple2dd *);
 extern void apple2_dd_map(vm_segment *);
+extern void apple2_dd_save(apple2dd *);
 extern void apple2_dd_set_mode(apple2dd *, int);
 extern void apple2_dd_shift(apple2dd *, int);
 extern void apple2_dd_step(apple2dd *, int);
@@ -203,6 +204,5 @@ extern void apple2_dd_switch_phase(apple2dd *, size_t);
 extern void apple2_dd_turn_on(apple2dd *, bool);
 extern void apple2_dd_write(apple2dd *);
 extern void apple2_dd_write_protect(apple2dd *, bool);
-extern void apple2_dd_save(apple2dd *);
 
 #endif
