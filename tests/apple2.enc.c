@@ -175,3 +175,27 @@ Test(apple2_enc, nib)
     vm_segment_free(nib);
     vm_segment_free(seg);
 }
+
+Test(apple2_enc, track)
+{
+    vm_segment *dest = vm_segment_create(100000);
+    int i, len;
+
+    for (i = 0; i < ENC_NUM_SECTORS; i++) {
+        vm_segment_copy_buf(seg, f_sector, i * ENC_DSECTOR, 0, 256);
+    }
+
+    apple2_enc_track(dest, seg, 0, 0);
+
+    for (i = 0; i < ENC_ETRACK_HEADER; i++) {
+        cr_assert_eq(vm_segment_get(dest, i), 0xff);
+    }
+
+    for (i = 0; i < ENC_ESECTOR; i++) {
+        cr_assert_eq(
+            vm_segment_get(dest, i + ENC_ETRACK_HEADER + ENC_ESECTOR_HEADER), 
+            f_enc_sector[i]);
+    }
+    
+    vm_segment_free(dest);
+}
