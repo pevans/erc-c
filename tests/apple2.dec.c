@@ -134,3 +134,26 @@ Test(apple2_dec, dos)
     vm_segment_free(enc);
     vm_segment_free(dec);
 }
+
+Test(apple2_dec, nib)
+{
+    vm_segment *seg = vm_segment_create(1000);
+    vm_segment *dec = vm_segment_create(1000);
+    vm_segment *nib;
+    int i;
+
+    for (i = 0; i < 1000; i++) {
+        vm_segment_set(seg, i, 0xff);
+    }
+
+    nib = apple2_enc_nib(seg);
+    apple2_dec_nib(dec, nib);
+
+    for (i = 0; i < 1000; i++) {
+        cr_assert_eq(vm_segment_get(dec, i), 0xff);
+    }
+
+    vm_segment_free(nib);
+    vm_segment_free(dec);
+    vm_segment_free(seg);
+}
