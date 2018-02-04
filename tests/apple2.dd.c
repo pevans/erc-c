@@ -242,3 +242,28 @@ Test(apple2_dd, switch_phase)
     apple2_dd_switch_phase(drive, 0x6);
     cr_assert_eq(drive->phase_state, 0x0);
 }
+
+Test(apple2_dd, switch_drive)
+{
+    apple2 *mach = apple2_create(100, 100);
+
+    apple2_dd_switch_drive(mach, 0xB);
+    cr_assert_eq(mach->selected_drive, mach->drive2);
+    apple2_dd_switch_drive(mach, 0xA);
+    cr_assert_eq(mach->selected_drive, mach->drive1);
+
+    apple2_dd_switch_drive(mach, 0x8);
+    cr_assert_eq(mach->drive1->online, false);
+    cr_assert_eq(mach->drive2->online, false);
+
+    apple2_dd_switch_drive(mach, 0x9);
+    cr_assert_eq(mach->drive1->online, true);
+    cr_assert_eq(mach->drive2->online, false);
+
+    apple2_dd_switch_drive(mach, 0xE);
+    cr_assert_eq(mach->selected_drive->mode, DD_READ);
+    apple2_dd_switch_drive(mach, 0xF);
+    cr_assert_eq(mach->selected_drive->mode, DD_WRITE);
+
+    apple2_free(mach);
+}
