@@ -298,3 +298,23 @@ Test(apple2_dd, switch_rw)
     cr_assert_eq(apple2_dd_switch_rw(drive), 0);
     cr_assert_eq(vm_segment_get(drive->data, drive->sector_pos - 1), 111);
 }
+
+// Ignoring these right now, as they are calling the other switch_*
+// functions that we do have tests for
+/* Test(apple2_dd, switch_read) */
+/* Test(apple2_dd, switch_write) */
+
+Test(apple2_dd, map)
+{
+    vm_segment *seg = vm_segment_create(MOS6502_MEMSIZE);
+    size_t addr;
+
+    apple2_dd_map(seg);
+
+    for (addr = 0xC0E0; addr < 0xC100; addr++) {
+        cr_assert_eq(seg->read_table[addr], apple2_dd_switch_read);
+        cr_assert_eq(seg->write_table[addr], apple2_dd_switch_write);
+    }
+
+    vm_segment_free(seg);
+}
