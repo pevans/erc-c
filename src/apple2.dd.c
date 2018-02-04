@@ -567,12 +567,7 @@ apple2_dd_map(vm_segment *seg)
 {
     size_t addr;
 
-    for (addr = 0xC0E0; addr < 0xC0F0; addr++) {
-        vm_segment_read_map(seg, addr, apple2_dd_switch_read);
-        vm_segment_write_map(seg, addr, apple2_dd_switch_write);
-    }
-
-    for (addr = 0xC0F0; addr < 0xC100; addr++) {
+    for (addr = 0xC0E0; addr < 0xC100; addr++) {
         vm_segment_read_map(seg, addr, apple2_dd_switch_read);
         vm_segment_write_map(seg, addr, apple2_dd_switch_write);
     }
