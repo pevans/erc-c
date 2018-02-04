@@ -180,3 +180,17 @@ Test(vm_segment, set16)
     vm_segment_set16(segment, 0, 0x2345);
     cr_assert_eq(vm_segment_get16(segment, 0), 0x2345);
 }
+
+Test(vm_segment, fwrite)
+{
+    FILE *stream;
+
+    stream = fopen("../data/zero.img", "r");
+    vm_segment_fread(segment, stream, 0, 123);
+
+    fclose(stream);
+    stream = fopen("/tmp/zero.img", "w");
+    cr_assert_eq(vm_segment_fwrite(segment, stream, 0, 123), OK);
+
+    fclose(stream);
+}
