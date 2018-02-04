@@ -203,5 +203,6 @@ extern void apple2_dd_switch_phase(apple2dd *, size_t);
 extern void apple2_dd_turn_on(apple2dd *, bool);
 extern void apple2_dd_write(apple2dd *);
 extern void apple2_dd_write_protect(apple2dd *, bool);
+extern void apple2_dd_save(apple2dd *);
 
 #endif
