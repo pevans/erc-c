@@ -280,3 +280,21 @@ Test(apple2_dd, switch_latch)
     apple2_dd_switch_latch(drive, 5);
     cr_assert_eq(drive->latch, 5);
 }
+
+Test(apple2_dd, switch_rw)
+{
+    drive->data = vm_segment_create(_140K_);
+    vm_segment_set(drive->data, 0, 123);
+    vm_segment_set(drive->data, 1, 234);
+
+    drive->mode = DD_READ;
+    cr_assert_eq(apple2_dd_switch_rw(drive), 123);
+    drive->mode = DD_WRITE;
+    drive->write_protect = true;
+    cr_assert_eq(apple2_dd_switch_rw(drive), 234);
+
+    drive->write_protect = false;
+    drive->latch = 111;
+    cr_assert_eq(apple2_dd_switch_rw(drive), 0);
+    cr_assert_eq(vm_segment_get(drive->data, drive->sector_pos - 1), 111);
+}
