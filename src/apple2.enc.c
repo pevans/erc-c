@@ -89,7 +89,7 @@ int
 apple2_enc_track(vm_segment *dest, vm_segment *src, 
                  int doff, int track)
 {
-    int soff = track * 4096;
+    int soff = track * ENC_DTRACK;
     int orig = doff;
     int sect, i;
 
@@ -106,7 +106,7 @@ apple2_enc_track(vm_segment *dest, vm_segment *src,
         doff += apple2_enc_sector(dest, src, doff, soff);
 
         // We're moving here in 256-byte blocks
-        soff += 256;
+        soff += ENC_DSECTOR;
     }
 
     return doff - orig;
