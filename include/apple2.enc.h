@@ -43,7 +43,7 @@
  * An encoded track contains 16 sectors, as mentioned for ENC_DTRACK.
  * But it also contains some additional padding (48 bytes-worth).
  */
-#define ENC_ETRACK 0x1810
+#define ENC_ETRACK 0x18f0
 
 /*
  * A sector header consists of some byte markers--all byte markers in
