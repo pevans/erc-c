@@ -173,3 +173,29 @@ Test(apple2_dd, write_protect)
     apple2_dd_write_protect(drive, 2222);
     cr_assert(drive->write_protect);
 }
+
+Test(apple2_dd, encode)
+{
+    // Mostly we want to test if this handles the image types correct.
+    // The encode function won't actually try to encode anything if the
+    // image segment is NULL.
+    drive->image_type = DD_NIBBLE; cr_assert_eq(apple2_dd_encode(drive), OK);
+    drive->image_type = DD_DOS33; cr_assert_eq(apple2_dd_encode(drive), OK);
+    drive->image_type = DD_PRODOS; cr_assert_eq(apple2_dd_encode(drive), OK);
+    drive->image_type = -1; cr_assert_neq(apple2_dd_encode(drive), OK);
+}
+
+Test(apple2_dd, decode)
+{
+    // Same drill as for the encode test
+    drive->image_type = DD_NIBBLE; cr_assert_eq(apple2_dd_encode(drive), OK);
+    drive->image_type = DD_DOS33; cr_assert_eq(apple2_dd_encode(drive), OK);
+    drive->image_type = DD_PRODOS; cr_assert_eq(apple2_dd_encode(drive), OK);
+    drive->image_type = -1; cr_assert_neq(apple2_dd_encode(drive), OK);
+}
+
+// Skipping this test because most everything it does is already tested
+// in some other capacity
+/* Test(apple2_dd, save) */
+
+
