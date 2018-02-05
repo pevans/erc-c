@@ -64,6 +64,7 @@ vm_screen_create()
     screen->last_key = '\0';
     screen->key_pressed = false;
     screen->dirty = false;
+    screen->should_exit = false;
 
     screen->window = NULL;
     screen->render = NULL;
@@ -170,6 +171,13 @@ bool
 vm_screen_active(vm_screen *scr)
 {
     vm_event_poll(scr);
+
+    // If something happened in the event loop that caused the user to
+    // signal an exit, then returning false here will do the trick
+    if (scr->should_exit) {
+        return false;
+    }
+
     return true;
 }
 

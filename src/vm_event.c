@@ -49,6 +49,7 @@ vm_event_keyboard(vm_event *ev)
             ev->screen->key_pressed = false;
 
             if (ch == SDLK_ESCAPE) {
+                ev->screen->should_exit = true;
             }
 
             break;

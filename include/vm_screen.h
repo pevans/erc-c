@@ -44,6 +44,11 @@ typedef struct {
      */
     bool dirty;
 
+    /*
+     * Should we exit (the next chance we get)?
+     */
+    bool should_exit;
+
 } vm_screen;
 
 extern bool vm_screen_active(vm_screen *);
