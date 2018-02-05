@@ -243,6 +243,12 @@ apple2_dd_position(apple2dd *drive)
 vm_8bit
 apple2_dd_read(apple2dd *drive)
 {
+    // If we have no disk in the drive, we will always return a zero
+    // byte
+    if (drive->data == NULL) {
+        return 0;
+    }
+
     vm_8bit byte = vm_segment_get(drive->data, apple2_dd_position(drive));
     apple2_dd_shift(drive, 1);
 
@@ -359,6 +365,11 @@ apple2_dd_turn_on(apple2dd *drive, bool online)
 void
 apple2_dd_write(apple2dd *drive)
 {
+    // If there's no disk in the drive, then we can't write anything
+    if (drive->data == NULL) {
+        return;
+    }
+
     vm_segment_set(drive->data, apple2_dd_position(drive), drive->latch);
     apple2_dd_shift(drive, 1);
 }
