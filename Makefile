@@ -1,4 +1,7 @@
 test:
 	cd tests/build && make && ./erc-test
 
-.PHONY: test
+build:
+	cd build && make && ./erc
+
+.PHONY: test build
