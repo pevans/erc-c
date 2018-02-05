@@ -12,6 +12,7 @@
 #include <sys/time.h>
 
 #include "log.h"
+#include "vm_event.h"
 #include "vm_screen.h"
 
 /*
@@ -168,50 +169,7 @@ vm_screen_free(vm_screen *screen)
 bool
 vm_screen_active(vm_screen *scr)
 {
-    SDL_Event event;
-    char ch;
-
-    // There may be _many_ events in the queue; for example, you may be
-    // facerolling on Zork because it feels good. And good for you if
-    // so--but still we have to handle all those keyboard events!
-    while (SDL_PollEvent(&event)) {
-        ch = '\0';
-
-        // It seems we may have pressed a key...
-        if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) {
-            // The sym field is of type SDL_Keycode; this type, however,
-            // maps roughly to Unicode, which of course maps roughly to
-            // ASCII in the low range.
-            ch = (char)event.key.keysym.sym;
-
-            // If we had shift pressed, we need to uppercase the
-            // character.
-            if (event.key.keysym.mod & KMOD_LSHIFT ||
-                event.key.keysym.mod & KMOD_RSHIFT
-               ) {
-                ch = toupper(ch);
-            }
-        }
-
-        switch (event.type) {
-            case SDL_KEYDOWN:
-                scr->dirty = true;
-                scr->key_pressed = true;
-                scr->last_key = ch;
-                break;
-
-            case SDL_KEYUP:
-                // Note we do not erase the last_key value.
-                scr->key_pressed = false;
-
-                if (ch == SDLK_ESCAPE) {
-                    return false;
-                }
-
-                break;
-        }
-    }
-
+    vm_event_poll(scr);
     return true;
 }
 

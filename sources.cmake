@@ -24,6 +24,7 @@ set(erc_sources
 	option.c
 	vm_area.c
 	vm_bitfont.c
+	vm_event.c
 	vm_screen.c
 	vm_segment.c
 	)
