@@ -54,9 +54,9 @@ vm_reflect_free(vm_reflect *ref)
     int vm_reflect_##x(vm_reflect *ref) { \
         if (ref->x == NULL) return ERR_INVALID; ref->x(ref); return OK; }
 
-REFLECT(cpu_info);
-REFLECT(machine_info);
-REFLECT(pause);
-REFLECT(resume);
-REFLECT(disasm_on);
-REFLECT(disasm_off);
+REFLECT(cpu_info);      // ignore docblock
+REFLECT(machine_info);  // ignore docblock
+REFLECT(pause);         // ignore docblock
+REFLECT(resume);        // ignore docblock
+REFLECT(disasm_on);     // ignore docblock
+REFLECT(disasm_off);    // ignore docblock
