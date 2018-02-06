@@ -10,5 +10,7 @@ typedef struct {
 
 extern void vm_event_keyboard(vm_event *);
 extern void vm_event_poll(vm_screen *);
+extern void vm_event_keyboard_normal(vm_event *, char);
+extern void vm_event_keyboard_special(vm_event *, char);
 
 #endif
