@@ -419,7 +419,9 @@ apple2_dd_switch_drive(apple2 *mach, size_t addr)
             break;
 
         case 0x9:
-            apple2_dd_turn_on(mach->selected_drive, true);
+            if (mach->selected_drive) {
+                apple2_dd_turn_on(mach->selected_drive, true);
+            }
             break;
 
         case 0xA:
@@ -431,11 +433,15 @@ apple2_dd_switch_drive(apple2 *mach, size_t addr)
             break;
 
         case 0xE:
-            mach->selected_drive->mode = DD_READ;
+            if (mach->selected_drive) {
+                mach->selected_drive->mode = DD_READ;
+            }
             break;
 
         case 0xF:
-            mach->selected_drive->mode = DD_WRITE;
+            if (mach->selected_drive) {
+                mach->selected_drive->mode = DD_WRITE;
+            }
             break;
     }
 }
