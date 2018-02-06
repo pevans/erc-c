@@ -62,7 +62,7 @@ struct vm_reflect {
  * be hooked into a reflect struct
  */
 #define REFLECT(x) \
-    void x(vm_reflect *)
+    void x(vm_reflect *ref)
 
 extern int vm_reflect_cpu_info(vm_reflect *);
 extern int vm_reflect_disasm_off(vm_reflect *);
