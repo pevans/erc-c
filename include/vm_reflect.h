@@ -57,6 +57,13 @@ struct vm_reflect {
 #endif
 };
 
+/*
+ * Allow us to either declare or define a new reflect function that can
+ * be hooked into a reflect struct
+ */
+#define REFLECT(x) \
+    void x(vm_reflect *)
+
 extern int vm_reflect_cpu_info(vm_reflect *);
 extern int vm_reflect_disasm_off(vm_reflect *);
 extern int vm_reflect_disasm_on(vm_reflect *);
