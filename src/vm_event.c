@@ -30,8 +30,6 @@ vm_event_keyboard(vm_event *ev)
 {
     char ch;
 
-    ch = '\0';
-
     // The sym field is of type SDL_Keycode; this type, however,
     // maps roughly to Unicode, which of course maps roughly to
     // ASCII in the low range.
