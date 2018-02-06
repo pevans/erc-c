@@ -14,4 +14,8 @@ static:
 	cd build && STATIC_ANALYSIS=1 cmake ..
 	cd tests/build && STATIC_ANALYSIS=1 cmake ..
 
-.PHONY: test build cmake static
+clean:
+	cd build && make clean
+	cd tests/build && make clean
+
+.PHONY: test build cmake static clean
