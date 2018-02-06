@@ -50,13 +50,13 @@ vm_reflect_free(vm_reflect *ref)
  * All of the reflect functions do essentially the same thing--at least,
  * right now they do.
  */
-#define REFLECT(x) \
+#define REFLECT_HANDLER(x) \
     int vm_reflect_##x(vm_reflect *ref) { \
         if (ref->x == NULL) return ERR_INVALID; ref->x(ref); return OK; }
 
-REFLECT(cpu_info);      // ignore docblock
-REFLECT(machine_info);  // ignore docblock
-REFLECT(pause);         // ignore docblock
-REFLECT(resume);        // ignore docblock
-REFLECT(disasm_on);     // ignore docblock
-REFLECT(disasm_off);    // ignore docblock
+REFLECT_HANDLER(cpu_info);      // ignore docblock
+REFLECT_HANDLER(machine_info);  // ignore docblock
+REFLECT_HANDLER(pause);         // ignore docblock
+REFLECT_HANDLER(resume);        // ignore docblock
+REFLECT_HANDLER(disasm_on);     // ignore docblock
+REFLECT_HANDLER(disasm_off);    // ignore docblock
