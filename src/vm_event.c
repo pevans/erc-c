@@ -4,6 +4,10 @@
 
 #include "vm_event.h"
 
+/*
+ * Look through all of the events that are queued up and, whatever we
+ * need to do for them, do that.
+ */
 void
 vm_event_poll(vm_screen *scr)
 {
@@ -17,6 +21,10 @@ vm_event_poll(vm_screen *scr)
     }
 }
 
+/*
+ * Handle any keyboard events from the event queue. Those would be
+ * things like pressing a key, releasing a key... boring stuff, really.
+ */
 void
 vm_event_keyboard(vm_event *ev)
 {
