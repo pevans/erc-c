@@ -5,6 +5,7 @@ enum vm_di_entry {
     VM_CPU,
     VM_MACHINE,
     VM_REFLECT,
+    VM_OUTPUT,
 
     // This value is the size of the DI container we will construct. As
     // you can see, it's quite a bit higher than what would be implied
