@@ -104,6 +104,11 @@ vm_event_keyboard_special(vm_event *ev, char ch)
 
             case 'i':
                 vm_reflect_cpu_info(NULL);
+                vm_reflect_machine_info(NULL);
+                break;
+
+            case 'p':
+                vm_reflect_pause(NULL);
                 break;
         }
     }
