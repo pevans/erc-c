@@ -12,8 +12,11 @@
 #include <unistd.h>
 
 #include "apple2.h"
+#include "apple2.reflect.h"
 #include "log.h"
 #include "option.h"
+#include "vm_di.h"
+#include "vm_reflect.h"
 #include "vm_screen.h"
 
 /*
@@ -41,6 +44,8 @@ init(int argc, char **argv)
 
         exit(1);
     }
+
+    vm_di_set(VM_OUTPUT, stdout);
 
     // We're literally using stdout in this heavy phase of development.
     log_open(stdout);
@@ -80,6 +85,7 @@ main(int argc, char **argv)
 {
     apple2 *mach;
     vm_screen *screen;
+    vm_reflect *ref;
     int err;
 
     init(argc, argv);
@@ -94,6 +100,18 @@ main(int argc, char **argv)
     mach = apple2_create(option_get_width(),
                          option_get_height());
 
+    vm_di_set(VM_MACHINE, mach);
+
+    // FIXME: eh; what if we have a machine which doesn't define the cpu
+    // field? Alternatively, we could require all implemented machines
+    // _to_ define a cpu field.
+    vm_di_set(VM_CPU, mach->cpu);
+
+    ref = vm_reflect_create();
+    vm_di_set(VM_REFLECT, ref);
+
+    apple2_reflect_init();
+
     // Ok, it's time to boot this up!
     err = apple2_boot(mach);
     if (err != OK) {
@@ -107,6 +125,7 @@ main(int argc, char **argv)
 
     // We're all done, so let's tear everything down.
     apple2_free(mach);
+    vm_reflect_free(ref);
 
     // ha ha ha ha #nervous #laughter
     printf("Hello, world\n");
