@@ -30,9 +30,7 @@ vm_reflect_create()
     ref->cpu_info = NULL;
     ref->machine_info = NULL;
     ref->pause = NULL;
-    ref->resume = NULL;
-    ref->disasm_on = NULL;
-    ref->disasm_off = NULL;
+    ref->disasm = NULL;
 
     return ref;
 }
@@ -59,6 +57,4 @@ vm_reflect_free(vm_reflect *ref)
 REFLECT_HANDLER(cpu_info);      // ignore docblock
 REFLECT_HANDLER(machine_info);  // ignore docblock
 REFLECT_HANDLER(pause);         // ignore docblock
-REFLECT_HANDLER(resume);        // ignore docblock
-REFLECT_HANDLER(disasm_on);     // ignore docblock
-REFLECT_HANDLER(disasm_off);    // ignore docblock
+REFLECT_HANDLER(disasm);        // ignore docblock

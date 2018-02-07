@@ -36,16 +36,14 @@ struct vm_reflect {
     vm_reflect_fn machine_info;
 
     /*
-     * These functions pause or resume operation of the virtual machine.
+     * This function will pause or resume operation of the virtual machine.
      */
     vm_reflect_fn pause;
-    vm_reflect_fn resume;
 
     /*
      * Turn on, or off, disassembly of the instructions being executed.
      */
-    vm_reflect_fn disasm_on;
-    vm_reflect_fn disasm_off;
+    vm_reflect_fn disasm;
 
     /*
      * Eventually we will have the ability to load and save state to a
@@ -65,11 +63,9 @@ struct vm_reflect {
     void x(vm_reflect *ref)
 
 extern int vm_reflect_cpu_info(vm_reflect *);
-extern int vm_reflect_disasm_off(vm_reflect *);
-extern int vm_reflect_disasm_on(vm_reflect *);
+extern int vm_reflect_disasm(vm_reflect *);
 extern int vm_reflect_machine_info(vm_reflect *);
 extern int vm_reflect_pause(vm_reflect *);
-extern int vm_reflect_resume(vm_reflect *);
 extern vm_reflect *vm_reflect_create();
 extern void vm_reflect_free(vm_reflect *);
 
