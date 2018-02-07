@@ -15,6 +15,7 @@ apple2_reflect_init()
     ref->cpu_info = apple2_reflect_cpu_info;
     ref->machine_info = apple2_reflect_machine_info;
     ref->pause = apple2_reflect_pause;
+    ref->disasm = apple2_reflect_disasm;
 }
 
 REFLECT(apple2_reflect_cpu_info)
@@ -48,4 +49,10 @@ REFLECT(apple2_reflect_pause)
 {
     apple2 *mach = (apple2 *)vm_di_get(VM_MACHINE);
     mach->paused = !mach->paused;
+}
+
+REFLECT(apple2_reflect_disasm)
+{
+    apple2 *mach = (apple2 *)vm_di_get(VM_MACHINE);
+    mach->disasm = !mach->disasm;
 }

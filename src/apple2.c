@@ -14,6 +14,7 @@
 #include "mos6502.dis.h"
 #include "objstore.h"
 #include "option.h"
+#include "vm_di.h"
 #include "vm_segment.h"
 
 /*
@@ -50,6 +51,9 @@ apple2_create(int width, int height)
 
     // Yes, please do execute opcodes to begin with
     mach->paused = false;
+
+    // Don't print opcodes by default
+    mach->disasm = false;
 
     // Forward set these to NULL in case we fail to build the machine
     // properly; that way, we won't try to free garbage data
@@ -334,9 +338,13 @@ apple2_free(apple2 *mach)
 void
 apple2_run_loop(apple2 *mach)
 {
+    FILE *out;
+
     if (option_flag(OPTION_DISASSEMBLE)) {
         return;
     }
+
+    out = (FILE *)vm_di_get(VM_OUTPUT);
 
     while (vm_screen_active(mach->screen)) {
         // If we're paused, then just re-loop until we're not
@@ -345,13 +353,17 @@ apple2_run_loop(apple2 *mach)
             continue;
         }
 
-#if 0
-        mach->drive1->locked = true;
-        mach->drive2->locked = true;
-        mos6502_dis_opcode(mach->cpu, stdout, mach->cpu->PC);
-        mach->drive1->locked = false;
-        mach->drive2->locked = false;
-#endif
+        if (mach->disasm) {
+            if (mach->selected_drive) {
+                mach->selected_drive->locked = true;
+            }
+            
+            mos6502_dis_opcode(mach->cpu, out, mach->cpu->PC);
+
+            if (mach->selected_drive) {
+                mach->selected_drive->locked = false;
+            }
+        }
 
         mos6502_execute(mach->cpu);
 

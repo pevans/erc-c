@@ -338,6 +338,11 @@ struct apple2 {
      * If paused is true, then execution of opcodes is suspended.
      */
     bool paused;
+
+    /*
+     * If this is true, then we will disassemble opcodes as we execute.
+     */
+    bool disasm;
 };
 
 extern apple2 *apple2_create(int, int);

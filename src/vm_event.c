@@ -110,6 +110,10 @@ vm_event_keyboard_special(vm_event *ev, char ch)
             case 'p':
                 vm_reflect_pause(NULL);
                 break;
+
+            case 'd':
+                vm_reflect_disasm(NULL);
+                break;
         }
     }
 }
