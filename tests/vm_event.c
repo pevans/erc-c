@@ -47,7 +47,8 @@ Test(vm_event, keyboard)
     cr_assert_eq(scr->key_pressed, false);
 
     cr_assert_eq(scr->should_exit, false);
-    ev.event.key.keysym.sym = SDLK_ESCAPE;
+    ev.event.key.keysym.sym = 'q';
+    ev.event.key.keysym.mod = KMOD_ALT;
     vm_event_keyboard(&ev);
     cr_assert_eq(scr->should_exit, true);
 
