@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 #include "log.h"
+#include "vm_di.h"
 #include "vm_reflect.h"
 
 /*
@@ -12,7 +13,7 @@
  * stream.
  */
 vm_reflect *
-vm_reflect_create(void *mach, void *cpu, FILE *stream)
+vm_reflect_create()
 {
     vm_reflect *ref;
 
@@ -22,9 +23,9 @@ vm_reflect_create(void *mach, void *cpu, FILE *stream)
         return NULL;
     }
 
-    ref->machine = mach;
-    ref->cpu = cpu;
-    ref->stream = stream;
+    ref->machine = vm_di_get(VM_MACHINE);
+    ref->cpu = vm_di_get(VM_CPU);
+    ref->stream = vm_di_get(VM_OUTPUT);
 
     ref->cpu_info = NULL;
     ref->machine_info = NULL;
@@ -52,6 +53,7 @@ vm_reflect_free(vm_reflect *ref)
  */
 #define REFLECT_HANDLER(x) \
     int vm_reflect_##x(vm_reflect *ref) { \
+        if (ref == NULL) ref = (vm_reflect *)vm_di_get(VM_REFLECT); \
         if (ref->x == NULL) return ERR_INVALID; ref->x(ref); return OK; }
 
 REFLECT_HANDLER(cpu_info);      // ignore docblock

@@ -70,7 +70,7 @@ extern int vm_reflect_disasm_on(vm_reflect *);
 extern int vm_reflect_machine_info(vm_reflect *);
 extern int vm_reflect_pause(vm_reflect *);
 extern int vm_reflect_resume(vm_reflect *);
-extern vm_reflect *vm_reflect_create(void *, void *, FILE *);
+extern vm_reflect *vm_reflect_create();
 extern void vm_reflect_free(vm_reflect *);
 
 #endif
