@@ -23,9 +23,7 @@ have_fun()
     ref->cpu_info = fun;
     ref->machine_info = fun;
     ref->pause = fun;
-    ref->resume = fun;
-    ref->disasm_on = fun;
-    ref->disasm_off = fun;
+    ref->disasm = fun;
 }
 
 static void
@@ -50,9 +48,7 @@ Test(vm_reflect, create)
     cr_assert_eq(ref->cpu_info, NULL);
     cr_assert_eq(ref->machine_info, NULL);
     cr_assert_eq(ref->pause, NULL);
-    cr_assert_eq(ref->resume, NULL);
-    cr_assert_eq(ref->disasm_on, NULL);
-    cr_assert_eq(ref->disasm_off, NULL);
+    cr_assert_eq(ref->disasm, NULL);
 }
 
 // Not much to do here
@@ -73,6 +69,4 @@ Test(vm_reflect, cpu_info)
 
 /* Test(vm_reflect, machine_info) */
 /* Test(vm_reflect, pause) */
-/* Test(vm_reflect, resume) */
-/* Test(vm_reflect, disasm_on) */
-/* Test(vm_reflect, disasm_off) */
+/* Test(vm_reflect, disasm) */
