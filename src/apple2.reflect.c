@@ -6,9 +6,6 @@
 #include "mos6502.h"
 #include "vm_di.h"
 
-#define CPU(x) \
-    mos6502 *x = (mos6502 *)ref->cpu
-
 void
 apple2_reflect_init()
 {
@@ -19,7 +16,10 @@ apple2_reflect_init()
 
 REFLECT(apple2_reflect_cpu_info)
 {
-//    CPU(cpu);
+    mos6502 *cpu = (mos6502 *)vm_di_get(VM_CPU);
+    FILE *out = (FILE *)vm_di_get(VM_OUTPUT);
 
-    printf("hey\n");
+    fprintf(out, "REGISTERS:\n");
+    fprintf(out, "  A:%02x X:%02x Y:%02x P:%02x S:%02x PC:%04x\n",
+            cpu->A, cpu->X, cpu->Y, cpu->P, cpu->S, cpu->PC);
 }
