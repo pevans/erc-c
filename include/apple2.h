@@ -333,6 +333,11 @@ struct apple2 {
      * operations you perform are (mostly) targeting that drive.
      */
     apple2dd *selected_drive;
+
+    /*
+     * If paused is true, then execution of opcodes is suspended.
+     */
+    bool paused;
 };
 
 extern apple2 *apple2_create(int, int);

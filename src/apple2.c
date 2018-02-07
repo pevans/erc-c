@@ -5,6 +5,8 @@
  * need to break this file up into components in the future...
  */
 
+#include <unistd.h>
+
 #include "apple2.h"
 #include "apple2.draw.h"
 #include "apple2.mem.h"
@@ -45,6 +47,9 @@ apple2_create(int width, int height)
     // By default, we have no strobe set; it should only be set when a
     // key is pressed
     mach->strobe = false;
+
+    // Yes, please do execute opcodes to begin with
+    mach->paused = false;
 
     // Forward set these to NULL in case we fail to build the machine
     // properly; that way, we won't try to free garbage data
@@ -334,6 +339,12 @@ apple2_run_loop(apple2 *mach)
     }
 
     while (vm_screen_active(mach->screen)) {
+        // If we're paused, then just re-loop until we're not
+        if (mach->paused) {
+            usleep(100000);     // but rest our weary head for a bit
+            continue;
+        }
+
 #if 0
         mach->drive1->locked = true;
         mach->drive2->locked = true;
