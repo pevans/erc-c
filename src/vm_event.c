@@ -3,6 +3,7 @@
  */
 
 #include "vm_event.h"
+#include "vm_reflect.h"
 
 /*
  * Look through all of the events that are queued up and, whatever we
@@ -99,6 +100,10 @@ vm_event_keyboard_special(vm_event *ev, char ch)
         switch (ch) {
             case 'q':
                 ev->screen->should_exit = true;
+                break;
+
+            case 'i':
+                vm_reflect_cpu_info(NULL);
                 break;
         }
     }
