@@ -7,6 +7,10 @@
 #include "mos6502.h"
 #include "vm_di.h"
 
+/*
+ * Initialize the reflection struct for the apple2 machine, setting up
+ * all of the reflect methods we may want to use.
+ */
 void
 apple2_reflect_init()
 {
@@ -18,6 +22,9 @@ apple2_reflect_init()
     ref->disasm = apple2_reflect_disasm;
 }
 
+/*
+ * Show some information about the CPU registers.
+ */
 REFLECT(apple2_reflect_cpu_info)
 {
     mos6502 *cpu = (mos6502 *)vm_di_get(VM_CPU);
@@ -28,6 +35,11 @@ REFLECT(apple2_reflect_cpu_info)
             cpu->A, cpu->X, cpu->Y, cpu->P, cpu->S, cpu->PC);
 }
 
+/*
+ * Show information about the apple2 machine--mostly some of the
+ * metadata variables, like what the bank switch status is, or what
+ * memory mode we're in.
+ */
 REFLECT(apple2_reflect_machine_info)
 {
     apple2 *mach = (apple2 *)vm_di_get(VM_MACHINE);
@@ -51,6 +63,10 @@ REFLECT(apple2_reflect_pause)
     mach->paused = !mach->paused;
 }
 
+/*
+ * Enable or disable disassembly output, toggling from one state to the
+ * other for each invocation.
+ */
 REFLECT(apple2_reflect_disasm)
 {
     apple2 *mach = (apple2 *)vm_di_get(VM_MACHINE);
