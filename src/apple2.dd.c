@@ -223,7 +223,7 @@ apple2_dd_position(apple2dd *drive)
         return 0;
     }
 
-    int track_offset = (drive->track_pos % 2) * ENC_ETRACK;
+    int track_offset = (drive->track_pos / 2) * ENC_ETRACK;
     return track_offset + drive->sector_pos;
 }
 
