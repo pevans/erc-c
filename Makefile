@@ -4,7 +4,7 @@ test:
 	cd tests/build && make && ./erc-test
 
 build:
-	cd build && make && ./erc
+	cd build && make
 
 cmake:
 	cd build && cmake ..
