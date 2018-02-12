@@ -67,6 +67,7 @@ Test(apple2_dd, position)
 Test(apple2_dd, read)
 {
     drive->data = vm_segment_create(_140K_);
+    drive->image = drive->data;     // image doesn't matter here
     vm_segment_set(drive->data, 0, 123);
     vm_segment_set(drive->data, 1, 234);
 
@@ -150,6 +151,7 @@ Test(apple2_dd, turn_on)
 Test(apple2_dd, write)
 {
     drive->data = vm_segment_create(_140K_);
+    drive->image = drive->data;     // image doesn't matter
 
     drive->latch = 123;
     apple2_dd_write(drive);
@@ -284,6 +286,7 @@ Test(apple2_dd, switch_latch)
 Test(apple2_dd, switch_rw)
 {
     drive->data = vm_segment_create(_140K_);
+    drive->image = drive->data;     // image doesn't matter
     vm_segment_set(drive->data, 0, 123);
     vm_segment_set(drive->data, 1, 234);
 
