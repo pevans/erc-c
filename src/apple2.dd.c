@@ -223,17 +223,8 @@ apple2_dd_position(apple2dd *drive)
         return 0;
     }
 
-    // This is a normative DOS 3.3 / ProDOS disk. (Except ProDOS is
-    // separated into 512 byte blocks which _shouldn't_ matter for our
-    // purposes but let's not talk about that here do-de-doo.)
-    if (drive->data->size == _140K_) {
-        int track_offset;
-
-        track_offset = (drive->track_pos % 2) * ENC_ETRACK;
-        return track_offset + drive->sector_pos;
-    }
-
-    return 0;
+    int track_offset = (drive->track_pos % 2) * ENC_ETRACK;
+    return track_offset + drive->sector_pos;
 }
 
 /*
