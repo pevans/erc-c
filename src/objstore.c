@@ -1,5 +1,5 @@
 /*
- * obj.c
+ * objstore.c
  */
 
 #include <zlib.h>
