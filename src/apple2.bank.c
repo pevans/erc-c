@@ -1,5 +1,5 @@
 /*
- * apple2.mem.c
+ * apple2.bank.c
  */
 
 #include "apple2.h"
