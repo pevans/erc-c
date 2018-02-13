@@ -1,5 +1,9 @@
 /*
  * apple2.draw.c
+ *
+ * Draw pretty pixels on the screen in the way that Apple II would work.
+ * NB: this code is pretty rough, and I expect some changes as we get
+ * further into development.
  */
 
 #include "apple2.h"

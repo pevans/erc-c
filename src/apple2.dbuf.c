@@ -1,5 +1,11 @@
 /*
  * apple2.dbuf.c
+ *
+ * Handle reads and writes to our display buffers and the soft switches
+ * that manage them. There are a number of conditions which may cause
+ * our I/O to use the auxiliary memory segment instead of the main one;
+ * additionally, we can signal to the VM that we need to redraw stuff
+ * when writes do happen.
  */
 
 #include "apple2.dbuf.h"

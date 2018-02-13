@@ -1,7 +1,27 @@
 /*
  * mos6502.dis.c
  *
- * Disassembly of the mos6502 machine code into an assembly notation.
+ * Disassembly of the mos6502 machine code into an assembly notation. I
+ * should note that there is no formal grammar (that I know of!) for
+ * 6502 assembly--just an informal notation that is de-facto supported
+ * by one assembler or another. The general format we use is as follows:
+ *
+ * LABEL:
+ *     INS    $OPER       ; comment
+ *
+ * Where LABEL is a--well, a label; INS is an instruction; $OPER is a
+ * hexadecimal number; and a semicolon denotes a comment follows until
+ * the end of the line.
+ *
+ * You will find a number of variants of `$OPER`, as the assembly
+ * notation uses those variants to denote a specific kind of address
+ * mode. `$OPER` is absolute mode; `$OP` (just two hex digits) is
+ * zero-page mode; `$(OP),Y` is indirect-indexed mode; etc. (Please
+ * refer to mos6502.addr.c for more details on those modes!)
+ *
+ * The code here generally pushes disassembled notation into FILE stream
+ * objects. If you need them in a string, for instance, you can mess
+ * with `setvbuf()` (as we indeed do in our unit-testing code!).
  */
 
 #include <stdbool.h>

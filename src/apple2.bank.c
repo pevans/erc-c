@@ -1,5 +1,16 @@
 /*
  * apple2.bank.c
+ *
+ * Handle reads and writes to bank-switchable memory, as well as the
+ * soft switches that manage access to bank-switched memory spaces.
+ * Bank-switchable memory is located from $D000..$FFFF, and those
+ * addresses may point to 1) system ROM; 2) main memory RAM; 3)
+ * auxiliary memory RAM; 4) a separate 4k bank of RAM in the
+ * $D000..$DFFF range, one for _each_ of main and aux memory. That is,
+ * you are allowed to fit a separate 16k RAM in 12k address space for
+ * both main and auxiliary memory.
+ *
+ * Are you confused yet? Keep reading!
  */
 
 #include "apple2.h"

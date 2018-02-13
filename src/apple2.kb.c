@@ -1,5 +1,10 @@
 /*
  * apple2.kb.c
+ *
+ * Handle soft switches to read keyboard state, which are surprisingly
+ * few and lightweight. The state would be the last key pressed, whether
+ * a key is pressed _right now_, and the keyboard strobe (which is used
+ * to determine if you've read last key pressed before or not).
  */
 
 #include "apple2.kb.h"

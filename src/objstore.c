@@ -1,5 +1,10 @@
 /*
  * objstore.c
+ *
+ * The code here allows us to work with the object store, which is an
+ * entity that allows us to toss all of our binary data needs into a big
+ * glob of stuff that we can unpack and use at runtime. Examples of such
+ * data are bitmap fonts, ROM data, etc.
  */
 
 #include <zlib.h>

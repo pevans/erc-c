@@ -1,5 +1,14 @@
 /*
  * vm_bitfont.c
+ *
+ * The bitfont code allows us to define and work with a bitmapped font.
+ * You can find the bitmap font glyphs in the `/fonts` subdir within the
+ * repository root, as well as bmp files that are compiled from those
+ * glyphs (via `/tools/build-fonts`).
+ *
+ * We do not have support for truetype fonts (nor other types of fonts)
+ * at this time, but the glyph system is pretty easy to work with, even
+ * if it is a hack.
  */
 
 #include "vm_bitfont.h"

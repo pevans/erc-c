@@ -1,5 +1,12 @@
 /*
  * apple2.dd.c
+ *
+ * This file encompasses the logic we use to handle disk drives in the
+ * Apple II machine. You'll find a lot of references to what may seem to
+ * be hardware implementation details, like stepper motor phases, but
+ * these are necessary because those details were exposed to software,
+ * and software was required to use those details to correctly position
+ * itself.
  */
 
 #include "apple2.dd.h"

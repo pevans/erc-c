@@ -1,5 +1,10 @@
 /*
  * apple2.mem.c
+ *
+ * Implement code to handle soft switches for memory modes in Apple II,
+ * to handle zero-page accesses, and to handle ROM initialization. If
+ * that sounds like a lot of not-necessarily-related stuff, you're
+ * right! FIXME: we should break this file up into smaller parts.
  */
 
 #include "apple2.bank.h"

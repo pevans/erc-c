@@ -1,8 +1,9 @@
 /*
  * apple2.c
  *
- * Here we have support for the apple2 machine. I suspect that we will
- * need to break this file up into components in the future...
+ * This file handles the top-level domain code for the Apple II machine.
+ * It's also a bit of a catch-all for logic which doesn't need its own
+ * file.
  */
 
 #include <unistd.h>

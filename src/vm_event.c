@@ -1,5 +1,10 @@
 /*
  * vm_event.c
+ *
+ * The code here handles events for the virtual machine; it essentially
+ * is a wrapper for SDL, presenting an interface to events that is
+ * independent of SDL itself. You would handle keyboard events here,
+ * mouse events, and more.
  */
 
 #include "vm_event.h"

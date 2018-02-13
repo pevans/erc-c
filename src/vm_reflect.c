@@ -1,5 +1,9 @@
 /*
  * vm_reflect.c
+ *
+ * Here we have support for reflection, or perhaps meta-manipulation, of
+ * the virtual machine. You can create hooks to stop the machine, or
+ * disassemble opcodes from it, or handle state.
  */
 
 #include <stdlib.h>

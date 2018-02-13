@@ -1,5 +1,8 @@
 /*
  * apple2.reflect.c
+ *
+ * Implement the reflection handlers for the virtual machine when the
+ * apple2 machine is being emulated.
  */
 
 #include "apple2.h"

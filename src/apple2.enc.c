@@ -1,5 +1,14 @@
 /*
  * apple2.enc.c
+ *
+ * Encode disk image data with 6-and-2 encoding, which in effect
+ * "nibbilizes" them (in exactly the way a .NIB file is saved). This
+ * process is somewhat complicated, and I don't blame you if you gently
+ * bop your head on your desk and ask woz, pleadingly, why, why, why.
+ *
+ * The reason for "why" is that early disk drives were pretty limited,
+ * and specifically could not have zero bits next to each other. Which
+ * is _crazy_. Hence the crazy code below. 
  */
 
 #include "apple2.enc.h"

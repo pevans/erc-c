@@ -1,5 +1,8 @@
 /*
  * apple2.dec.c
+ *
+ * Decode 6-and-2 encoding to get back to the "raw" state that image
+ * data has. You can read more on why this is necessary in apple2.enc.c.
  */
 
 #include <stdbool.h>
