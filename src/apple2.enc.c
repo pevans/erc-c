@@ -1,5 +1,5 @@
 /*
- * apple2.nib.c
+ * apple2.enc.c
  */
 
 #include "apple2.enc.h"
