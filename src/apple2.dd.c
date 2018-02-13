@@ -1,5 +1,5 @@
 /*
- * apple2.disk_drive.c
+ * apple2.dd.c
  */
 
 #include "apple2.dd.h"
