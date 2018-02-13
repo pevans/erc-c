@@ -15,6 +15,14 @@
 #include "apple2.dd.h"
 #include "vm_segment.h"
 
+/*
+ * This is the table that holds the bytes that represent 6-and-2 encoded
+ * data. Note the table goes from $00..$3F; that is the amount of values
+ * that six bits can hold. Each of those six-bit combinations maps to a
+ * different byte value that would be literally written to and read from
+ * the disk media. Apple II's RWTS subroutine would then translate them
+ * back into data that is useful to the software being run.
+ */
 static vm_8bit gcr62[] = {
 //  00    01    02    03    04    05    06    07    08    09    0a    0b    0c    0d    0e    0f 
     0x96, 0x97, 0x9a, 0x9b, 0x9d, 0x9e, 0x9f, 0xa6, 0xa7, 0xab, 0xac, 0xad, 0xae, 0xaf, 0xb2, 0xb3,
