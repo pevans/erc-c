@@ -179,7 +179,27 @@ apple2_dd_phaser(apple2dd *drive)
 {
     int phase = drive->phase_state;
     int last = drive->last_phase;
+    int step = 0;
 
+    if (phase == (last << 1)) {
+        step++;
+    } else if (phase == 0x1 && last == 0x8) {
+        step++;
+    } else if (phase == (last >> 1)) {
+        step--;
+    } else if (phase == 0x8 && last == 0x1) {
+        step--;
+    }
+
+    if (phase == 0 && last == 0) {
+        step = 0;
+    }
+
+    if (phase == 1 && last == 0) {
+        step = 1;
+    }
+
+#if 0
     // This is a bit of trickery; there is no phase state for 0x10 or
     // 0x0, but we want to pretend like the phase is "next" to the bit
     // we're operating with for the purpose of establishing a direction.
@@ -201,7 +221,13 @@ apple2_dd_phaser(apple2dd *drive)
     if (phase == 0 && last != 0x1 && last != 0x8) {
         return;
     }
+#endif
 
+    //printf("phase:%02x last:%02x step:%d\n", phase, last, step);
+
+    apple2_dd_step(drive, step);
+
+#if 0
     // If phase > last, then we must move the head forward by a half
     // track. If it's < last, then we move the head backward, again by a
     // half track.
@@ -210,6 +236,7 @@ apple2_dd_phaser(apple2dd *drive)
     } else if (phase < last) {
         apple2_dd_step(drive, -1);
     }
+#endif
 
     // Recall our trickery above with the phase variable? Because of it,
     // we have to save the phase_state field into last_phase, and not
@@ -248,6 +275,7 @@ apple2_dd_read(apple2dd *drive)
     }
 
     vm_8bit byte = vm_segment_get(drive->data, apple2_dd_position(drive));
+    //printf("byte = %02x, pos = %05x\n", byte, apple2_dd_position(drive));
     apple2_dd_shift(drive, 1);
 
     return byte;
@@ -320,10 +348,6 @@ apple2_dd_shift(apple2dd *drive, int pos)
     while (drive->sector_pos > MAX_SECTOR_POS) {
         // We need to reset the sector pos to zero, because...
         drive->sector_pos -= (MAX_SECTOR_POS + 1);
-        
-        // We also need to move to the next track, so let's adjust by
-        // two half-tracks.
-        apple2_dd_step(drive, 2);
     }
 }
 
@@ -337,6 +361,7 @@ apple2_dd_shift(apple2dd *drive, int pos)
 void
 apple2_dd_step(apple2dd *drive, int steps)
 {
+    //printf("step %d, new track_pos %d\n", steps, drive->track_pos + steps);
     drive->track_pos += steps;
 
     if (drive->track_pos > MAX_DRIVE_STEPS) {
@@ -368,8 +393,10 @@ apple2_dd_write(apple2dd *drive)
         return;
     }
 
-    vm_segment_set(drive->data, apple2_dd_position(drive), drive->latch);
-    apple2_dd_shift(drive, 1);
+	if (drive->latch & 0x80) {
+		vm_segment_set(drive->data, apple2_dd_position(drive), drive->latch);
+		apple2_dd_shift(drive, 1);
+	}
 }
 
 /*
@@ -401,6 +428,8 @@ apple2_dd_switch_phase(apple2dd *drive, size_t addr)
         case 0x6: drive->phase_state &= ~0x8; break;
         case 0x7: drive->phase_state |=  0x8; break;
     }
+
+    apple2_dd_phaser(drive);
 }
 
 /*
