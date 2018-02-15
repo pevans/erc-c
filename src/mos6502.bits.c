@@ -97,8 +97,11 @@ DEFINE_INST(lsr)
 {
     SET_RESULT(oper >> 1);
 
-    // Set ZERO if it should apply
-    mos6502_modify_status(cpu, MOS_ZERO, oper, result);
+    // Set ZERO if it should apply; also inspect the NEGATIVE flag, but
+    // note that doing so will have the effect of _always_ unsetting the
+    // N flag, because literally any byte value shifted right will
+    // immediately lose the sign bit and be non-negative.
+    mos6502_modify_status(cpu, MOS_NZ, oper, result);
 
     // However, we handle carry a bit differently here. The carry bit
     // should be 1 if oper & 0x1; that is, when we shift right, we want
