@@ -31,10 +31,11 @@
 #include "mos6502.enums.h"
 
 static char s_inst[4],
+            s_addr[5],
             s_oper[10],
             s_value[3],
             s_label[13],
-            s_state[54],
+            s_state[63],
             s_bytes[12];
 
 static vm_8bit jump_table[MOS6502_MEMSIZE];
@@ -189,6 +190,8 @@ mos6502_dis_operand(mos6502 *cpu,
             snprintf(s_value, sizeof(s_value), "%02x", eff_value);
             break;
     }
+
+    snprintf(s_addr, sizeof(s_addr), "%04x", cpu->eff_addr); 
 }
 
 /*
@@ -344,9 +347,9 @@ mos6502_dis_opcode(mos6502 *cpu, FILE *stream, int address)
         // what the PC was at the point of this opcode sequence; two,
         // the opcode;
         snprintf(s_state, sizeof(s_state) - 1, 
-                 "pc:%02x%02x cy:%02d val:%2s a:%02x x:%02x y:%02x p:%c%c-%c%c%c%c s:%02x", 
+                 "pc:%02x%02x cy:%02d addr:%4s val:%2s a:%02x x:%02x y:%02x p:%c%c-%c%c%c%c s:%02x", 
                 cpu->PC >> 8, cpu->PC & 0xff,
-                mos6502_cycles(cpu, opcode), s_value,
+                mos6502_cycles(cpu, opcode), s_addr, s_value,
                 cpu->A, cpu->X, cpu->Y, 
                 cpu->P & MOS_NEGATIVE ? 'N' : 'n',
                 cpu->P & MOS_OVERFLOW ? 'O' : 'o',
@@ -369,7 +372,7 @@ mos6502_dis_opcode(mos6502 *cpu, FILE *stream, int address)
         }
     }
 
-    fprintf(stream, "%s  %4s %-9s ; %-51s | %s\n",
+    fprintf(stream, "%s  %4s %-9s ; %-60s | %s\n",
             s_label, s_inst, s_oper, s_state, s_bytes);
 
     if (mos6502_would_jump(inst_code)) {
