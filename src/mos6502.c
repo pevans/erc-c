@@ -271,7 +271,7 @@ mos6502_modify_status(mos6502 *cpu, vm_8bit status, int orig, int result)
 
     if (status & MOS_ZERO) {
         cpu->P &= ~MOS_ZERO;
-        if (result == 0) {
+        if ((result & 0xff) == 0) {
             cpu->P |= MOS_ZERO;
         }
     }
