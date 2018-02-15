@@ -223,8 +223,6 @@ apple2_dd_phaser(apple2dd *drive)
     }
 #endif
 
-    //printf("phase:%02x last:%02x step:%d\n", phase, last, step);
-
     apple2_dd_step(drive, step);
 
 #if 0
@@ -275,7 +273,6 @@ apple2_dd_read(apple2dd *drive)
     }
 
     vm_8bit byte = vm_segment_get(drive->data, apple2_dd_position(drive));
-    //printf("byte = %02x, pos = %05x\n", byte, apple2_dd_position(drive));
     apple2_dd_shift(drive, 1);
 
     return byte;
@@ -345,9 +342,9 @@ apple2_dd_shift(apple2dd *drive, int pos)
 
     drive->sector_pos += pos;
 
-    while (drive->sector_pos > MAX_SECTOR_POS) {
+    if (drive->sector_pos >= ENC_ETRACK) {
         // We need to reset the sector pos to zero, because...
-        drive->sector_pos -= (MAX_SECTOR_POS + 1);
+        drive->sector_pos = 0;
     }
 }
 
@@ -361,7 +358,6 @@ apple2_dd_shift(apple2dd *drive, int pos)
 void
 apple2_dd_step(apple2dd *drive, int steps)
 {
-    //printf("step %d, new track_pos %d\n", steps, drive->track_pos + steps);
     drive->track_pos += steps;
 
     if (drive->track_pos > MAX_DRIVE_STEPS) {
