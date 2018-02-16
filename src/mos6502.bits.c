@@ -141,13 +141,19 @@ DEFINE_INST(rol)
     MOS_CARRY_BIT();
     SET_RESULT(oper << 1);
 
+    // Rotations are effectively _9-bit_. So we aren't rotating bit 7
+    // into bit 0; we're rotating bit 7 into the carry bit, and we're
+    // rotating the _previous value of the carry bit_ into bit 0.
+    if (cpu->P & MOS_CARRY) {
+        result |= 0x1;
+    }
+
     if (oper & 0x80) {
         carry = 1;
     }
 
     cpu->P &= ~MOS_CARRY;
     if (carry) {
-        result |= 0x01;
         cpu->P |= MOS_CARRY;
     }
 
@@ -169,13 +175,17 @@ DEFINE_INST(ror)
     MOS_CARRY_BIT();
     SET_RESULT(oper >> 1);
 
+    // See the code for ROL for my note on 9-bit rotation (vs. 8-bit).
+    if (cpu->P & MOS_CARRY) {
+        result |= 0x80;
+    }
+
     if (oper & 0x01) {
         carry = 1;
     }
 
     cpu->P &= ~MOS_CARRY;
     if (carry) {
-        result |= 0x80;
         cpu->P |= MOS_CARRY;
     }
 
