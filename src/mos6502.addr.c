@@ -260,7 +260,7 @@ DEFINE_ADDR(zpg)
 DEFINE_ADDR(zpx)
 {
     ADDR_LO(cpu);
-    EFF_ADDR(addr + cpu->X);
+    EFF_ADDR((addr + cpu->X) & 0xff);
 
     return mos6502_get(cpu, eff_addr);
 }
@@ -272,7 +272,7 @@ DEFINE_ADDR(zpx)
 DEFINE_ADDR(zpy)
 {
     ADDR_LO(cpu);
-    EFF_ADDR(addr + cpu->Y);
+    EFF_ADDR((addr + cpu->Y) & 0xff);
 
     return mos6502_get(cpu, eff_addr);
 }
