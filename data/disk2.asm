@@ -7,8 +7,17 @@
 ; NOTE THAT THIS SOURCE CODE IS NOT ORIGINAL TO APPLE. I translated by
 ; hand from the machine code in the ROM. Any comments, etc. you see
 ; here, are from me--NOT APPLE.
+;
+; For details on the assembly instructions--what they mean and do--this
+; is a good resource: 
+; http://www.e-tradition.net/bytes/6502/6502_instruction_set.html
+;
+; Any number that has a $ in front of it means it's a hex number, vs.
+; decimal.
 
-; Our definitions for this little program
+; Our definitions for this little program. The EQU symbol is not a
+; formal instruction understood by the 6502 CPU; it's a notation that
+; simply means "equals"; e.g. GBASL equals $26.
                 GBASL       EQU $26
                 GBASH       EQU $27
                 BAS2H       EQU $2B
