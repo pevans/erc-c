@@ -112,6 +112,15 @@
 46:AA                       TAX
 47:BD 81 C0                 LDA PHASEON,X
 4A:A9 56                    LDA #$56
+
+; In at least one implementation (notably WinApple), the opcode below is
+; rewritten as `A9 00 EA`, which is equivalent to:
+;   LDA #$00
+;   NOP
+; This would essentially remove the WAIT call. The WAIT subroutine will,
+; in the course of its operation, leave $00 in A, which explains the LDA
+; #$00 opcode sequence. The NOP is there to replace the third byte
+; (which was part of the JSR address in its original form).
 4C:20 A8 FC                 JSR WAIT            ; wait for the motor
 4F:88                       DEY
 50:10 EB                    BPL PHASELOOP
