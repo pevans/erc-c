@@ -254,7 +254,7 @@ E9:D0 EE                    BNE WRITELOOP   ; we'll loop here 256 times
 
 ; We're in the home stretch... we're just double-checking if we copied
 ; things into the ENTRY page properly.
-EB:E6 27                    INC GBASH       ; so now GBASL/H is $0801
+EB:E6 27                    INC GBASH       ; so now GBASL/H is $0900
 ED:E6 3D                    INC A1H
 EF:A5 3D                    LDA A1H
 F1:CD 00 08                 CMP ENTRY       ; if A < ENTRY
