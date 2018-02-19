@@ -22,6 +22,8 @@
  * different byte value that would be literally written to and read from
  * the disk media. Apple II's RWTS subroutine would then translate them
  * back into data that is useful to the software being run.
+ *
+ * Also, since I forget: gcr is short for "group coded recording"
  */
 static vm_8bit gcr62[] = {
 //  00    01    02    03    04    05    06    07    08    09    0a    0b    0c    0d    0e    0f 
@@ -219,11 +221,6 @@ apple2_enc_sector(vm_segment *dest, vm_segment *src,
     vm_segment_set(dest, doff++, 0xaa);
     vm_segment_set(dest, doff++, 0xad);
 
-    // Sure... let's just toss in a few self-sync bytes
-    for (i = 0; i < 6; i++) {
-        vm_segment_set(dest, doff++, 0xff);
-    }
-
     // Now we use the gcr table for 6-and-2 encoding to take the XOR'd
     // values and represent them as they should be in the destination
     // segment. This constitutes the data field of the sector.
@@ -291,6 +288,12 @@ apple2_enc_sector_header(vm_segment *seg, int off,
     vm_segment_set(seg, off++, 0xde);
     vm_segment_set(seg, off++, 0xaa);
     vm_segment_set(seg, off++, 0xeb);
+
+    // Write six (exactly six!) self-sync bytes following the epilogue,
+    // because the Disk II controller/RWTS method expect to find it.
+    for (int i = 0; i < 6; i++) {
+        vm_segment_set(seg, off++, 0xff);
+    }
 
     return off - orig;
 }
