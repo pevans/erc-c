@@ -299,9 +299,9 @@ Test(apple2_dd, switch_rw)
     cr_assert_eq(apple2_dd_switch_rw(drive), 234);
 
     drive->write_protect = false;
-    drive->latch = 111;
+    drive->latch = 191;
     cr_assert_eq(apple2_dd_switch_rw(drive), 0);
-    cr_assert_eq(vm_segment_get(drive->data, drive->sector_pos - 1), 111);
+    cr_assert_eq(vm_segment_get(drive->data, drive->sector_pos - 1), 191);
 }
 
 // Ignoring these right now, as they are calling the other switch_*
