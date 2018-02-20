@@ -97,7 +97,7 @@ Test(mos6502_bits, rol)
 
     cpu->eff_addr = 234;
     mos6502_handle_rol(cpu, 128);
-    cr_assert_eq(mos6502_get(cpu, 234), 1);
+    cr_assert_eq(mos6502_get(cpu, 234), 0);
 }
 
 Test(mos6502_bits, ror)
@@ -106,6 +106,6 @@ Test(mos6502_bits, ror)
     cr_assert_eq(cpu->A, 160);
 
     cpu->eff_addr = 123;
-    mos6502_handle_ror(cpu, 1);
+    mos6502_handle_ror(cpu, 0);
     cr_assert_eq(mos6502_get(cpu, 123), 128);
 }
