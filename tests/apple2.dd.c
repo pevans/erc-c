@@ -114,7 +114,6 @@ Test(apple2_dd, shift)
     cr_assert_eq(drive->track_pos, 0);
 
     // this should be the mod of sector_pos and MAX_SECTOR_POS
-    printf("it's %d\n", drive->sector_pos);
     cr_assert_eq(drive->sector_pos, 0);
 }
 
