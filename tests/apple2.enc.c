@@ -93,7 +93,7 @@ Test(apple2_enc, dos)
     FILE *fp = fopen("../../build/karateka.dsk", "r");
 
     vm_segment_fread(seg, fp, 0, _140K_);
-    enc = apple2_enc_dos(seg, sectab);
+    enc = apple2_enc_dos(DD_DOS33, seg);
 
     cr_assert_neq(enc, NULL);
 
@@ -197,7 +197,7 @@ Test(apple2_enc, track)
         vm_segment_copy_buf(seg, f_sector, i * ENC_DSECTOR, 0, 256);
     }
 
-    apple2_enc_track(dest, seg, sectab, 0, 0);
+    apple2_enc_track(DD_DOS33, dest, seg, 0, 0);
 
     for (i = 0; i < ENC_ETRACK_HEADER; i++) {
         cr_assert_eq(vm_segment_get(dest, i), 0xff);

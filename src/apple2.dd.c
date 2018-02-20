@@ -14,16 +14,6 @@
 #include "apple2.enc.h"
 #include "apple2.h"
 
-static int sector_dos33[] = {
-    0x0, 0x7, 0xe, 0x6, 0xd, 0x5, 0xc, 0x4,
-    0xb, 0x3, 0xa, 0x2, 0x9, 0x1, 0x8, 0xf,
-};
-
-static int sector_prodos[] = {
-    0x0, 0x8, 0x1, 0x9, 0x2, 0xa, 0x3, 0xb,
-    0x4, 0xc, 0x5, 0xd, 0x6, 0xe, 0x7, 0xf,
-};
-
 /*
  * Create a new disk drive. We do not create a memory segment for the
  * drive right away, as the size of said data can be variable based on
@@ -57,6 +47,42 @@ apple2_dd_create()
     drive->image_type = DD_NOTYPE;
 
     return drive;
+}
+
+int
+apple2_dd_sector_num(int type, int sect)
+{
+    static const int dos33[] = {
+        0x0, 0x7, 0xe, 0x6, 0xd, 0x5, 0xc, 0x4,
+        0xb, 0x3, 0xa, 0x2, 0x9, 0x1, 0x8, 0xf,
+    };
+
+    static const int prodos[] = {
+        0x0, 0x8, 0x1, 0x9, 0x2, 0xa, 0x3, 0xb,
+        0x4, 0xc, 0x5, 0xd, 0x6, 0xe, 0x7, 0xf,
+    };
+
+    const int *sectab;
+
+    // Booooo
+    if (sect < 0 || sect > 15) {
+        return 0;
+    }
+
+    switch (type) {
+        case DD_DOS33:
+            sectab = dos33;
+            break;
+            
+        case DD_PRODOS:
+            sectab = prodos;
+            break;
+
+        case DD_NIBBLE:
+            return sect;
+    }
+
+    return sectab[sect];
 }
 
 /*
@@ -123,11 +149,8 @@ apple2_dd_encode(apple2dd *drive)
             break;
 
         case DD_DOS33:
-            drive->data = apple2_enc_dos(drive->image, sector_dos33);
-            break;
-
         case DD_PRODOS:
-            drive->data = apple2_enc_dos(drive->image, sector_prodos);
+            drive->data = apple2_enc_dos(drive->image_type, drive->image);
             break;
 
         default:

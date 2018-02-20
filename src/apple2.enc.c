@@ -39,7 +39,7 @@ static vm_8bit gcr62[] = {
  * 3.2 and 3.1 (which use 5-and-3 encoding).
  */
 vm_segment *
-apple2_enc_dos(vm_segment *src, const int *sectab)
+apple2_enc_dos(int type, vm_segment *src)
 {
     vm_segment *dest;
     int i, doff = 0;
@@ -58,7 +58,7 @@ apple2_enc_dos(vm_segment *src, const int *sectab)
     // away with just using tracks-and-sectors. In particular, DOS 3.3
     // has 35 tracks of 4096 bytes each.
     for (i = 0; i < 35; i++) {
-        doff += apple2_enc_track(dest, src, sectab, doff, i);
+        doff += apple2_enc_track(type, dest, src, doff, i);
     }
 
     return dest;
@@ -105,7 +105,7 @@ apple2_enc_nib(vm_segment *src)
  * written into dest.
  */
 int
-apple2_enc_track(vm_segment *dest, vm_segment *src, const int *sectab,
+apple2_enc_track(int sectype, vm_segment *dest, vm_segment *src,
                  int doff, int track)
 {
     int toff = track * ENC_DTRACK;
@@ -119,7 +119,7 @@ apple2_enc_track(vm_segment *dest, vm_segment *src, const int *sectab,
     }
 
     for (sect = 0; sect < 16; sect++) {
-        soff = toff + (ENC_DSECTOR * sectab[sect]);
+        soff = toff + (ENC_DSECTOR * apple2_dd_sector_num(sectype, sect));
 
         // Each sector has a header with some metadata, plus some
         // markers and padding.

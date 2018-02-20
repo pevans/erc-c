@@ -189,6 +189,7 @@ extern int apple2_dd_decode(apple2dd *);
 extern int apple2_dd_encode(apple2dd *);
 extern int apple2_dd_insert(apple2dd *, FILE *, int);
 extern int apple2_dd_position(apple2dd *);
+extern int apple2_dd_sector_num(int, int);
 extern vm_8bit apple2_dd_read(apple2dd *);
 extern vm_8bit apple2_dd_switch_rw(apple2dd *);
 extern void apple2_dd_eject(apple2dd *);
