@@ -217,7 +217,7 @@ Test(apple2_dd, phaser)
     cr_assert_eq(drive->track_pos, 1);
 
     // And test that we can go backward
-    drive->phase_state = 0;
+    drive->phase_state = 0x2;
     apple2_dd_phaser(drive);
     cr_assert_eq(drive->track_pos, 0);
 }
