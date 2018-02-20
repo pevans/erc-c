@@ -1,6 +1,7 @@
 #include <criterion/criterion.h>
 
 #include "apple2.dd.h"
+#include "apple2.enc.h"
 
 static apple2dd *drive;
 
@@ -109,11 +110,12 @@ Test(apple2_dd, shift)
 
     // Push it beyond the sector boundary; see if the track position
     // updates as it should.
-    apple2_dd_shift(drive, MAX_SECTOR_POS + 3);
-    cr_assert_eq(drive->track_pos, 2);
+    apple2_dd_shift(drive, ENC_ETRACK + 3);
+    cr_assert_eq(drive->track_pos, 0);
 
     // this should be the mod of sector_pos and MAX_SECTOR_POS
-    cr_assert_eq(drive->sector_pos, 7);
+    printf("it's %d\n", drive->sector_pos);
+    cr_assert_eq(drive->sector_pos, 0);
 }
 
 Test(apple2_dd, step)
