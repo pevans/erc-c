@@ -39,7 +39,7 @@ static vm_8bit gcr62[] = {
  * 3.2 and 3.1 (which use 5-and-3 encoding).
  */
 vm_segment *
-apple2_enc_dos(vm_segment *src)
+apple2_enc_dos(vm_segment *src, const int *sectab)
 {
     vm_segment *dest;
     int i, doff = 0;
@@ -58,7 +58,7 @@ apple2_enc_dos(vm_segment *src)
     // away with just using tracks-and-sectors. In particular, DOS 3.3
     // has 35 tracks of 4096 bytes each.
     for (i = 0; i < 35; i++) {
-        doff += apple2_enc_track(dest, src, doff, i);
+        doff += apple2_enc_track(dest, src, sectab, doff, i);
     }
 
     return dest;
@@ -105,12 +105,12 @@ apple2_enc_nib(vm_segment *src)
  * written into dest.
  */
 int
-apple2_enc_track(vm_segment *dest, vm_segment *src, 
+apple2_enc_track(vm_segment *dest, vm_segment *src, const int *sectab,
                  int doff, int track)
 {
-    int soff = track * ENC_DTRACK;
+    int toff = track * ENC_DTRACK;
     int orig = doff;
-    int sect, i;
+    int sect, i, soff;
 
     // We'll start off with some self-sync bytes to separate this track
     // from any other
@@ -119,13 +119,12 @@ apple2_enc_track(vm_segment *dest, vm_segment *src,
     }
 
     for (sect = 0; sect < 16; sect++) {
+        soff = toff + (ENC_DSECTOR * sectab[sect]);
+
         // Each sector has a header with some metadata, plus some
         // markers and padding.
         doff += apple2_enc_sector_header(dest, doff, track, sect);
         doff += apple2_enc_sector(dest, src, doff, soff);
-
-        // We're moving here in 256-byte blocks
-        soff += ENC_DSECTOR;
     }
 
     return doff - orig;
