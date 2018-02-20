@@ -51,7 +51,7 @@
  * the track number, the sector number, the volume, and an XOR'd
  * combination of all three.
  */
-#define ENC_ESECTOR_HEADER 0xe
+#define ENC_ESECTOR_HEADER 0x14
 
 /*
  * The track header (as mentioned for ENC_ETRACK) is 48 bytes of--well,
