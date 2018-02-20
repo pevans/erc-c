@@ -37,7 +37,7 @@ setup()
     // into, but use an underlying string buffer that we can easily
     // check with Criterion. Uh, unless we blow out the buffer size...
     // don't do that :D
-    setvbuf(stream, buf, _IOFBF, 256);
+    setvbuf(stream, buf, _IOFBF, BUFSIZ);
 
     mem = vm_segment_create(MOS6502_MEMSIZE);
     cpu = mos6502_create(mem, mem);
@@ -216,7 +216,7 @@ Test(mos6502_dis, opcode)
     mos6502_set(cpu, 1, 0x38);
 
     bytes = mos6502_dis_opcode(cpu, stream, 0);
-    assert_buf("   AND #$38      ; pc:0000 cy:02 val:38 a:00 x:00 y:00 p:NO-dIZC s:ff  | 29 38\n");
+    assert_buf("   AND #$38      ; pc:0000 cy:02 addr:0000 val:38 a:00 x:00 y:00 p:NO-dIZC s:ff | 29 38\n");
     cr_assert_eq(bytes, 2);
 }
 
@@ -230,14 +230,14 @@ Test(mos6502_dis, scan)
     mos6502_set(cpu, 5, 0x12);
 
     mos6502_dis_scan(cpu, stream, 0, 6);
-
+    
     // FIXME: scan does not currently advance the PC byte; _should_ it?
     // I'm honestly not sure. There are definitely times (e.g. during
     // runtime operation) when you don't want it to, but as a standalone
     // disassembler, it feels less useful when PC isn't emulated.
-    assert_buf("   AND #$38      ; pc:0000 cy:02 val:38 a:00 x:00 y:00 p:NO-dIZC s:ff  | 29 38\n"
-               "   DEY           ; pc:0000 cy:02 val:   a:00 x:00 y:00 p:NO-dIZC s:ff  | 88\n"
-               "   JMP ($1234)   ; pc:0000 cy:05 val:29 a:00 x:00 y:00 p:NO-dIZC s:ff  | 6c 34 12\n"
+    assert_buf("   AND #$38      ; pc:0000 cy:02 addr:0000 val:38 a:00 x:00 y:00 p:NO-dIZC s:ff | 29 38\n"
+               "   DEY           ; pc:0000 cy:02 addr:0000 val:   a:00 x:00 y:00 p:NO-dIZC s:ff | 88\n"
+               "   JMP ($1234)   ; pc:0000 cy:05 addr:0000 val:29 a:00 x:00 y:00 p:NO-dIZC s:ff | 6c 34 12\n"
                ";;;\n\n"
                );
 }
