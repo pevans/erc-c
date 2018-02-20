@@ -5,6 +5,14 @@
 #include "apple2.dd.h"
 
 /*
+ * This is the DOS 3.3 order; just to have something to use as a basis
+ */
+static int sectab[] = {
+    0x0, 0x7, 0xe, 0x6, 0xd, 0x5, 0xc, 0x4,
+    0xb, 0x3, 0xa, 0x2, 0x9, 0x1, 0x8, 0xf,
+};
+
+/*
  * Ripped from apple2.enc.c
  */
 static vm_8bit f_sector[] = {
@@ -103,7 +111,7 @@ Test(apple2_dec, track)
         vm_segment_set(orig, i, 0xff);
     }
 
-    apple2_enc_track(enc, orig, 0, 0);
+    apple2_enc_track(enc, orig, sectab, 0, 0);
     apple2_dec_track(dec, enc, 0, 0);
 
     for (i = 0; i < ENC_DTRACK; i++) {
@@ -120,7 +128,7 @@ Test(apple2_dec, dos)
     int i;
 
     vm_segment_fread(seg, fp, 0, _140K_);
-    enc = apple2_enc_dos(seg);
+    enc = apple2_enc_dos(seg, sectab);
     dec = vm_segment_create(1000000);
 
     apple2_dec_dos(dec, enc);
