@@ -193,7 +193,7 @@ apple2_dd_decode(apple2dd *drive)
 
         case DD_DOS33:
         case DD_PRODOS:
-            apple2_dec_dos(drive->image, drive->data);
+            apple2_dec_dos(drive->image_type, drive->image, drive->data);
             break;
 
         default:

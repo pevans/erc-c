@@ -7,6 +7,7 @@
 
 #include <stdbool.h>
 
+#include "apple2.dd.h"
 #include "apple2.dec.h"
 #include "apple2.enc.h"
 #include "vm_segment.h"
@@ -33,7 +34,7 @@ static vm_8bit conv6bit[] = {
  * given segment.
  */
 int
-apple2_dec_dos(vm_segment *dest, vm_segment *src)
+apple2_dec_dos(int sectype, vm_segment *dest, vm_segment *src)
 {
     int i, doff, tracklen;
 
@@ -42,7 +43,7 @@ apple2_dec_dos(vm_segment *dest, vm_segment *src)
     }
 
     for (i = 0, doff = 0; i < ENC_NUM_TRACKS; i++) {
-        tracklen = apple2_dec_track(dest, src, doff, i);
+        tracklen = apple2_dec_track(sectype, dest, src, doff, i);
 
         // Something went wrong...
         if (tracklen != ENC_DTRACK) {
@@ -80,18 +81,18 @@ apple2_dec_nib(vm_segment *dest, vm_segment *src)
  * This should return ENC_DTRACK bytes; if not, something went wrong.
  */
 int
-apple2_dec_track(vm_segment *dest, vm_segment *src, int doff, int track)
+apple2_dec_track(int sectype, vm_segment *dest, vm_segment *src, int doff, int track)
 {
-    int soff = track * ENC_ETRACK;
     int orig = doff;
-    int sect, sectlen;
+    int sect, sectlen, soff;
 
-    // Tracks have 48 bytes of filler... at least, as we build them
-    // (actual disk media may have more or less, it seems). Let's skip
-    // what we see.
-    soff += ENC_ETRACK_HEADER;
+    soff = (track * ENC_ETRACK) + ENC_ETRACK_HEADER;
 
     for (sect = 0; sect < ENC_NUM_SECTORS; sect++) {
+        doff =
+            (track * ENC_DTRACK) +
+            (apple2_dd_sector_num(sectype, sect) * ENC_DSECTOR);
+
         // This is going to be 256, for all intents and purposes
         sectlen = apple2_dec_sector(dest, src, doff, soff + ENC_ESECTOR_HEADER);
 
@@ -101,13 +102,7 @@ apple2_dec_track(vm_segment *dest, vm_segment *src, int doff, int track)
             return 0;
         }
 
-        doff += sectlen;
-        soff += ENC_ESECTOR + ENC_ESECTOR_HEADER;
-    }
-
-    // Something isn't right...
-    if (doff - orig != ENC_DTRACK) {
-        return 0;
+        soff += ENC_ESECTOR;
     }
 
     return ENC_DTRACK;
@@ -171,7 +166,7 @@ apple2_dec_sector(vm_segment *dest, vm_segment *src, int doff, int soff)
 
     // The footer_ok variable will be true if the ending byte markers we
     // expect to see are actually there.
-    int footer = soff + 9 + 0x157;
+    int footer = soff + 3 + 0x157;
     bool footer_ok =
         vm_segment_get(src, footer) == 0xde &&
         vm_segment_get(src, footer + 1) == 0xaa &&
@@ -186,7 +181,7 @@ apple2_dec_sector(vm_segment *dest, vm_segment *src, int doff, int soff)
     // Here we mean to convert the 6-and-2 encoded bytes back into its
     // first intermediate form
     for (i = 0; i < 0x157; i++) {
-        conv[i] = conv6bit[vm_segment_get(src, soff + i + 9) & 0x7f];
+        conv[i] = conv6bit[vm_segment_get(src, soff + i + 3) & 0x7f];
     }
 
     // Originally, we XOR'd each byte when encoding; so we need to do
