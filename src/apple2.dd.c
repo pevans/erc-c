@@ -49,6 +49,23 @@ apple2_dd_create()
     return drive;
 }
 
+/*
+ * If we suppose that DOS 3.3 and ProDOS disk _images_ have their tracks
+ * and sectors laid out in a logical or linear sense (tracks 0-35,
+ * sectors 0-16, in that order), then this function will return the
+ * sector within one track as it would be _physically_ laid out on the
+ * disk media.
+ *
+ * As you might suppose, the physical layout is different from the
+ * logical one. Sectors are physically laid out in an interleaved
+ * manner, where a sector from the first half of a track are mixed in
+ * with sectors from the latter half; this is keep the distance your
+ * disk drive would need to rotate to get to an arbitrary, given sector
+ * at a somewhat minimum. (For instance: suppose you were on sector 1,
+ * and you needed sector 2, but the disk media had already rotated to
+ * sector 3; you now need to do another full rotation to get back to
+ * sector 2.)
+ */
 int
 apple2_dd_sector_num(int type, int sect)
 {
