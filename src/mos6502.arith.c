@@ -72,16 +72,19 @@ DEFINE_INST(cpy)
 
 /*
  * Here we will decrement the value at the effective address in memory
- * by 1. The DEC instruction is _unable_ to decrement the accumulator,
- * which was a tiny oversight in the original build of the 6502.
- * (Whoopsie!)
+ * by 1.
  */
 DEFINE_INST(dec) 
 {
     if (cpu->eff_addr) {
         mos6502_modify_status(cpu, MOS_NZ, oper, oper - 1);
         mos6502_set(cpu, cpu->eff_addr, oper - 1);
+        return;
     }
+
+    // If we get here, then this is ACC mode, and we should work off
+    // that.
+    cpu->A--;
 }
 
 /*
@@ -103,16 +106,17 @@ DEFINE_INST(dey)
 }
 
 /*
- * The INC instruction is basically the same as the DEC one. It, also,
- * can only work with an address in memory, and it increments the value
- * by 1.
+ * The INC instruction is basically the same as the DEC one.
  */
 DEFINE_INST(inc)
 {
     if (cpu->eff_addr) {
         mos6502_modify_status(cpu, MOS_NZ, oper, oper + 1);
         mos6502_set(cpu, cpu->eff_addr, oper + 1);
+        return;
     }
+
+    cpu->A++;
 }
 
 /*

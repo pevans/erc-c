@@ -58,11 +58,9 @@ Test(mos6502_arith, cpy)
 
 Test(mos6502_arith, dec)
 {
-    // Note that DEC does NOT decrement the accumulator if the last
-    // address is not set. It does _nothing_.
     cpu->A = 5;
     mos6502_handle_dec(cpu, 0);
-    cr_assert_neq(cpu->A, 4);
+    cr_assert_eq(cpu->A, 4);
 
     cpu->eff_addr = 123;
     mos6502_set(cpu, 123, 44);
@@ -93,6 +91,11 @@ Test(mos6502_arith, inc)
     cpu->eff_addr = 123;
     mos6502_handle_inc(cpu, 55);
     cr_assert_eq(mos6502_get(cpu, 123), 56);
+
+    cpu->A = 8;
+    cpu->eff_addr = 0;
+    mos6502_handle_inc(cpu, 0);
+    cr_assert_eq(cpu->A, 9);
 }
 
 Test(mos6502_arith, inx)
