@@ -68,6 +68,16 @@ DEFINE_INST(bpl)
 }
 
 /*
+ * This instruction will branch in all cases. It's not a true
+ * conditional; it's analagous to a relative address mode JMP.
+ */
+DEFINE_INST(bra)
+{
+    // Always jump!
+    JUMP_IF(1);
+}
+
+/*
  * Branch if the overflow bit is clear.
  */
 DEFINE_INST(bvc)

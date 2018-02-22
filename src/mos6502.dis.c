@@ -53,6 +53,7 @@ static char *instruction_strings[] = {
     "BMI",
     "BNE",
     "BPL",
+    "BRA",
     "BRK",
     "BVC",
     "BVS",

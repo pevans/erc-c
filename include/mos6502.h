@@ -186,6 +186,7 @@ DECL_INST(bim);
 DECL_INST(bmi);
 DECL_INST(bne);
 DECL_INST(bpl);
+DECL_INST(bra);
 DECL_INST(brk);
 DECL_INST(bvc);
 DECL_INST(bvs);

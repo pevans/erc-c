@@ -77,6 +77,7 @@ enum instruction {
     BMI,    // Branch on MInus 
     BNE,    // Branch on Not Equal to zero
     BPL,    // Branch on PLus
+    BRA,    // BRanch Always
     BRK,    // BReaK (interrupt)
     BVC,    // Branch on oVerflow Clear
     BVS,    // Branch on oVerflow Set

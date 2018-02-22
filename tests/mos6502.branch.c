@@ -78,6 +78,14 @@ Test(mos6502_branch, bpl)
     cr_assert_eq(cpu->PC, 125);
 }
 
+Test(mos6502_branch, bra)
+{
+    cr_assert_eq(cpu->PC, 0);
+    cpu->eff_addr = 123;
+    mos6502_handle_bra(cpu, 0);
+    cr_assert_eq(cpu->PC, 123);
+}
+
 Test(mos6502_branch, bvc)
 {
     cpu->eff_addr = 123;
