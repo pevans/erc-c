@@ -130,6 +130,14 @@ DEFINE_INST(sty)
 }
 
 /*
+ * Store a zero byte into the effective address
+ */
+DEFINE_INST(stz)
+{
+    mos6502_set(cpu, cpu->eff_addr, 0);
+}
+
+/*
  * The TAX instruction taxes no one but your patience for my puns. What
  * it does do is transfer the contents of the A register to X.
  */

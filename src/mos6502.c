@@ -33,10 +33,10 @@ static int instructions[] = {
     BMI, AND, AND, BAD, BIT, AND, ROL, BAD, SEC, AND, DEC, BAD, BIT, AND, ROL, BAD, // 3x
     RTI, EOR, BAD, BAD, BAD, EOR, LSR, BAD, PHA, EOR, LSR, BAD, JMP, EOR, LSR, BAD, // 4x
     BVC, EOR, EOR, BAD, BAD, EOR, LSR, BAD, CLI, EOR, PHY, BAD, BAD, EOR, LSR, BAD, // 5x
-    RTS, ADC, BAD, BAD, BAD, ADC, ROR, BAD, PLA, ADC, ROR, BAD, JMP, ADC, ROR, BAD, // 6x
-    BVS, ADC, ADC, BAD, BAD, ADC, ROR, BAD, SEI, ADC, PLY, BAD, JMP, ADC, ROR, BAD, // 7x
+    RTS, ADC, BAD, BAD, STZ, ADC, ROR, BAD, PLA, ADC, ROR, BAD, JMP, ADC, ROR, BAD, // 6x
+    BVS, ADC, ADC, BAD, STZ, ADC, ROR, BAD, SEI, ADC, PLY, BAD, JMP, ADC, ROR, BAD, // 7x
     BRA, STA, BAD, BAD, STY, STA, STX, BAD, DEY, BIM, TXA, BAD, STY, STA, STX, BAD, // 8x
-    BCC, STA, STA, BAD, STY, STA, STX, BAD, TYA, STA, TXS, BAD, BAD, STA, BAD, BAD, // 9x
+    BCC, STA, STA, BAD, STY, STA, STX, BAD, TYA, STA, TXS, BAD, STZ, STA, STZ, BAD, // 9x
     LDY, LDA, LDX, BAD, LDY, LDA, LDX, BAD, TAY, LDA, TAX, BAD, LDY, LDA, LDX, BAD, // Ax
     BCS, LDA, LDA, BAD, LDY, LDA, LDX, BAD, CLV, LDA, TSX, BAD, LDY, LDA, LDX, BAD, // Bx
     CPY, CMP, BAD, BAD, CPY, CMP, DEC, BAD, INY, CMP, DEX, BAD, CPY, CMP, DEC, BAD, // Cx
@@ -114,6 +114,7 @@ static mos6502_instruction_handler instruction_handlers[] = {
     INST_HANDLER(sta),
     INST_HANDLER(stx),
     INST_HANDLER(sty),
+    INST_HANDLER(stz),
     INST_HANDLER(tax),
     INST_HANDLER(tay),
     INST_HANDLER(tsx),
@@ -135,10 +136,10 @@ static int cycles[] = {
       2,   5,   5,   0,   4,   4,   6,   0,   2,   4,   2,   0,   4,   4,   7,   0, // 3x
       6,   6,   0,   0,   0,   3,   5,   0,   3,   2,   2,   0,   3,   4,   6,   0, // 4x
       2,   5,   5,   0,   0,   4,   6,   0,   2,   4,   3,   0,   0,   4,   7,   0, // 5x
-      6,   6,   0,   0,   0,   3,   5,   0,   4,   2,   2,   0,   5,   4,   6,   0, // 6x
-      2,   5,   5,   0,   0,   4,   6,   0,   2,   4,   4,   0,   6,   4,   7,   0, // 7x
+      6,   6,   0,   0,   3,   3,   5,   0,   4,   2,   2,   0,   5,   4,   6,   0, // 6x
+      2,   5,   5,   0,   4,   4,   6,   0,   2,   4,   4,   0,   6,   4,   7,   0, // 7x
       3,   6,   0,   0,   3,   3,   3,   0,   2,   2,   2,   0,   4,   4,   4,   0, // 8x
-      2,   6,   5,   0,   4,   4,   4,   0,   2,   5,   2,   0,   0,   5,   0,   0, // 9x
+      2,   6,   5,   0,   4,   4,   4,   0,   2,   5,   2,   0,   4,   5,   5,   0, // 9x
       2,   6,   2,   0,   3,   3,   3,   0,   2,   2,   2,   0,   4,   4,   4,   0, // Ax
       2,   5,   5,   0,   4,   4,   4,   0,   2,   4,   2,   0,   4,   4,   4,   0, // Bx
       2,   6,   0,   0,   3,   3,   5,   0,   2,   2,   2,   0,   4,   4,   3,   0, // Cx

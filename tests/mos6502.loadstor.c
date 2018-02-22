@@ -110,6 +110,20 @@ Test(mos6502_loadstor, sty)
     cr_assert_eq(mos6502_get(cpu, cpu->eff_addr), cpu->Y);
 }
 
+Test(mos6502_loadstor, stz)
+{
+    // To begin with, we want a non-zero value in eff_addr
+    cpu->eff_addr = 111;
+    mos6502_set(cpu, cpu->eff_addr, 222);
+
+    // Furthermore, we pass in a non-zero operand to stz, which
+    // _shouldn't_ care what the operand is. It should only assign a
+    // zero to eff_addr.
+    mos6502_handle_stz(cpu, 11);
+
+    cr_assert_eq(mos6502_get(cpu, cpu->eff_addr), 0);
+}
+
 Test(mos6502_loadstor, tax)
 {
     cpu->A = 111;

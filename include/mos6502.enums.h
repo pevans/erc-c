@@ -122,6 +122,7 @@ enum instruction {
     STA,    // STore Accumulator
     STX,    // STore X
     STY,    // STore Y
+    STZ,    // STore Zero
     TAX,    // Transfer Accumulator to X
     TAY,    // Transfer Accumulator to Y
     TSX,    // Transfer Stack register to X

@@ -231,6 +231,7 @@ DECL_INST(sei);
 DECL_INST(sta);
 DECL_INST(stx);
 DECL_INST(sty);
+DECL_INST(stz);
 DECL_INST(tax);
 DECL_INST(tay);
 DECL_INST(tsx);
