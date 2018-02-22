@@ -40,6 +40,20 @@ Test(mos6502_loadstor, php)
     cr_assert_eq(mos6502_get(cpu, 0x01ff), 0x43);
 }
 
+Test(mos6502_loadstor, phx)
+{
+    cpu->X = 123;
+    mos6502_handle_phx(cpu, 0);
+    cr_assert_eq(mos6502_get(cpu, 0x01ff), 123);
+}
+
+Test(mos6502_loadstor, phy)
+{
+    cpu->Y = 234;
+    mos6502_handle_phy(cpu, 0);
+    cr_assert_eq(mos6502_get(cpu, 0x01ff), 234);
+}
+
 Test(mos6502_loadstor, pla)
 {
     mos6502_push_stack(cpu, 0x0033);
@@ -54,6 +68,22 @@ Test(mos6502_loadstor, plp)
     mos6502_handle_plp(cpu, 0);
 
     cr_assert_eq(cpu->P, 0x52);
+}
+
+Test(mos6502_loadstor, plx)
+{
+    mos6502_push_stack(cpu, 87);
+    mos6502_handle_plx(cpu, 0);
+
+    cr_assert_eq(cpu->X, 87);
+}
+
+Test(mos6502_loadstor, ply)
+{
+    mos6502_push_stack(cpu, 44);
+    mos6502_handle_ply(cpu, 0);
+
+    cr_assert_eq(cpu->Y, 44);
 }
 
 Test(mos6502_loadstor, sta)

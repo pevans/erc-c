@@ -105,8 +105,12 @@ enum instruction {
     ORA,    // OR with Accumulator
     PHA,    // PusH Accumulator
     PHP,    // PusH Predicate register
+    PHX,    // PusH X register
+    PHY,    // PusH Y register
     PLA,    // PulL Accumulator
     PLP,    // PulL Predicate register
+    PLX,    // PulL X register
+    PLY,    // PulL Y register
     ROL,    // ROtate Left
     ROR,    // ROtate Right
     RTI,    // ReTurn from Interrupt

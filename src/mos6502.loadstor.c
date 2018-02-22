@@ -53,6 +53,23 @@ DEFINE_INST(php)
 }
 
 /*
+ * Push the X register onto the stack. Sadly, this does not summon a
+ * phoenix to assist you in hours of need.
+ */
+DEFINE_INST(phx)
+{
+    mos6502_push_stack(cpu, cpu->X);
+}
+
+/*
+ * Push the Y register onto the stack
+ */
+DEFINE_INST(phy)
+{
+    mos6502_push_stack(cpu, cpu->Y);
+}
+
+/*
  * Here we pop the stack (or "pull" it), and assign to the accumulator.
  */
 DEFINE_INST(pla)
@@ -69,6 +86,22 @@ DEFINE_INST(pla)
 DEFINE_INST(plp)
 {
     cpu->P = mos6502_pop_stack(cpu);
+}
+
+/*
+ * Pop from the stack and assign that byte to the X register
+ */
+DEFINE_INST(plx)
+{
+    cpu->X = mos6502_pop_stack(cpu);
+}
+
+/*
+ * Pop from the stack and assign that byte to the Y register
+ */
+DEFINE_INST(ply)
+{
+    cpu->Y = mos6502_pop_stack(cpu);
 }
 
 /*
