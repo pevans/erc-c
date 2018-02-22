@@ -95,6 +95,9 @@ apple2_dd_sector_num(int type, int sect)
             sectab = prodos;
             break;
 
+        // We also allow default behavior to mimic NIBBLE, but there's
+        // probably no "right" default behavior to use.
+        default:
         case DD_NIBBLE:
             return sect;
     }
