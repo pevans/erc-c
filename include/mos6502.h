@@ -182,6 +182,7 @@ DECL_INST(bcc);
 DECL_INST(bcs);
 DECL_INST(beq);
 DECL_INST(bit);
+DECL_INST(bim);
 DECL_INST(bmi);
 DECL_INST(bne);
 DECL_INST(bpl);

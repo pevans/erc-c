@@ -75,6 +75,22 @@ DEFINE_INST(bit)
 }
 
 /*
+ * The BIM instruction (which is made up--it's not a real instruction)
+ * is here to handle the specific use-case of a BIT instruction in
+ * immediate (IMM) mode. We do this in a separate instruction to avoid
+ * the need to add logic to the BIT instruction such that it has to know
+ * or care about its opcode or its address mode.
+ */
+DEFINE_INST(bim)
+{
+    // This is the same behavior as BIT
+    cpu->P &= ~MOS_ZERO;
+    if (!(cpu->A & oper)) {
+        cpu->P |= MOS_ZERO;
+    }
+}
+
+/*
  * Compute the bitwise-exclusive-or between the accumulator and operand,
  * and store the result in A.
  */

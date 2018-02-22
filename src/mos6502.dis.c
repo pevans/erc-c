@@ -49,6 +49,7 @@ static char *instruction_strings[] = {
     "BCS",
     "BEQ",
     "BIT",
+    "BIM",
     "BMI",
     "BNE",
     "BPL",

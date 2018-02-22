@@ -73,6 +73,7 @@ enum instruction {
     BCS,    // Branch on Carry Set
     BEQ,    // Branch on EQual to zero
     BIT,    // BIT test
+    BIM,    // BIt test (imMediate mode) (* not a real instruction in the processor; just used by us)
     BMI,    // Branch on MInus 
     BNE,    // Branch on Not Equal to zero
     BPL,    // Branch on PLus

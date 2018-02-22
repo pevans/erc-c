@@ -56,6 +56,23 @@ Test(mos6502_bits, bit)
     cr_assert_eq(cpu->P & MOS_ZERO, MOS_ZERO);
 }
 
+Test(mos6502_bits, bim)
+{
+    // This version of BIT should not modify the NV flags
+    cpu->P |= MOS_NEGATIVE;
+    cpu->P |= MOS_OVERFLOW;
+
+    cpu->A = 63;
+    mos6502_handle_bim(cpu, 123);
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, MOS_NEGATIVE);
+    cr_assert_eq(cpu->P & MOS_OVERFLOW, MOS_OVERFLOW);
+
+    cpu->A = 4;
+    mos6502_handle_bim(cpu, 123);
+    cr_assert_eq(cpu->P & MOS_ZERO, MOS_ZERO);
+}
+
 Test(mos6502_bits, eor)
 {
     cpu->A = 5;

@@ -35,7 +35,7 @@ static int instructions[] = {
     BVC, EOR, EOR, BAD, BAD, EOR, LSR, BAD, CLI, EOR, BAD, BAD, BAD, EOR, LSR, BAD, // 5x
     RTS, ADC, BAD, BAD, BAD, ADC, ROR, BAD, PLA, ADC, ROR, BAD, JMP, ADC, ROR, BAD, // 6x
     BVS, ADC, ADC, BAD, BAD, ADC, ROR, BAD, SEI, ADC, BAD, BAD, BAD, ADC, ROR, BAD, // 7x
-    BAD, STA, BAD, BAD, STY, STA, STX, BAD, DEY, BIT, TXA, BAD, STY, STA, STX, BAD, // 8x
+    BAD, STA, BAD, BAD, STY, STA, STX, BAD, DEY, BIM, TXA, BAD, STY, STA, STX, BAD, // 8x
     BCC, STA, STA, BAD, STY, STA, STX, BAD, TYA, STA, TXS, BAD, BAD, STA, BAD, BAD, // 9x
     LDY, LDA, LDX, BAD, LDY, LDA, LDX, BAD, TAY, LDA, TAX, BAD, LDY, LDA, LDX, BAD, // Ax
     BCS, LDA, LDA, BAD, LDY, LDA, LDX, BAD, CLV, LDA, TSX, BAD, LDY, LDA, LDX, BAD, // Bx
@@ -65,6 +65,7 @@ static mos6502_instruction_handler instruction_handlers[] = {
     INST_HANDLER(bcs),
     INST_HANDLER(beq),
     INST_HANDLER(bit),
+    INST_HANDLER(bim),
     INST_HANDLER(bmi),
     INST_HANDLER(bne),
     INST_HANDLER(bpl),
