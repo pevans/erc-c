@@ -27,7 +27,7 @@
  */
 static int instructions[] = {
 //   00   01   02   03   04   05   06   07   08   09   0A   0B   0C   0D   0E   0F
-    BRK, ORA, BAD, BAD, BAD, ORA, ASL, BAD, PHP, ORA, ASL, BAD, BAD, ORA, ASL, BAD, // 0x
+    BRK, ORA, BAD, BAD, TSB, ORA, ASL, BAD, PHP, ORA, ASL, BAD, TSB, ORA, ASL, BAD, // 0x
     BPL, ORA, ORA, BAD, TRB, ORA, ASL, BAD, CLC, ORA, INC, BAD, TRB, ORA, ASL, BAD, // 1x
     JSR, AND, BAD, BAD, BIT, AND, ROL, BAD, PLP, AND, ROL, BAD, BIT, AND, ROL, BAD, // 2x
     BMI, AND, AND, BAD, BIT, AND, ROL, BAD, SEC, AND, DEC, BAD, BIT, AND, ROL, BAD, // 3x
@@ -118,6 +118,7 @@ static mos6502_instruction_handler instruction_handlers[] = {
     INST_HANDLER(tax),
     INST_HANDLER(tay),
     INST_HANDLER(trb),
+    INST_HANDLER(tsb),
     INST_HANDLER(tsx),
     INST_HANDLER(txa),
     INST_HANDLER(txs),
@@ -131,7 +132,7 @@ static mos6502_instruction_handler instruction_handlers[] = {
  */
 static int cycles[] = {
 //   00   01   02   03   04   05   06   07   08   09   0A   0B   0C   0D   0E   0F
-      7,   6,   0,   0,   0,   3,   5,   0,   3,   2,   2,   0,   0,   4,   6,   0, // 0x
+      7,   6,   0,   0,   5,   3,   5,   0,   3,   2,   2,   0,   6,   4,   6,   0, // 0x
       2,   5,   5,   0,   5,   4,   6,   0,   2,   4,   2,   0,   6,   4,   7,   0, // 1x
       6,   6,   0,   0,   3,   3,   5,   0,   4,   2,   2,   0,   4,   4,   6,   0, // 2x
       2,   5,   5,   0,   4,   4,   6,   0,   2,   4,   2,   0,   4,   4,   7,   0, // 3x

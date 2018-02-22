@@ -203,3 +203,53 @@ DEFINE_INST(ror)
         cpu->A = result & 0xff;
     }
 }
+
+/*
+ * This is a really funky instruction. And not in the good, dancy kinda
+ * way.
+ *
+ * First, it does a BIT-style test to see if A & oper are zero; if so,
+ * it sets the Z flag.
+ *
+ * Second, it clears all bits in eff_addr where A's corresponding bits
+ * are set to 1. It ignores all bits in eff_addr where A's bits are
+ * zero.
+ *
+ * E.g.:
+ *
+ * A: 01011001  (accumulator)
+ * M: 11111111  (value in memory)
+ * R: 10100110  (result)
+ *
+ * And, as following that, the Z flag should be zero because A&M is a
+ * non-zero result.
+ */
+DEFINE_INST(trb)
+{
+    cpu->P &= ~MOS_ZERO;
+    if (!(cpu->A & oper)) {
+        cpu->P |= MOS_ZERO;
+    }
+
+    mos6502_set(cpu, cpu->eff_addr,
+                (cpu->A ^ 0xff) & oper);
+}
+
+/*
+ * Test to see if (A & oper) are zero and set Z flag if so.
+ * Additionally, set the bits in the byte at a given effective address
+ * (M) to 1 where the A register's bits are also 1. (Bits that are 0 in
+ * A are unchanged in M.)
+ */
+DEFINE_INST(tsb)
+{
+    cpu->P &= ~MOS_ZERO;
+    if (!(cpu->A & oper)) {
+        cpu->P |= MOS_ZERO;
+    }
+
+    // The behavior described in the docblock here can be accomplished
+    // simply by OR'ing the accumulator and the operand, and storing
+    // back into memory at eff_addr.
+    mos6502_set(cpu, cpu->eff_addr, cpu->A | oper);
+}

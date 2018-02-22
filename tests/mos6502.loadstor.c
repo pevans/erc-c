@@ -140,23 +140,6 @@ Test(mos6502_loadstor, tay)
     cr_assert_eq(cpu->Y, 111);
 }
 
-Test(mos6502_loadstor, trb)
-{
-    cpu->A = 6;
-    mos6502_handle_trb(cpu, 3);
-    cr_assert_eq(cpu->P & MOS_ZERO, 0);
-    cpu->A = 9;
-    mos6502_handle_trb(cpu, 2);
-    cr_assert_eq(cpu->P & MOS_ZERO, MOS_ZERO);
-
-    cpu->eff_addr = 111;
-    mos6502_set(cpu, cpu->eff_addr, 123);
-    mos6502_handle_trb(cpu, 123);
-
-    cr_assert_eq(mos6502_get(cpu, cpu->eff_addr),
-                 (cpu->A ^ 0xff) & 123);
-}
-
 Test(mos6502_loadstor, tsx)
 {
     cpu->S = 111;

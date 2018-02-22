@@ -127,3 +127,43 @@ Test(mos6502_bits, ror)
     mos6502_handle_ror(cpu, 0);
     cr_assert_eq(mos6502_get(cpu, 123), 128);
 }
+
+Test(mos6502_bits, trb)
+{
+    cpu->A = 6;
+    mos6502_handle_trb(cpu, 3);
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
+    cpu->A = 9;
+    mos6502_handle_trb(cpu, 2);
+    cr_assert_eq(cpu->P & MOS_ZERO, MOS_ZERO);
+
+    cpu->eff_addr = 111;
+    mos6502_set(cpu, cpu->eff_addr, 123);
+    mos6502_handle_trb(cpu, 123);
+
+    cr_assert_eq(mos6502_get(cpu, cpu->eff_addr),
+                 (cpu->A ^ 0xff) & 123);
+}
+
+Test(mos6502_bits, tsb)
+{
+    // I borrowed this code from the trb test; TSB and TRB do exactly
+    // the same thing in regards to the zero bit.
+    cpu->A = 6;
+    mos6502_handle_trb(cpu, 3);
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
+    cpu->A = 9;
+    mos6502_handle_trb(cpu, 2);
+    cr_assert_eq(cpu->P & MOS_ZERO, MOS_ZERO);
+
+    // This is similar to the segment in the trb test that focuses on
+    // the resetting (clearing) of bits, but modified to account for the
+    // differing result that tsb would provide--namely that the 1s in A
+    // will be set in the location in memory, rather than cleared.
+    cpu->eff_addr = 111;
+    mos6502_set(cpu, cpu->eff_addr, 123);
+    mos6502_handle_tsb(cpu, 123);
+
+    cr_assert_eq(mos6502_get(cpu, cpu->eff_addr), cpu->A | 123);
+}
+

@@ -19,7 +19,7 @@
  */
 static int addr_modes[] = {
 //   00   01   02   03   04   05   06   07   08   09   0A   0B   0C   0D   0E   0F
-    IMP, IDX, NOA, NOA, NOA, ZPG, ZPG, NOA, IMP, IMM, ACC, NOA, NOA, ABS, ABS, NOA, // 0x
+    IMP, IDX, NOA, NOA, ZPG, ZPG, ZPG, NOA, IMP, IMM, ACC, NOA, ABS, ABS, ABS, NOA, // 0x
     REL, IDY, ZPG, NOA, ZPG, ZPX, ZPX, NOA, IMP, ABY, ACC, NOA, ABS, ABX, ABX, NOA, // 1x
     ABS, IDX, NOA, NOA, ZPG, ZPG, ZPG, NOA, IMP, IMM, ACC, NOA, ABS, ABS, ABS, NOA, // 2x
     REL, IDY, ZPG, NOA, ZPX, ZPX, ZPX, NOA, IMP, ABY, ACC, NOA, ABX, ABX, ABX, NOA, // 3x
