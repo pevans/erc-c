@@ -8,12 +8,18 @@ TestSuite(mos6502_exec, .init = setup, .fini = teardown);
 
 Test(mos6502_exec, brk)
 {
+    // Start out with the decimal bit high so we can test it gets turned
+    // off; this assignment also guarantees the I bit is low, and that
+    // should be set high by the handler as well.
+    cpu->P = MOS_DECIMAL;
+
     vm_8bit orig_P = cpu->P;
 
     cpu->PC = 123;
     mos6502_handle_brk(cpu, 0);
     cr_assert_eq(cpu->PC, 125);
     cr_assert_eq(cpu->P & MOS_INTERRUPT, MOS_INTERRUPT);
+    cr_assert_eq(cpu->P & MOS_DECIMAL, 0);
 
     cr_assert_eq(mos6502_pop_stack(cpu), orig_P);
     cr_assert_eq(mos6502_pop_stack(cpu), 123);

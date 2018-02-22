@@ -32,6 +32,7 @@ DEFINE_INST(brk)
     mos6502_push_stack(cpu, cpu->PC & 0xff);
     mos6502_push_stack(cpu, cpu->P);
     cpu->P |= MOS_INTERRUPT;
+    cpu->P &= ~MOS_DECIMAL;
     cpu->PC += 2;
 }
 
