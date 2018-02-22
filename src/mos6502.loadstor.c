@@ -157,6 +157,37 @@ DEFINE_INST(tay)
 }
 
 /*
+ * This is a really funky instruction. And not in the good, dancy kinda
+ * way.
+ *
+ * First, it does a BIT-style test to see if A & oper are zero; if so,
+ * it sets the Z flag.
+ *
+ * Second, it clears all bits in eff_addr where A's corresponding bits
+ * are set to 1. It ignores all bits in eff_addr where A's bits are
+ * zero.
+ *
+ * E.g.:
+ *
+ * A: 01011001  (accumulator)
+ * M: 11111111  (value in memory)
+ * R: 10100110  (result)
+ *
+ * And, as following that, the Z flag should be zero because A&M is a
+ * non-zero result.
+ */
+DEFINE_INST(trb)
+{
+    cpu->P &= ~MOS_ZERO;
+    if (!(cpu->A & oper)) {
+        cpu->P |= MOS_ZERO;
+    }
+
+    mos6502_set(cpu, cpu->eff_addr,
+                (cpu->A ^ 0xff) & oper);
+}
+
+/*
  * Transfer the stack pointer (S register) to X.
  */
 DEFINE_INST(tsx)

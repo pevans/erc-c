@@ -125,6 +125,7 @@ enum instruction {
     STZ,    // STore Zero
     TAX,    // Transfer Accumulator to X
     TAY,    // Transfer Accumulator to Y
+    TRB,    // Test and Reset Bits
     TSX,    // Transfer Stack register to X
     TXA,    // Transfer X to Accumulator
     TXS,    // Transfer X to Stack register

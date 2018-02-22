@@ -101,6 +101,7 @@ static char *instruction_strings[] = {
     "STZ",
     "TAX",
     "TAY",
+    "TRB",
     "TSX",
     "TXA",
     "TXS",
