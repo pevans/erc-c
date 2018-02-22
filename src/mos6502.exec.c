@@ -68,10 +68,18 @@ DEFINE_INST(nop)
     // do nothing
 }
 
+/*
+ * This is not any different from NOP, except that it uses a different
+ * address mode.
+ */
 DEFINE_INST(np2)
 {
 }
 
+/*
+ * This is not any different from NOP, except that it uses a different
+ * address mode.
+ */
 DEFINE_INST(np3)
 {
 }
