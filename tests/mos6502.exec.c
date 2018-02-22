@@ -45,6 +45,13 @@ Test(mos6502_exec, jsr)
     cr_assert_eq(mos6502_pop_stack(cpu), 125);
 }
 
+/*
+ * In addition to nop, we also have np2 and np3 which also do nothing.
+ * We're just passing on those.
+ *
+ * Test(mos6502_exec, np2)
+ * Test(mos6502_exec, np3)
+ */
 Test(mos6502_exec, nop)
 {
     // currently this test does nothing -- we _should_ test to see if we

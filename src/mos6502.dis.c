@@ -78,6 +78,8 @@ static char *instruction_strings[] = {
     "LDY",
     "LSR",
     "NOP",
+    "NP2",
+    "NP3",
     "ORA",
     "PHA",
     "PHP",
@@ -231,11 +233,17 @@ int
 mos6502_dis_expected_bytes(int addr_mode)
 {
     switch (addr_mode) {
+        // This is kind of not a real address mode? We use it to tell
+        // the code to skip three bytes for opcodes that use it.
+        case BY3:
+            return 3;
+
         // These are 16-bit operands, because they work with absolute
         // addresses in memory.
         case ABS:
         case ABY:
         case ABX:
+        case BY2:   // (also not a real address mode!)
         case IND:
             return 2;
 

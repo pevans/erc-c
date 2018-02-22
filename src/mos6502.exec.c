@@ -68,6 +68,14 @@ DEFINE_INST(nop)
     // do nothing
 }
 
+DEFINE_INST(np2)
+{
+}
+
+DEFINE_INST(np3)
+{
+}
+
 /*
  * Here we return from an interrupt, which effectively resets the PC
  * register to the last value on the stack.

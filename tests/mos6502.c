@@ -124,6 +124,8 @@ Test(mos6502, would_jump)
             case BVS:
             case JMP:
             case JSR:
+            case NP2:
+            case NP3:
             case RTS:
             case RTI:
                 expect = true;

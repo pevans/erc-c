@@ -211,6 +211,8 @@ DECL_INST(ldx);
 DECL_INST(ldy);
 DECL_INST(lsr);
 DECL_INST(nop);
+DECL_INST(np2);
+DECL_INST(np3);
 DECL_INST(ora);
 DECL_INST(pha);
 DECL_INST(php);

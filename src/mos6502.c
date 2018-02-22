@@ -27,22 +27,22 @@
  */
 static int instructions[] = {
 //   00   01   02   03   04   05   06   07   08   09   0A   0B   0C   0D   0E   0F
-    BRK, ORA, BAD, BAD, TSB, ORA, ASL, BAD, PHP, ORA, ASL, BAD, TSB, ORA, ASL, BAD, // 0x
-    BPL, ORA, ORA, BAD, TRB, ORA, ASL, BAD, CLC, ORA, INC, BAD, TRB, ORA, ASL, BAD, // 1x
-    JSR, AND, BAD, BAD, BIT, AND, ROL, BAD, PLP, AND, ROL, BAD, BIT, AND, ROL, BAD, // 2x
-    BMI, AND, AND, BAD, BIT, AND, ROL, BAD, SEC, AND, DEC, BAD, BIT, AND, ROL, BAD, // 3x
-    RTI, EOR, BAD, BAD, BAD, EOR, LSR, BAD, PHA, EOR, LSR, BAD, JMP, EOR, LSR, BAD, // 4x
-    BVC, EOR, EOR, BAD, BAD, EOR, LSR, BAD, CLI, EOR, PHY, BAD, BAD, EOR, LSR, BAD, // 5x
-    RTS, ADC, BAD, BAD, STZ, ADC, ROR, BAD, PLA, ADC, ROR, BAD, JMP, ADC, ROR, BAD, // 6x
-    BVS, ADC, ADC, BAD, STZ, ADC, ROR, BAD, SEI, ADC, PLY, BAD, JMP, ADC, ROR, BAD, // 7x
-    BRA, STA, BAD, BAD, STY, STA, STX, BAD, DEY, BIM, TXA, BAD, STY, STA, STX, BAD, // 8x
-    BCC, STA, STA, BAD, STY, STA, STX, BAD, TYA, STA, TXS, BAD, STZ, STA, STZ, BAD, // 9x
-    LDY, LDA, LDX, BAD, LDY, LDA, LDX, BAD, TAY, LDA, TAX, BAD, LDY, LDA, LDX, BAD, // Ax
-    BCS, LDA, LDA, BAD, LDY, LDA, LDX, BAD, CLV, LDA, TSX, BAD, LDY, LDA, LDX, BAD, // Bx
-    CPY, CMP, BAD, BAD, CPY, CMP, DEC, BAD, INY, CMP, DEX, BAD, CPY, CMP, DEC, BAD, // Cx
-    BNE, CMP, CMP, BAD, BAD, CMP, DEC, BAD, CLD, CMP, PHX, BAD, BAD, CMP, DEC, BAD, // Dx
-    CPX, SBC, BAD, BAD, CPX, SBC, INC, BAD, INX, SBC, NOP, BAD, CPX, SBC, INC, BAD, // Ex
-    BEQ, SBC, SBC, BAD, BAD, SBC, INC, BAD, SED, SBC, PLX, BAD, BAD, SBC, INC, BAD, // Fx
+    BRK, ORA, NP2, NOP, TSB, ORA, ASL, NOP, PHP, ORA, ASL, NOP, TSB, ORA, ASL, NOP, // 0x
+    BPL, ORA, ORA, NOP, TRB, ORA, ASL, NOP, CLC, ORA, INC, NOP, TRB, ORA, ASL, NOP, // 1x
+    JSR, AND, NP2, NOP, BIT, AND, ROL, NOP, PLP, AND, ROL, NOP, BIT, AND, ROL, NOP, // 2x
+    BMI, AND, AND, NOP, BIT, AND, ROL, NOP, SEC, AND, DEC, NOP, BIT, AND, ROL, NOP, // 3x
+    RTI, EOR, NP2, NOP, NP2, EOR, LSR, NOP, PHA, EOR, LSR, NOP, JMP, EOR, LSR, NOP, // 4x
+    BVC, EOR, EOR, NOP, NP2, EOR, LSR, NOP, CLI, EOR, PHY, NOP, NP3, EOR, LSR, NOP, // 5x
+    RTS, ADC, NP2, NOP, STZ, ADC, ROR, NOP, PLA, ADC, ROR, NOP, JMP, ADC, ROR, NOP, // 6x
+    BVS, ADC, ADC, NOP, STZ, ADC, ROR, NOP, SEI, ADC, PLY, NOP, JMP, ADC, ROR, NOP, // 7x
+    BRA, STA, NP2, NOP, STY, STA, STX, NOP, DEY, BIM, TXA, NOP, STY, STA, STX, NOP, // 8x
+    BCC, STA, STA, NOP, STY, STA, STX, NOP, TYA, STA, TXS, NOP, STZ, STA, STZ, NOP, // 9x
+    LDY, LDA, LDX, NOP, LDY, LDA, LDX, NOP, TAY, LDA, TAX, NOP, LDY, LDA, LDX, NOP, // Ax
+    BCS, LDA, LDA, NOP, LDY, LDA, LDX, NOP, CLV, LDA, TSX, NOP, LDY, LDA, LDX, NOP, // Bx
+    CPY, CMP, NP2, NOP, CPY, CMP, DEC, NOP, INY, CMP, DEX, NOP, CPY, CMP, DEC, NOP, // Cx
+    BNE, CMP, CMP, NOP, NP2, CMP, DEC, NOP, CLD, CMP, PHX, NOP, NP3, CMP, DEC, NOP, // Dx
+    CPX, SBC, NP2, NOP, CPX, SBC, INC, NOP, INX, SBC, NOP, NOP, CPX, SBC, INC, NOP, // Ex
+    BEQ, SBC, SBC, NOP, NP2, SBC, INC, NOP, SED, SBC, PLX, NOP, NP3, SBC, INC, NOP, // Fx
 };
 
 /*
@@ -94,6 +94,8 @@ static mos6502_instruction_handler instruction_handlers[] = {
     INST_HANDLER(ldy),
     INST_HANDLER(lsr),
     INST_HANDLER(nop),
+    INST_HANDLER(np2),
+    INST_HANDLER(np3),
     INST_HANDLER(ora),
     INST_HANDLER(pha),
     INST_HANDLER(php),
@@ -132,22 +134,22 @@ static mos6502_instruction_handler instruction_handlers[] = {
  */
 static int cycles[] = {
 //   00   01   02   03   04   05   06   07   08   09   0A   0B   0C   0D   0E   0F
-      7,   6,   0,   0,   5,   3,   5,   0,   3,   2,   2,   0,   6,   4,   6,   0, // 0x
-      2,   5,   5,   0,   5,   4,   6,   0,   2,   4,   2,   0,   6,   4,   6,   0, // 1x
-      6,   6,   0,   0,   3,   3,   5,   0,   4,   2,   2,   0,   4,   4,   6,   0, // 2x
-      2,   5,   5,   0,   4,   4,   6,   0,   2,   4,   2,   0,   4,   4,   6,   0, // 3x
-      6,   6,   0,   0,   0,   3,   5,   0,   3,   2,   2,   0,   3,   4,   6,   0, // 4x
-      2,   5,   5,   0,   0,   4,   6,   0,   2,   4,   3,   0,   0,   4,   6,   0, // 5x
-      6,   6,   0,   0,   3,   3,   5,   0,   4,   2,   2,   0,   5,   4,   6,   0, // 6x
-      2,   5,   5,   0,   4,   4,   6,   0,   2,   4,   4,   0,   6,   4,   6,   0, // 7x
-      3,   6,   0,   0,   3,   3,   3,   0,   2,   2,   2,   0,   4,   4,   4,   0, // 8x
-      2,   6,   5,   0,   4,   4,   4,   0,   2,   5,   2,   0,   4,   5,   5,   0, // 9x
-      2,   6,   2,   0,   3,   3,   3,   0,   2,   2,   2,   0,   4,   4,   4,   0, // Ax
-      2,   5,   5,   0,   4,   4,   4,   0,   2,   4,   2,   0,   4,   4,   4,   0, // Bx
-      2,   6,   0,   0,   3,   3,   5,   0,   2,   2,   2,   0,   4,   4,   3,   0, // Cx
-      2,   5,   5,   0,   0,   4,   6,   0,   2,   4,   3,   0,   0,   4,   7,   0, // Dx
-      2,   6,   0,   0,   3,   3,   5,   0,   2,   2,   2,   0,   4,   4,   6,   0, // Ex
-      2,   5,   5,   0,   0,   4,   6,   0,   2,   4,   4,   0,   0,   4,   7,   0, // Fx
+      7,   6,   2,   1,   5,   3,   5,   1,   3,   2,   2,   1,   6,   4,   6,   1, // 0x
+      2,   5,   5,   1,   5,   4,   6,   1,   2,   4,   2,   1,   6,   4,   6,   1, // 1x
+      6,   6,   2,   1,   3,   3,   5,   1,   4,   2,   2,   1,   4,   4,   6,   1, // 2x
+      2,   5,   5,   1,   4,   4,   6,   1,   2,   4,   2,   1,   4,   4,   6,   1, // 3x
+      6,   6,   2,   1,   3,   3,   5,   1,   3,   2,   2,   1,   3,   4,   6,   1, // 4x
+      2,   5,   5,   1,   4,   4,   6,   1,   2,   4,   3,   1,   8,   4,   6,   1, // 5x
+      6,   6,   2,   1,   3,   3,   5,   1,   4,   2,   2,   1,   5,   4,   6,   1, // 6x
+      2,   5,   5,   1,   4,   4,   6,   1,   2,   4,   4,   1,   6,   4,   6,   1, // 7x
+      3,   6,   2,   1,   3,   3,   3,   1,   2,   2,   2,   1,   4,   4,   4,   1, // 8x
+      2,   6,   5,   1,   4,   4,   4,   1,   2,   5,   2,   1,   4,   5,   5,   1, // 9x
+      2,   6,   2,   1,   3,   3,   3,   1,   2,   2,   2,   1,   4,   4,   4,   1, // Ax
+      2,   5,   5,   1,   4,   4,   4,   1,   2,   4,   2,   1,   4,   4,   4,   1, // Bx
+      2,   6,   2,   1,   3,   3,   5,   1,   2,   2,   2,   1,   4,   4,   3,   1, // Cx
+      2,   5,   5,   1,   4,   4,   6,   1,   2,   4,   3,   1,   4,   4,   7,   1, // Dx
+      2,   6,   2,   1,   3,   3,   5,   1,   2,   2,   2,   1,   4,   4,   6,   1, // Ex
+      2,   5,   5,   1,   4,   4,   6,   1,   2,   4,   4,   1,   4,   4,   7,   1, // Fx
 };
 
 /*
@@ -462,6 +464,8 @@ mos6502_would_jump(int inst_code)
         inst_code == BVS ||
         inst_code == JMP ||
         inst_code == JSR ||
+        inst_code == NP2 ||     // this is KIND of a hack, but it works!
+        inst_code == NP3 ||     // these jump ahead by 2 or 3 bytes (respectively)
         inst_code == RTS ||
         inst_code == RTI;
 }

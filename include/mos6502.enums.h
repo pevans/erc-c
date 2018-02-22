@@ -47,6 +47,8 @@ enum addr_mode {
     ABS,    // absolute
     ABX,    // absolute x-index
     ABY,    // absolute y-index
+    BY2,    // Consume 2 bytes (for NP2)
+    BY3,    // Consume 3 bytes (for NP3)
     IMM,    // immediate
     IMP,    // implied
     IND,    // indirect
@@ -102,6 +104,8 @@ enum instruction {
     LDY,    // LoaD Y
     LSR,    // Logical Shift Right
     NOP,    // NO oPeration
+    NP2,    // No oPeration (2 bytes consumed)
+    NP3,    // No oPeration (3 bytes consumed)
     ORA,    // OR with Accumulator
     PHA,    // PusH Accumulator
     PHP,    // PusH Predicate register
