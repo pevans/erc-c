@@ -34,7 +34,7 @@ static int instructions[] = {
     RTI, EOR, BAD, BAD, BAD, EOR, LSR, BAD, PHA, EOR, LSR, BAD, JMP, EOR, LSR, BAD, // 4x
     BVC, EOR, EOR, BAD, BAD, EOR, LSR, BAD, CLI, EOR, BAD, BAD, BAD, EOR, LSR, BAD, // 5x
     RTS, ADC, BAD, BAD, BAD, ADC, ROR, BAD, PLA, ADC, ROR, BAD, JMP, ADC, ROR, BAD, // 6x
-    BVS, ADC, ADC, BAD, BAD, ADC, ROR, BAD, SEI, ADC, BAD, BAD, BAD, ADC, ROR, BAD, // 7x
+    BVS, ADC, ADC, BAD, BAD, ADC, ROR, BAD, SEI, ADC, BAD, BAD, JMP, ADC, ROR, BAD, // 7x
     BAD, STA, BAD, BAD, STY, STA, STX, BAD, DEY, BIM, TXA, BAD, STY, STA, STX, BAD, // 8x
     BCC, STA, STA, BAD, STY, STA, STX, BAD, TYA, STA, TXS, BAD, BAD, STA, BAD, BAD, // 9x
     LDY, LDA, LDX, BAD, LDY, LDA, LDX, BAD, TAY, LDA, TAX, BAD, LDY, LDA, LDX, BAD, // Ax
@@ -131,7 +131,7 @@ static int cycles[] = {
       6,   6,   0,   0,   0,   3,   5,   0,   3,   2,   2,   0,   3,   4,   6,   0, // 4x
       2,   5,   5,   0,   0,   4,   6,   0,   2,   4,   0,   0,   0,   4,   7,   0, // 5x
       6,   6,   0,   0,   0,   3,   5,   0,   4,   2,   2,   0,   5,   4,   6,   0, // 6x
-      2,   5,   5,   0,   0,   4,   6,   0,   2,   4,   0,   0,   0,   4,   7,   0, // 7x
+      2,   5,   5,   0,   0,   4,   6,   0,   2,   4,   0,   0,   6,   4,   7,   0, // 7x
       0,   6,   0,   0,   3,   3,   3,   0,   2,   2,   2,   0,   4,   4,   4,   0, // 8x
       2,   6,   5,   0,   4,   4,   4,   0,   2,   5,   2,   0,   0,   5,   0,   0, // 9x
       2,   6,   2,   0,   3,   3,   3,   0,   2,   2,   2,   0,   4,   4,   4,   0, // Ax
