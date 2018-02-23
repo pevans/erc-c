@@ -17,6 +17,19 @@ Test(mos6502_arith, adc)
     cr_assert_eq(cpu->A, 73);
 }
 
+Test(mos6502_arith, adc_dec)
+{
+    cpu->P &= ~MOS_CARRY;
+    cpu->A = 0x05;
+    mos6502_handle_adc_dec(cpu, 0x10);
+    cr_assert_eq(cpu->A, 0x15);
+
+    // Test that A + M + 1 works for carry
+    cpu->P |= MOS_CARRY;
+    mos6502_handle_adc_dec(cpu, 0x13);
+    cr_assert_eq(cpu->A, 0x29);
+}
+
 Test(mos6502_arith, cmp)
 {
     cpu->A = 5;
@@ -122,4 +135,17 @@ Test(mos6502_arith, sbc)
     cpu->A = 16;
     mos6502_handle_sbc(cpu, 8);
     cr_assert_eq(cpu->A, 8);
+}
+
+Test(mos6502_arith, sbc_dec)
+{
+    cpu->P = 0;
+    cpu->A = 0x15;
+    mos6502_handle_sbc_dec(cpu, 0x6);
+    cr_assert_eq(cpu->A, 0x9);
+
+    cpu->P |= MOS_CARRY;
+    cpu->A = 0x12;
+    mos6502_handle_sbc_dec(cpu, 0x2);
+    cr_assert_eq(cpu->A, 0x9);
 }

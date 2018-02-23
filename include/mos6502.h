@@ -175,6 +175,7 @@ DECL_ADDR_MODE(zpy);
  * (excepting mos6502.addr.c).
  */
 DECL_INST(adc);
+DECL_INST(adc_dec);
 DECL_INST(and);
 DECL_INST(asl);
 DECL_INST(bad);
@@ -227,6 +228,7 @@ DECL_INST(ror);
 DECL_INST(rti);
 DECL_INST(rts);
 DECL_INST(sbc);
+DECL_INST(sbc_dec);
 DECL_INST(sec);
 DECL_INST(sed);
 DECL_INST(sei);

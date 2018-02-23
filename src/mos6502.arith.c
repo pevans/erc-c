@@ -15,12 +15,69 @@
  */
 DEFINE_INST(adc)
 {
+    if (cpu->P & MOS_DECIMAL) {
+        mos6502_handle_adc_dec(cpu, oper);
+        return;
+    }
+
     MOS_CARRY_BIT();
     SET_RESULT(cpu->A + oper + carry);
 
     mos6502_modify_status(cpu, MOS_NVZC, cpu->A, result);
 
     cpu->A = result & 0xff;
+}
+
+/*
+ * Add a number to the accumulator using Binary-Coded Decimal, or BCD.
+ * Some things still work the same--for instance, if carry is high, we
+ * will still add one to A+M. The V flag doesn't make any sense in BCD,
+ * and apparently ADC's effects on V in decimal mode is "undocumented"?
+ * The N flag is also a bit odd, and the general wisdom seems to be that
+ * you should use multiple bytes if you want to represent a negative,
+ * and just use the sign bit on the MSB.
+ */
+DEFINE_INST(adc_dec)
+{
+    MOS_CARRY_BIT();
+
+    // Determine the most and least siginificant digits of A and oper.
+    int a_msd = cpu->A >> 4,
+        a_lsd = cpu->A & 0xf,
+        o_msd = oper >> 4,
+        o_lsd = oper & 0xf;
+    
+    // If any of these are greater than 9, then they are invalid BCD
+    // values, and we give up.
+    if (a_msd > 9 || a_lsd > 9 || o_msd > 9 || o_lsd > 9) {
+        return;
+    }
+
+    // Sum is built using the decimal senses of the msd/lsd variables;
+    // carry is also a factor.
+    int sum =
+        ((a_msd * 10) + a_lsd) +
+        ((o_msd * 10) + o_lsd) + carry;
+
+    // But ultimately, one byte can only hold $00 - $99
+    int modsum = sum % 100;
+
+    // And the final result has to be ported back into a "hexadecimal"
+    // number; you see, BCD values are not just literally decimal, they
+    // are decimal in hexadecimal form.
+    SET_RESULT(((modsum / 10) << 4) | (modsum % 10));
+
+    // Because the rules for carry is a bit different, we'll handle it
+    // here.
+    cpu->P &= ~MOS_CARRY;
+    if (sum > 100) {
+        cpu->P |= MOS_CARRY;
+    }
+
+    // We'll check zero, but not negative or overflow.
+    mos6502_modify_status(cpu, MOS_ZERO, cpu->A, sum);
+
+    cpu->A = result;
 }
 
 /*
@@ -145,9 +202,74 @@ DEFINE_INST(iny)
  */
 DEFINE_INST(sbc)
 {
+    // Jump into the binary coded decimal world with us! It's... funky!
+    if (cpu->P & MOS_DECIMAL) {
+        mos6502_handle_sbc_dec(cpu, oper);
+        return;
+    }
+
     MOS_CARRY_BIT();
     SET_RESULT(cpu->A - oper - carry);
 
-    mos6502_modify_status(cpu, MOS_NVZC, cpu->A, result);
+    // Carry is handled slightly differently in SBC; it's set if the
+    // value is non-negative, and unset if negative. (It's essentially a
+    // mirror of the N flag in that sense.)
+    cpu->P |= MOS_CARRY;
+    if (result >= 0x80) {
+        cpu->P &= ~MOS_CARRY;
+    }
+
+    mos6502_modify_status(cpu, MOS_NVZ, cpu->A, result);
     cpu->A = result & 0xff;
+}
+
+/*
+ * Pretty similar to the code we're doing in adc_dec; we are here
+ * performing a subtraction in binary coded decimal.
+ *
+ * Note: a lot of this code is lifted from adc_dec; it's probably the
+ * only other time we will need to use this specific code, so I'm doing
+ * the Martin Fowler thing and waiting for a third occasion to arise
+ * before refactoring this into its own function.
+ */
+DEFINE_INST(sbc_dec)
+{
+    MOS_CARRY_BIT();
+
+    // Determine the most and least siginificant digits of A and oper.
+    int a_msd = cpu->A >> 4,
+        a_lsd = cpu->A & 0xf,
+        o_msd = oper >> 4,
+        o_lsd = oper & 0xf;
+    
+    // If any of these are greater than 9, then they are invalid BCD
+    // values, and we give up.
+    if (a_msd > 9 || a_lsd > 9 || o_msd > 9 || o_lsd > 9) {
+        return;
+    }
+
+    // Sum is built using the decimal senses of the msd/lsd variables;
+    // carry is also a factor.
+    int diff =
+        ((a_msd * 10) + a_lsd) -
+        ((o_msd * 10) + o_lsd) - carry;
+
+    // Force C to high to begin with
+    cpu->P |= MOS_CARRY;
+
+    // If diff is negative, we need to "overflow" it back to a
+    // positive number by adding 100. We also need to unset the C flag.
+    if (diff < 0) {
+        diff += 100;
+        cpu->P &= ~MOS_CARRY;
+    }
+
+    // And the final result has to be ported back into a "hexadecimal"
+    // number; you see, BCD values are not just literally decimal, they
+    // are decimal in hexadecimal form.
+    SET_RESULT(((diff / 10) << 4) | (diff % 10));
+
+    mos6502_modify_status(cpu, MOS_ZERO, cpu->A, result);
+
+    cpu->A = result;
 }
