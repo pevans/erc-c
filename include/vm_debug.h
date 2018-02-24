@@ -1,24 +1,8 @@
 #ifndef _VM_DEBUG_H_
 #define _VM_DEBUG_H_
 
-typedef struct {
-    /*
-     * Most commands that need an argument will simply use addr1, but a
-     * few have more than one address--hence addr2.
-     */
-    int addr1;
-    int addr2;
-
-    /*
-     * If we have a thing we want to work with, but want to leave what
-     * that is up to the helper func, then you can write it into the
-     * target.
-     *
-     * If a command uses target, followed by an address, that address
-     * will be in addr1.
-     */
-    char target[256];
-} vm_debug_args;
+struct vm_debug_args;
+typedef struct vm_debug_args vm_debug_args;
 
 typedef void (*vm_debug_func)(vm_debug_args *);
 
@@ -52,9 +36,38 @@ typedef struct {
     char *desc;
 } vm_debug_cmd;
 
+struct vm_debug_args {
+    /*
+     * Most commands that need an argument will simply use addr1, but a
+     * few have more than one address--hence addr2.
+     */
+    int addr1;
+    int addr2;
+
+    /*
+     * If we have a thing we want to work with, but want to leave what
+     * that is up to the helper func, then you can write it into the
+     * target.
+     *
+     * If a command uses target, followed by an address, that address
+     * will be in addr1.
+     */
+    char *target;
+
+    /*
+     * The command our arguments are attached to; from here we can call
+     * the handler with ourselves. (Very meta.)
+     */
+    vm_debug_cmd *cmd;
+};
+
 #define DEBUG_CMD(x) \
     void vm_debug_cmd_##x (vm_debug_args *args)
 
+extern vm_debug_cmd *vm_debug_find_cmd(const char *);
+extern void vm_debug_execute(const char *);
+
 extern DEBUG_CMD(help);
+extern DEBUG_CMD(resume);
 
 #endif

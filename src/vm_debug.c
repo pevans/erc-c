@@ -2,17 +2,148 @@
  * vm_debug.c
  */
 
+#include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <strings.h>
 
 #include "vm_debug.h"
 #include "vm_di.h"
+#include "vm_reflect.h"
 
 vm_debug_cmd cmdtable[] = {
     { "help", "h", 0, vm_debug_cmd_help, "",
         "Print out this list of commands", },
+    { "resume", "r", 0, vm_debug_cmd_resume, "",
+        "Resume execution", },
 };
 
 #define CMDTABLE_SIZE (sizeof(cmdtable) / sizeof(vm_debug_cmd))
+
+char *
+vm_debug_next_arg(char **str)
+{
+    char *tok;
+
+    while ((tok = strsep(str, " "))) {
+        if (tok == NULL) {
+            return NULL;
+        }
+
+        if (*tok == '\0') {
+            continue;
+        }
+
+        break;
+    }
+
+    return tok;
+}
+
+int
+vm_debug_addr(const char *str)
+{
+    int addr;
+
+    if (str == NULL) {
+        return -1;
+    }
+
+    addr = strtol(str, NULL, 16);
+    if (addr == 0 && errno == EINVAL) {
+        return -1;
+    }
+
+    return addr;
+}
+
+void
+vm_debug_execute(const char *str)
+{
+    char *tok, *ebuf;
+    vm_debug_cmd *cmd;
+    vm_debug_args args;
+
+    ebuf = strdup(str);
+    cmd = NULL;
+
+    tok = vm_debug_next_arg(&ebuf);
+
+    // No input
+    if (tok == NULL) {
+        return;
+    }
+
+    cmd = vm_debug_find_cmd(tok);
+
+    // No command found
+    if (cmd == NULL) {
+        return;
+    }
+
+    args.addr1 = 0;
+    args.addr2 = 0;
+    args.target = NULL;
+
+    switch (cmd->nargs) {
+        case 2:
+            args.target = vm_debug_next_arg(&ebuf);
+
+            // This _may_ be -1 if we have a string target for argument
+            // 1, as in the writestate command
+            args.addr1 = vm_debug_addr(args.target);
+
+            args.addr2 = vm_debug_addr(vm_debug_next_arg(&ebuf));
+
+            // But if this is -1, then something went wrong
+            if (args.addr2 == -1) {
+                return;
+            }
+
+            break;
+
+        case 1:
+            args.addr1 = vm_debug_addr(vm_debug_next_arg(&ebuf));
+
+            // Oh no
+            if (args.addr1 == -1) {
+                return;
+            }
+
+            break;
+
+        case 0:
+        default:
+            break;
+    }
+
+    cmd->handler(&args);
+}
+
+static int
+cmd_compar(const void *k, const void *elem)
+{
+    const char *key = (const char *)k;
+    const vm_debug_cmd *cmd = (const vm_debug_cmd *)elem;
+
+    if (strlen(key) < 3) {
+        return strcmp(key, cmd->abbrev);
+    }
+
+    return strcmp(key, cmd->name);
+}
+
+/*
+ * Return the cmd struct for a command that matches str, which can
+ * either be an abbreviation (if 1 or 2 characters) or a full name (if
+ * otherwise). If no matching cmd can be found, return NULL.
+ */
+vm_debug_cmd *
+vm_debug_find_cmd(const char *str)
+{
+    return (vm_debug_cmd *)bsearch(str, &cmdtable, CMDTABLE_SIZE,
+                                   sizeof(vm_debug_cmd), cmd_compar);
+}
 
 DEBUG_CMD(help)
 {
@@ -24,4 +155,9 @@ DEBUG_CMD(help)
         fprintf(stream, "%-15s%-5s%-15s%s\n", cmd->name, cmd->abbrev, 
                 cmd->argdesc, cmd->desc);
     }
+}
+
+DEBUG_CMD(resume)
+{
+    vm_reflect_pause(NULL);
 }
