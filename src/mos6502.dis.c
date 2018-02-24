@@ -30,7 +30,7 @@
 #include "mos6502.dis.h"
 #include "mos6502.enums.h"
 
-static char s_bytes[9],
+static char s_bytes[10],
             s_inst[4],
             s_operand[11];
 

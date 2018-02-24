@@ -27,6 +27,7 @@ setup()
     stream = fopen("/dev/null", "w");
     if (stream == NULL) {
         perror("Could not open temporary file for mos6502 disassembly tests");
+        exit(1);
     }
 
     // The C standard library allows us to set an arbitrary buffer for a
@@ -111,11 +112,11 @@ Test(mos6502_dis, operand)
 
     // Test a forward jump (operand < 128)
     mos6502_dis_operand(cpu, buf, sizeof(buf), 500, REL, 52);
-    assert_buf("ADDR_0228");
+    assert_buf("<0228>");
 
     // Test a backward jump (operand >= 128)
     mos6502_dis_operand(cpu, buf, sizeof(buf), 500, REL, 152);
-    assert_buf("ADDR_018c");
+    assert_buf("<018c>");
 }
 
 Test(mos6502_dis, instruction)
@@ -210,7 +211,7 @@ Test(mos6502_dis, opcode)
     mos6502_set(cpu, 1, 0x38);
 
     bytes = mos6502_dis_opcode(cpu, stream, 0);
-    assert_buf("   AND #$38      ; pc:0000 cy:02 addr:0000 val:38 a:00 x:00 y:00 p:NO-dIZC s:ff | 29 38\n");
+    assert_buf("0000:29 38                     AND   #$38\n");
     cr_assert_eq(bytes, 2);
 }
 
@@ -229,9 +230,7 @@ Test(mos6502_dis, scan)
     // I'm honestly not sure. There are definitely times (e.g. during
     // runtime operation) when you don't want it to, but as a standalone
     // disassembler, it feels less useful when PC isn't emulated.
-    assert_buf("   AND #$38      ; pc:0000 cy:02 addr:0000 val:38 a:00 x:00 y:00 p:NO-dIZC s:ff | 29 38\n"
-               "   DEY           ; pc:0000 cy:02 addr:0000 val:   a:00 x:00 y:00 p:NO-dIZC s:ff | 88\n"
-               "   JMP ($1234)   ; pc:0000 cy:05 addr:0000 val:29 a:00 x:00 y:00 p:NO-dIZC s:ff | 6c 34 12\n"
-               ";;;\n\n"
-               );
+    assert_buf("0000:29 38                     AND   #$38\n"
+               "0000:88                        DEY   #$38\n"
+               "0000:6C 34 12                  JMP   ($1234)\n");
 }
