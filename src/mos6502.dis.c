@@ -30,15 +30,9 @@
 #include "mos6502.dis.h"
 #include "mos6502.enums.h"
 
-static char s_inst[4],
-            s_addr[5],
-            s_oper[10],
-            s_value[3],
-            s_label[13],
-            s_state[63],
-            s_bytes[12];
-
-static vm_8bit jump_table[MOS6502_MEMSIZE];
+static char s_bytes[9],
+            s_inst[4],
+            s_operand[11];
 
 static char *instruction_strings[] = {
     "ADC",
@@ -127,7 +121,6 @@ mos6502_dis_operand(mos6502 *cpu,
                     vm_16bit value)
 {
     int rel_address;
-    int ind_address;
     vm_8bit eff_value = 0;
     mos6502_address_resolver resolv;
 
@@ -141,41 +134,27 @@ mos6502_dis_operand(mos6502 *cpu,
             break;
         case ABS:
             snprintf(str, len, "$%04X", value);
-            snprintf(s_value, sizeof(s_value), "%02x", eff_value);
             break;
         case ABX:
             snprintf(str, len, "$%04X,X", value);
-            snprintf(s_value, sizeof(s_value), "%02x", eff_value);
             break;
         case ABY:
             snprintf(str, len, "$%04X,Y", value);
-            snprintf(s_value, sizeof(s_value), "%02x", eff_value);
             break;
         case IMM:
             snprintf(str, len, "#$%02X", value);
-            snprintf(s_value, sizeof(s_value), "%02x", eff_value);
             break;
         case IMP:
-            snprintf(s_value, sizeof(s_value), "%02x", 0);
+            snprintf(str, len, "");
             break;
         case IND:
-            ind_address = mos6502_get(cpu, value + 1) << 8;
-            ind_address |= mos6502_get(cpu, value);
-            if (jump_table[ind_address]) {
-                mos6502_dis_label(str, len, ind_address);
-                snprintf(s_value, sizeof(s_value), "%02X", 0);
-            } else {
-                snprintf(str, len, "($%04X)", value);
-                snprintf(s_value, sizeof(s_value), "%02x", eff_value);
-            }
+            snprintf(str, len, "($%04X)", value);
             break;
         case IDX:
             snprintf(str, len, "($%02X,X)", value);
-            snprintf(s_value, sizeof(s_value), "%02x", eff_value);
             break;
         case IDY:
             snprintf(str, len, "($%02X),Y", value);
-            snprintf(s_value, sizeof(s_value), "%02x", eff_value);
             break;
         case REL:
             rel_address = address + value;
@@ -183,26 +162,20 @@ mos6502_dis_operand(mos6502 *cpu,
                 rel_address -= 256;
             }
 
-            mos6502_dis_label(str, len, rel_address);
-            snprintf(s_value, sizeof(s_value), "%02x", eff_value);
+            snprintf(str, len, "<%04x>", rel_address);
             break;
         case ZPG:
             // We add a couple of spaces here to help our output
             // comments line up.
             snprintf(str, len, "$%02X", value);
-            snprintf(s_value, sizeof(s_value), "%02x", eff_value);
             break;
         case ZPX:
             snprintf(str, len, "$%02X,X", value);
-            snprintf(s_value, sizeof(s_value), "%02x", eff_value);
             break;
         case ZPY:
             snprintf(str, len, "$%02X,Y", value);
-            snprintf(s_value, sizeof(s_value), "%02x", eff_value);
             break;
     }
-
-    snprintf(s_addr, sizeof(s_addr), "%04x", cpu->eff_addr); 
 }
 
 /*
@@ -324,77 +297,34 @@ mos6502_dis_opcode(mos6502 *cpu, FILE *stream, int address)
             break;
     }
 
-    // If the stream is NULL, we're doing some kind of lookahead.
-    // Furthermore, if this is an instruction that would switch control
-    // to a different spot in the program, then let's label this in the
-    // jump table.
-    if (stream == NULL && mos6502_would_jump(inst_code)) {
-        mos6502_dis_jump_label(cpu, operand, address, addr_mode);
-    }
-
     // It's totally possible that we are not expected to print out the
     // contents of our inspection of the opcode. (For example, we may
     // just want to set the jump table in a lookahead operation.)
     if (stream) {
-        s_label[0] = '\0';
-        s_oper[0] = '\0';
-        s_value[0] = '\0';
-
-        // Hey! We might have a label at this position in the code. If
-        // so, let's print out the label.
-        if (jump_table[address]) {
-            // This will print out just the label itself.
-            mos6502_dis_label(s_label, sizeof(s_label) - 3, address);
-
-            // But to actually define the label, we need a colon to
-            // complete the notation. (We don't _need_ a newline, but it
-            // looks nicer to my arbitrary sensibilities. Don't @ me!)
-            snprintf(s_label + 9, sizeof(s_label) - 9, ":\n");
-        }
-
         // Print out the instruction code that our opcode represents.
         mos6502_dis_instruction(s_inst, sizeof(s_inst), inst_code);
 
         if (expected) {
             // Print out the operand given the proper address mode.
-            mos6502_dis_operand(cpu, s_oper, sizeof(s_oper), address, addr_mode, operand);
+            mos6502_dis_operand(cpu, s_operand, sizeof(s_operand), 
+                                address, addr_mode, operand);
         }
-
-        // Here we just want to show a few pieces of information; one,
-        // what the PC was at the point of this opcode sequence; two,
-        // the opcode;
-        snprintf(s_state, sizeof(s_state) - 1, 
-                 "pc:%02x%02x cy:%02d addr:%4s val:%2s a:%02x x:%02x y:%02x p:%c%c-%c%c%c%c s:%02x", 
-                cpu->PC >> 8, cpu->PC & 0xff,
-                mos6502_cycles(cpu, opcode), s_addr, s_value,
-                cpu->A, cpu->X, cpu->Y, 
-                cpu->P & MOS_NEGATIVE ? 'N' : 'n',
-                cpu->P & MOS_OVERFLOW ? 'O' : 'o',
-                cpu->P & MOS_DECIMAL ? 'D' : 'd',
-                cpu->P & MOS_INTERRUPT ? 'I' : 'i',
-                cpu->P & MOS_ZERO ? 'Z' : 'z',
-                cpu->P & MOS_CARRY ? 'C' : 'c',
-                cpu->S);
 
         // And three, the operand, if any. Remembering that the operand
         // should be shown in little-endian order.
         if (expected == 2) {
-            snprintf(s_bytes, sizeof(s_bytes) - 1, "%02x %02x %02x", 
+            snprintf(s_bytes, sizeof(s_bytes) - 1, "%02X %02X %02X", 
                      opcode, operand & 0xff, operand >> 8);
         } else if (expected == 1) {
-            snprintf(s_bytes, sizeof(s_bytes) - 1, "%02x %02x", 
+            snprintf(s_bytes, sizeof(s_bytes) - 1, "%02X %02X", 
                      opcode, operand & 0xff);
         } else {
-            snprintf(s_bytes, sizeof(s_bytes) - 1, "%02x", opcode);
+            snprintf(s_bytes, sizeof(s_bytes) - 1, "%02X", opcode);
         }
     }
 
-    fprintf(stream, "%s  %4s %-9s ; %-60s | %s\n",
-            s_label, s_inst, s_oper, s_state, s_bytes);
-
-    if (mos6502_would_jump(inst_code)) {
-        fprintf(stream, ";;;\n\n");
-    }
+    fprintf(stream, "%04X:%-9s%20s   %s\n",
+            cpu->PC, s_bytes, s_inst, s_operand);
 
     // The expected number of bytes here is for the operand, but we need
     // to add one for the opcode to return the true number that this
@@ -412,81 +342,4 @@ mos6502_dis_scan(mos6502 *cpu, FILE *stream, int pos, int end)
     while (pos < end) {
         pos += mos6502_dis_opcode(cpu, stream, pos);
     }
-}
-
-/*
- * Associate a label with a given address or operand, depending on the
- * address mode. For example, with REL, the jump label will be based on
- * the address but added to or subtracted with the operand. Whereas in
- * IND, the address is wholly dependent on the operand.
- */
-void
-mos6502_dis_jump_label(mos6502 *cpu, 
-                       vm_16bit operand, 
-                       int address, 
-                       int addr_mode)
-{
-    int jump_loc;
-
-    switch (addr_mode) {
-        case ABS:
-            jump_loc = operand;
-            break;
-
-        // With indirect address mode, the address we want to jump to is
-        // not the literal operand, but a 16-bit address that is
-        // _pointed to_ by the address represented by the operand. Think
-        // of the operand as a kind of double pointer, or just re-watch
-        // Inception.
-        case IND:
-            jump_loc = mos6502_get(cpu, operand + 1) << 8;
-            jump_loc |= mos6502_get(cpu, operand);
-            break;
-
-        // In relative address mode, the jump location will be a
-        // number -- well -- relative to the address. If the 8th bit
-        // of the operand is 1, then we treat the number as a
-        // negative; otherwise, positive or zero.
-        case REL:
-            jump_loc = address + operand;
-
-            if (operand > 127) {
-                jump_loc -= 256;
-            }
-            break;
-
-        default:
-            return;
-    }
-
-    jump_table[jump_loc] = 1;
-}
-
-/*
- * Print out the form of our label to the given file stream. This is
- * fairly dumb; it'll print out whatever address you give to it.
- */
-inline void
-mos6502_dis_label(char *str, int len, int address)
-{
-    snprintf(str, len, "ADDR_%04x", address);
-}
-
-/*
- * Remove the previously-set label in the jump table for a given
- * address.
- */
-inline void
-mos6502_dis_jump_unlabel(int address)
-{
-    jump_table[address] = 0;
-}
-
-/*
- * Return true if the given address has a jump label associated with it.
- */
-inline bool
-mos6502_dis_is_jump_label(int address)
-{
-    return jump_table[address] == 1;
 }

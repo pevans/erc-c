@@ -91,12 +91,6 @@ Test(mos6502_dis, operand)
     // jump-labeled version.
     mos6502_dis_operand(cpu, buf, sizeof(buf), 0, IND, 0x1234);
     assert_buf("($1234)");
-    mos6502_dis_jump_label(cpu, 0x1234, 0, IND);
-    mos6502_dis_operand(cpu, buf, sizeof(buf), 0, IND, 0x1234);
-    assert_buf("ADDR_3448");
-
-    // Let's undo our label above...
-    mos6502_dis_jump_unlabel(0x1234);
 
     mos6502_dis_operand(cpu, buf, sizeof(buf), 0, IDX, 0x12);
     assert_buf("($12,X)");
@@ -240,38 +234,4 @@ Test(mos6502_dis, scan)
                "   JMP ($1234)   ; pc:0000 cy:05 addr:0000 val:29 a:00 x:00 y:00 p:NO-dIZC s:ff | 6c 34 12\n"
                ";;;\n\n"
                );
-}
-
-/*
- * These tests are all contained within the jump_label test below.
- * Test(mos6502_dis, jump_unlabel)
- * Test(mos6502_dis, is_jump_label)
- */
-Test(mos6502_dis, jump_label)
-{
-    cr_assert_eq(mos6502_dis_is_jump_label(123), false);
-    
-    mos6502_set(cpu, 123, 5);
-    mos6502_set(cpu, 124, 0);
-
-    mos6502_dis_jump_label(cpu, 123, 0, IND);
-    cr_assert_eq(mos6502_dis_is_jump_label(5), true);
-    mos6502_dis_jump_unlabel(123);
-    cr_assert_eq(mos6502_dis_is_jump_label(123), false);
-
-    // Testing forward relative
-    mos6502_dis_jump_label(cpu, 123, 10, REL);
-    cr_assert_eq(mos6502_dis_is_jump_label(123 + 10), true);
-    mos6502_dis_jump_unlabel(123 + 10);
-
-    // Testing backward relative
-    mos6502_dis_jump_label(cpu, 133, 1000, REL);
-    cr_assert_eq(mos6502_dis_is_jump_label(133 + 1000 - 256), true);
-    mos6502_dis_jump_unlabel(133 + 1000 - 256);
-}
-
-Test(mos6502_dis, label)
-{
-    mos6502_dis_label(buf, sizeof(buf) - 1, 123);
-    assert_buf("ADDR_007b");
 }
