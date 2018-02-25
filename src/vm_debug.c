@@ -23,6 +23,8 @@ vm_debug_cmd cmdtable[] = {
         "Print the machine and CPU state", },
     { "resume", "r", vm_debug_cmd_resume, 0, "",
         "Resume execution", },
+    { "writeaddr", "wa", vm_debug_cmd_writeaddr, 2, "<addr> <byte>",
+        "Write <byte> at <addr>", },
 };
 
 #define CMDTABLE_SIZE (sizeof(cmdtable) / sizeof(vm_debug_cmd))
