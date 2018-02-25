@@ -259,6 +259,10 @@ mos6502_dis_opcode(mos6502 *cpu, FILE *stream, int address)
     int inst_code;
     int expected;
 
+    memset(s_bytes, 0, sizeof(s_bytes));
+    memset(s_inst, 0, sizeof(s_inst));
+    memset(s_operand, 0, sizeof(s_operand));
+
     // The next byte is assumed to be the opcode we work with.
     opcode = mos6502_get(cpu, address);
 
