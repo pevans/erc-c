@@ -108,3 +108,10 @@ Test(vm_debug, cmd_printaddr)
     vm_debug_cmd_printaddr(&args);
     cr_assert_str_eq(buf, "$7F\n");
 }
+
+Test(vm_debug, jump)
+{
+    args.addr1 = 123;
+    vm_debug_cmd_jump(&args);
+    cr_assert_eq(mach->cpu->PC, 123);
+}

@@ -68,6 +68,7 @@ extern vm_debug_cmd *vm_debug_find_cmd(const char *);
 extern void vm_debug_execute(const char *);
 
 extern DEBUG_CMD(help);
+extern DEBUG_CMD(jump);
 extern DEBUG_CMD(printaddr);
 extern DEBUG_CMD(printstate);
 extern DEBUG_CMD(resume);

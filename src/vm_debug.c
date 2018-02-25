@@ -15,6 +15,8 @@
 vm_debug_cmd cmdtable[] = {
     { "help", "h", vm_debug_cmd_help, 0, "",
         "Print out this list of commands", },
+    { "jump", "j", vm_debug_cmd_jump, 1, "<addr>",
+        "Jump to <addr> for next execution", },
     { "printaddr", "pa", vm_debug_cmd_printaddr, 1, "<addr>",
         "Print the value at memory address <addr>", },
     { "printstate", "ps", vm_debug_cmd_printstate, 0, "",
@@ -180,4 +182,13 @@ DEBUG_CMD(printaddr)
     FILE *stream = (FILE *)vm_di_get(VM_OUTPUT);
 
     fprintf(stream, "$%02X\n", mos6502_get(cpu, args->addr1));
+}
+
+DEBUG_CMD(jump)
+{
+    // FIXME: same issue as for printaddr -- overall we need to refactor
+    // vm_reflect quite a bit
+
+    mos6502 *cpu = (mos6502 *)vm_di_get(VM_CPU);
+    cpu->PC = args->addr1;
 }
