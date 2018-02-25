@@ -132,27 +132,27 @@ Test(vm_debug, cmd_writestate)
     args.addr1 = 111;
     args.target = "a";
     vm_debug_cmd_writestate(&args);
-    cr_assert_eq(mach->cpu->A, args.addr1);
+    cr_assert_eq(mach->cpu->A, args.addr2);
 
     args.addr1 = 112;
     args.target = "x";
     vm_debug_cmd_writestate(&args);
-    cr_assert_eq(mach->cpu->X, args.addr1);
+    cr_assert_eq(mach->cpu->X, args.addr2);
 
     args.addr1 = 113;
     args.target = "y";
     vm_debug_cmd_writestate(&args);
-    cr_assert_eq(mach->cpu->Y, args.addr1);
+    cr_assert_eq(mach->cpu->Y, args.addr2);
 
     args.addr1 = 114;
     args.target = "p";
     vm_debug_cmd_writestate(&args);
-    cr_assert_eq(mach->cpu->P, args.addr1);
+    cr_assert_eq(mach->cpu->P, args.addr2);
 
     args.addr1 = 115;
     args.target = "s";
     vm_debug_cmd_writestate(&args);
-    cr_assert_eq(mach->cpu->S, args.addr1);
+    cr_assert_eq(mach->cpu->S, args.addr2);
 }
 
 Test(vm_debug, break)
