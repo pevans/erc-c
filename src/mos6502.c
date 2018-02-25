@@ -14,6 +14,7 @@
 #include "log.h"
 #include "mos6502.h"
 #include "mos6502.dis.h"
+#include "vm_debug.h"
 
 // All of our address modes, instructions, etc. are defined here.
 #include "mos6502.enums.h"
@@ -362,6 +363,10 @@ mos6502_execute(mos6502 *cpu)
     int /*cycles,*/ bytes;
     mos6502_address_resolver resolver;
     mos6502_instruction_handler handler;
+
+    if (vm_debug_broke(cpu->PC)) {
+        return;
+    }
 
     opcode = mos6502_get(cpu, cpu->PC);
 
