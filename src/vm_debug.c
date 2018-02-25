@@ -257,6 +257,12 @@ DEBUG_CMD(help)
 
 DEBUG_CMD(resume)
 {
+    mos6502 *cpu = (mos6502 *)vm_di_get(VM_CPU);
+
+    // If we paused because of a breakpoint, then we need to clear it
+    // before we can really keep moving.
+    vm_debug_unbreak(cpu->PC);
+
     vm_reflect_pause(NULL);
 }
 
@@ -296,11 +302,11 @@ DEBUG_CMD(writestate)
     mos6502 *cpu = (mos6502 *)vm_di_get(VM_CPU);
 
     switch (tolower(*args->target)) {
-        case 'a': cpu->A = args->addr1; break;
-        case 'p': cpu->P = args->addr1; break;
-        case 's': cpu->S = args->addr1; break;
-        case 'x': cpu->X = args->addr1; break;
-        case 'y': cpu->Y = args->addr1; break;
+        case 'a': cpu->A = args->addr2; break;
+        case 'p': cpu->P = args->addr2; break;
+        case 's': cpu->S = args->addr2; break;
+        case 'x': cpu->X = args->addr2; break;
+        case 'y': cpu->Y = args->addr2; break;
     }
 }
 
