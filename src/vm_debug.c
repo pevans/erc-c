@@ -192,3 +192,9 @@ DEBUG_CMD(jump)
     mos6502 *cpu = (mos6502 *)vm_di_get(VM_CPU);
     cpu->PC = args->addr1;
 }
+
+DEBUG_CMD(writeaddr)
+{
+    mos6502 *cpu = (mos6502 *)vm_di_get(VM_CPU);
+    mos6502_set(cpu, args->addr1, args->addr2);
+}

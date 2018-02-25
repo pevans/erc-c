@@ -109,9 +109,18 @@ Test(vm_debug, cmd_printaddr)
     cr_assert_str_eq(buf, "$7F\n");
 }
 
-Test(vm_debug, jump)
+Test(vm_debug, cmd_jump)
 {
     args.addr1 = 123;
     vm_debug_cmd_jump(&args);
     cr_assert_eq(mach->cpu->PC, 123);
+}
+
+Test(vm_debug, cmd_writeaddr)
+{
+    args.addr1 = 123;
+    args.addr2 = 0xf5;
+
+    vm_debug_cmd_writeaddr(&args);
+    cr_assert_eq(mos6502_get(mach->cpu, args.addr1), args.addr2);
 }

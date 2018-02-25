@@ -72,5 +72,6 @@ extern DEBUG_CMD(jump);
 extern DEBUG_CMD(printaddr);
 extern DEBUG_CMD(printstate);
 extern DEBUG_CMD(resume);
+extern DEBUG_CMD(writeaddr);
 
 #endif
