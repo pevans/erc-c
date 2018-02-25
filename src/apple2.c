@@ -15,7 +15,9 @@
 #include "mos6502.dis.h"
 #include "objstore.h"
 #include "option.h"
+#include "vm_debug.h"
 #include "vm_di.h"
+#include "vm_reflect.h"
 #include "vm_segment.h"
 
 /*
@@ -346,11 +348,18 @@ apple2_run_loop(apple2 *mach)
     }
 
     out = (FILE *)vm_di_get(VM_OUTPUT);
+    vm_reflect_pause(NULL);
 
     while (vm_screen_active(mach->screen)) {
         // If we're paused, then just re-loop until we're not
         if (mach->paused) {
-            usleep(100000);     // but rest our weary head for a bit
+            char *input = vm_debug_prompt();
+
+            if (input != NULL) {
+                vm_debug_execute(input);
+            }
+
+            free(input);
             continue;
         }
 

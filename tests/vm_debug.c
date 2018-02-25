@@ -124,3 +124,57 @@ Test(vm_debug, cmd_writeaddr)
     vm_debug_cmd_writeaddr(&args);
     cr_assert_eq(mos6502_get(mach->cpu, args.addr1), args.addr2);
 }
+
+Test(vm_debug, cmd_writestate)
+{
+    args.addr1 = 111;
+    args.target = "a";
+    vm_debug_cmd_writestate(&args);
+    cr_assert_eq(mach->cpu->A, args.addr1);
+
+    args.addr1 = 112;
+    args.target = "x";
+    vm_debug_cmd_writestate(&args);
+    cr_assert_eq(mach->cpu->X, args.addr1);
+
+    args.addr1 = 113;
+    args.target = "y";
+    vm_debug_cmd_writestate(&args);
+    cr_assert_eq(mach->cpu->Y, args.addr1);
+
+    args.addr1 = 114;
+    args.target = "p";
+    vm_debug_cmd_writestate(&args);
+    cr_assert_eq(mach->cpu->P, args.addr1);
+
+    args.addr1 = 115;
+    args.target = "s";
+    vm_debug_cmd_writestate(&args);
+    cr_assert_eq(mach->cpu->S, args.addr1);
+}
+
+Test(vm_debug, break)
+{
+    vm_debug_break(0x2);
+
+    mos6502_set(mach->cpu, 0, 0xEA);
+    mos6502_set(mach->cpu, 1, 0xEA);
+    mos6502_set(mach->cpu, 2, 0xEA);
+    mos6502_set(mach->cpu, 3, 0xEA);
+
+    mos6502_execute(mach->cpu);
+    cr_assert_eq(mach->cpu->PC, 1);
+    mos6502_execute(mach->cpu);
+    cr_assert_eq(mach->cpu->PC, 2);
+    mos6502_execute(mach->cpu);
+    cr_assert_eq(mach->cpu->PC, 2);
+}
+
+Test(vm_debug, broke)
+{
+    cr_assert_eq(vm_debug_broke(0x23), false);
+    vm_debug_break(0x23);
+    cr_assert_eq(vm_debug_broke(0x23), true);
+}
+
+/* Test(vm_debug, quit) */

@@ -2,6 +2,7 @@
  * vm_debug.c
  */
 
+#include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,6 +13,18 @@
 #include "vm_di.h"
 #include "vm_reflect.h"
 
+/*
+ * The largest address size we can set a breakpoint for
+ */
+#define BREAKPOINTS_MAX 0x10000
+
+/*
+ * A table of breakpoints, arranged by address in a CPU. If
+ * breakpoints[i] is zero, then there is no breakpoint. If it is
+ * non-zero, then there is a breakpoint at address i.
+ */
+static int breakpoints[BREAKPOINTS_MAX];
+
 vm_debug_cmd cmdtable[] = {
     { "help", "h", vm_debug_cmd_help, 0, "",
         "Print out this list of commands", },
@@ -21,10 +34,14 @@ vm_debug_cmd cmdtable[] = {
         "Print the value at memory address <addr>", },
     { "printstate", "ps", vm_debug_cmd_printstate, 0, "",
         "Print the machine and CPU state", },
+    { "quit", "q", vm_debug_cmd_quit, 0, "",
+        "Quit the emulator", },
     { "resume", "r", vm_debug_cmd_resume, 0, "",
         "Resume execution", },
     { "writeaddr", "wa", vm_debug_cmd_writeaddr, 2, "<addr> <byte>",
         "Write <byte> at <addr>", },
+    { "writestate", "ws", vm_debug_cmd_writestate, 2, "<reg> <byte>",
+        "Write <byte> into <reg>", },
 };
 
 #define CMDTABLE_SIZE (sizeof(cmdtable) / sizeof(vm_debug_cmd))
@@ -34,7 +51,7 @@ vm_debug_next_arg(char **str)
 {
     char *tok;
 
-    while ((tok = strsep(str, " "))) {
+    while ((tok = strsep(str, " "))){
         if (tok == NULL) {
             return NULL;
         }
@@ -46,7 +63,8 @@ vm_debug_next_arg(char **str)
         break;
     }
 
-    return tok; }
+    return tok;
+}
 
 int
 vm_debug_addr(const char *str)
@@ -63,6 +81,48 @@ vm_debug_addr(const char *str)
     }
 
     return addr;
+}
+
+void
+vm_debug_break(int addr)
+{
+    if (addr < 0 || addr >= BREAKPOINTS_MAX) {
+        return;
+    }
+
+    breakpoints[addr] = 1;
+}
+
+bool
+vm_debug_broke(int addr)
+{
+    if (addr < 0 || addr >= BREAKPOINTS_MAX) {
+        return false;
+    }
+
+    return breakpoints[addr] != 0;
+}
+
+char *
+vm_debug_prompt()
+{
+    char buf[256];
+    FILE *stream = (FILE *)vm_di_get(VM_OUTPUT);
+
+    if (feof(stdin)) {
+        return NULL;
+    }
+
+    fputs("erc> ", stream);
+
+    if (fgets(buf, 256, stdin) == NULL) {
+        return NULL;
+    }
+
+    // Cut off the newline character, if there is one
+    buf[strlen(buf)-1] = '\0';
+
+    return strdup(buf);
 }
 
 void
@@ -126,6 +186,8 @@ vm_debug_execute(const char *str)
     }
 
     cmd->handler(&args);
+
+    free(ebuf);
 }
 
 static int
@@ -199,4 +261,22 @@ DEBUG_CMD(writeaddr)
 {
     mos6502 *cpu = (mos6502 *)vm_di_get(VM_CPU);
     mos6502_set(cpu, args->addr1, args->addr2);
+}
+
+DEBUG_CMD(writestate)
+{
+    mos6502 *cpu = (mos6502 *)vm_di_get(VM_CPU);
+
+    switch (tolower(*args->target)) {
+        case 'a': cpu->A = args->addr1; break;
+        case 'p': cpu->P = args->addr1; break;
+        case 's': cpu->S = args->addr1; break;
+        case 'x': cpu->X = args->addr1; break;
+        case 'y': cpu->Y = args->addr1; break;
+    }
+}
+
+DEBUG_CMD(quit)
+{
+    exit(0);
 }

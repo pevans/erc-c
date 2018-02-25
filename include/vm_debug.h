@@ -1,6 +1,8 @@
 #ifndef _VM_DEBUG_H_
 #define _VM_DEBUG_H_
 
+#include <stdbool.h>
+
 struct vm_debug_args;
 typedef struct vm_debug_args vm_debug_args;
 
@@ -64,14 +66,20 @@ struct vm_debug_args {
 #define DEBUG_CMD(x) \
     void vm_debug_cmd_##x (vm_debug_args *args)
 
+extern bool vm_debug_broke(int);
+extern char *vm_debug_prompt();
 extern vm_debug_cmd *vm_debug_find_cmd(const char *);
+extern void vm_debug_break(int);
 extern void vm_debug_execute(const char *);
+extern void vm_debug_quit();
 
 extern DEBUG_CMD(help);
 extern DEBUG_CMD(jump);
 extern DEBUG_CMD(printaddr);
 extern DEBUG_CMD(printstate);
+extern DEBUG_CMD(quit);
 extern DEBUG_CMD(resume);
 extern DEBUG_CMD(writeaddr);
+extern DEBUG_CMD(writestate);
 
 #endif
