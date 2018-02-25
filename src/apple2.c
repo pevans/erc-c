@@ -357,6 +357,16 @@ apple2_run_loop(apple2 *mach)
 
         // If we're paused, then just re-loop until we're not
         if (mach->paused) {
+            if (mach->selected_drive) {
+                mach->selected_drive->locked = true;
+            }
+
+            mos6502_dis_opcode(mach->cpu, out, mach->cpu->PC);
+
+            if (mach->selected_drive) {
+                mach->selected_drive->locked = false;
+            }
+
             char *input = vm_debug_prompt();
 
             if (input != NULL) {
