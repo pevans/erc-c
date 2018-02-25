@@ -212,4 +212,25 @@ Test(vm_debug, unbreak_all)
     cr_assert_eq(vm_debug_broke(55555), false);
 }
 
+Test(vm_debug, cmd_step)
+{
+    // Just setting us up with some NOPs for the testing
+    mos6502_set(mach->cpu, 0, 0xEA);
+    mos6502_set(mach->cpu, 1, 0xEA);
+    mos6502_set(mach->cpu, 2, 0xEA);
+    mos6502_set(mach->cpu, 3, 0xEA);
+
+    vm_debug_break(1);
+    mos6502_execute(mach->cpu);
+    cr_assert_eq(mach->cpu->PC, 1);
+
+    // We should go nowhere here
+    mos6502_execute(mach->cpu);
+    cr_assert_eq(mach->cpu->PC, 1);
+
+    // Step should a) unbreak at PC, b) execute at PC
+    vm_debug_cmd_step(&args);
+    cr_assert_eq(mach->cpu->PC, 2);
+}
+
 /* Test(vm_debug, quit) */

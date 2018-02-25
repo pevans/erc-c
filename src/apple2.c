@@ -351,6 +351,10 @@ apple2_run_loop(apple2 *mach)
     vm_reflect_pause(NULL);
 
     while (vm_screen_active(mach->screen)) {
+        if (vm_debug_broke(mach->cpu->PC)) {
+            mach->paused = true;
+        }
+
         // If we're paused, then just re-loop until we're not
         if (mach->paused) {
             char *input = vm_debug_prompt();

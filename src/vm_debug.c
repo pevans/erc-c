@@ -41,6 +41,8 @@ vm_debug_cmd cmdtable[] = {
         "Quit the emulator", },
     { "resume", "r", vm_debug_cmd_resume, 0, "",
         "Resume execution", },
+    { "step", "s", vm_debug_cmd_step, 0, "",
+        "Execute the current opcode and break at the next", },
     { "unbreak", "u", vm_debug_cmd_unbreak, 1, "<addr>",
         "Remove breakpoint at <addr>", },
     { "writeaddr", "wa", vm_debug_cmd_writeaddr, 2, "<addr> <byte>",
@@ -310,4 +312,13 @@ DEBUG_CMD(quit)
 DEBUG_CMD(unbreak)
 {
     vm_debug_unbreak(args->addr1);
+}
+
+DEBUG_CMD(step)
+{
+    mos6502 *cpu = (mos6502 *)vm_di_get(VM_CPU);
+
+    vm_debug_unbreak(cpu->PC);
+    mos6502_execute(cpu);
+    vm_debug_break(cpu->PC);
 }

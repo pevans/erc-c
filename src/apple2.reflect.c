@@ -33,8 +33,7 @@ REFLECT(apple2_reflect_cpu_info)
     mos6502 *cpu = (mos6502 *)vm_di_get(VM_CPU);
     FILE *out = (FILE *)vm_di_get(VM_OUTPUT);
 
-    fprintf(out, "REGISTERS:\n");
-    fprintf(out, "  A:%02x X:%02x Y:%02x P:%02x S:%02x PC:%04x\n",
+    fprintf(out, "CPU:  A:%02x X:%02x Y:%02x P:%02x S:%02x PC:%04x\n",
             cpu->A, cpu->X, cpu->Y, cpu->P, cpu->S, cpu->PC);
 }
 
@@ -48,12 +47,9 @@ REFLECT(apple2_reflect_machine_info)
     apple2 *mach = (apple2 *)vm_di_get(VM_MACHINE);
     FILE *out = (FILE *)vm_di_get(VM_OUTPUT);
 
-    fprintf(out, "MACHINE:\n");
-    fprintf(out, "  display_mode: %02x\n", mach->display_mode);
-    fprintf(out, "  color_mode: %02x\n", mach->color_mode);
-    fprintf(out, "  bank_switch: %02x\n", mach->bank_switch);
-    fprintf(out, "  memory_mode: %02x\n", mach->memory_mode);
-    fprintf(out, "  strobe: %02x\n", mach->strobe);
+    fprintf(out, "MACH: BS:%02x CM:%02x DM:%02x MM:%02x STROBE:%02x\n",
+            mach->bank_switch, mach->color_mode, mach->display_mode,
+            mach->memory_mode, mach->strobe);
 }
 
 /*

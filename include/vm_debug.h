@@ -82,6 +82,7 @@ extern DEBUG_CMD(printaddr);
 extern DEBUG_CMD(printstate);
 extern DEBUG_CMD(quit);
 extern DEBUG_CMD(resume);
+extern DEBUG_CMD(step);
 extern DEBUG_CMD(unbreak);
 extern DEBUG_CMD(writeaddr);
 extern DEBUG_CMD(writestate);
