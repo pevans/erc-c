@@ -7,14 +7,19 @@
 #include <stdlib.h>
 #include <strings.h>
 
+#include "mos6502.h"
 #include "vm_debug.h"
 #include "vm_di.h"
 #include "vm_reflect.h"
 
 vm_debug_cmd cmdtable[] = {
-    { "help", "h", 0, vm_debug_cmd_help, "",
+    { "help", "h", vm_debug_cmd_help, 0, "",
         "Print out this list of commands", },
-    { "resume", "r", 0, vm_debug_cmd_resume, "",
+    { "printaddr", "pa", vm_debug_cmd_printaddr, 1, "<addr>",
+        "Print the value at memory address <addr>", },
+    { "printstate", "ps", vm_debug_cmd_printstate, 0, "",
+        "Print the machine and CPU state", },
+    { "resume", "r", vm_debug_cmd_resume, 0, "",
         "Resume execution", },
 };
 
@@ -37,8 +42,7 @@ vm_debug_next_arg(char **str)
         break;
     }
 
-    return tok;
-}
+    return tok; }
 
 int
 vm_debug_addr(const char *str)
@@ -160,4 +164,20 @@ DEBUG_CMD(help)
 DEBUG_CMD(resume)
 {
     vm_reflect_pause(NULL);
+}
+
+DEBUG_CMD(printstate)
+{
+    vm_reflect_cpu_info(NULL);
+    vm_reflect_machine_info(NULL);
+}
+
+DEBUG_CMD(printaddr)
+{
+    // FIXME: This is... too machine-specific; we need to abstract this logic
+    
+    mos6502 *cpu = (mos6502 *)vm_di_get(VM_CPU);
+    FILE *stream = (FILE *)vm_di_get(VM_OUTPUT);
+
+    fprintf(stream, "$%02X\n", mos6502_get(cpu, args->addr1));
 }

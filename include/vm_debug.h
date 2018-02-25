@@ -16,14 +16,14 @@ typedef struct {
     char *abbrev;
 
     /*
-     * The number of arguments we expect to see
-     */
-    int nargs;
-
-    /*
      * The function that will do something with the command's input
      */
     vm_debug_func handler;
+
+    /*
+     * The number of arguments we expect to see
+     */
+    int nargs;
 
     /*
      * What do our arguments look like?
@@ -68,6 +68,8 @@ extern vm_debug_cmd *vm_debug_find_cmd(const char *);
 extern void vm_debug_execute(const char *);
 
 extern DEBUG_CMD(help);
+extern DEBUG_CMD(printaddr);
+extern DEBUG_CMD(printstate);
 extern DEBUG_CMD(resume);
 
 #endif

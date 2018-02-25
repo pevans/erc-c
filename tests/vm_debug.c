@@ -94,3 +94,17 @@ Test(vm_debug, cmd_resume)
 
     cr_assert_eq(mach->paused, false);
 }
+
+Test(vm_debug, cmd_printstate)
+{
+    vm_debug_cmd_printstate(&args);
+    cr_assert_neq(strlen(buf), 0);
+}
+
+Test(vm_debug, cmd_printaddr)
+{
+    args.addr1 = 123;
+    mos6502_set(mach->cpu, args.addr1, 127);
+    vm_debug_cmd_printaddr(&args);
+    cr_assert_str_eq(buf, "$7F\n");
+}
