@@ -49,6 +49,8 @@ teardown()
     fclose(stream);
 
     apple2_free(mach);
+
+    vm_debug_unbreak_all();
 }
 
 TestSuite(vm_debug, .init = setup, .fini = teardown);
@@ -175,6 +177,39 @@ Test(vm_debug, broke)
     cr_assert_eq(vm_debug_broke(0x23), false);
     vm_debug_break(0x23);
     cr_assert_eq(vm_debug_broke(0x23), true);
+}
+
+Test(vm_debug, unbreak)
+{
+    vm_debug_break(0x23);
+
+    cr_assert_eq(vm_debug_broke(0x23), true);
+    vm_debug_unbreak(0x23);
+    cr_assert_eq(vm_debug_broke(0x23), false);
+}
+
+Test(vm_debug, cmd_break)
+{
+    args.addr1 = 123;
+    vm_debug_cmd_break(&args);
+
+    cr_assert_eq(vm_debug_broke(123), true);
+}
+
+Test(vm_debug, cmd_unbreak)
+{
+    args.addr1 = 123;
+    vm_debug_cmd_break(&args);
+    cr_assert_eq(vm_debug_broke(123), true);
+    vm_debug_cmd_unbreak(&args);
+    cr_assert_eq(vm_debug_broke(123), false);
+}
+
+Test(vm_debug, unbreak_all)
+{
+    vm_debug_break(55555);
+    vm_debug_unbreak_all();
+    cr_assert_eq(vm_debug_broke(55555), false);
 }
 
 /* Test(vm_debug, quit) */

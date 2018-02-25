@@ -72,13 +72,17 @@ extern vm_debug_cmd *vm_debug_find_cmd(const char *);
 extern void vm_debug_break(int);
 extern void vm_debug_execute(const char *);
 extern void vm_debug_quit();
+extern void vm_debug_unbreak(int);
+extern void vm_debug_unbreak_all();
 
+extern DEBUG_CMD(break);
 extern DEBUG_CMD(help);
 extern DEBUG_CMD(jump);
 extern DEBUG_CMD(printaddr);
 extern DEBUG_CMD(printstate);
 extern DEBUG_CMD(quit);
 extern DEBUG_CMD(resume);
+extern DEBUG_CMD(unbreak);
 extern DEBUG_CMD(writeaddr);
 extern DEBUG_CMD(writestate);
 

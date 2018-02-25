@@ -4,6 +4,7 @@
 
 #include <ctype.h>
 #include <errno.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
@@ -20,12 +21,14 @@
 
 /*
  * A table of breakpoints, arranged by address in a CPU. If
- * breakpoints[i] is zero, then there is no breakpoint. If it is
- * non-zero, then there is a breakpoint at address i.
+ * breakpoints[i] is false, then there is no breakpoint. If it is
+ * true, then there is a breakpoint at address i.
  */
-static int breakpoints[BREAKPOINTS_MAX];
+static bool breakpoints[BREAKPOINTS_MAX];
 
 vm_debug_cmd cmdtable[] = {
+    { "break", "b", vm_debug_cmd_break, 1, "<addr>",
+        "Add breakpoint at <addr>", },
     { "help", "h", vm_debug_cmd_help, 0, "",
         "Print out this list of commands", },
     { "jump", "j", vm_debug_cmd_jump, 1, "<addr>",
@@ -38,6 +41,8 @@ vm_debug_cmd cmdtable[] = {
         "Quit the emulator", },
     { "resume", "r", vm_debug_cmd_resume, 0, "",
         "Resume execution", },
+    { "unbreak", "u", vm_debug_cmd_unbreak, 1, "<addr>",
+        "Remove breakpoint at <addr>", },
     { "writeaddr", "wa", vm_debug_cmd_writeaddr, 2, "<addr> <byte>",
         "Write <byte> at <addr>", },
     { "writestate", "ws", vm_debug_cmd_writestate, 2, "<reg> <byte>",
@@ -90,7 +95,17 @@ vm_debug_break(int addr)
         return;
     }
 
-    breakpoints[addr] = 1;
+    breakpoints[addr] = true;
+}
+
+void
+vm_debug_unbreak(int addr)
+{
+    if (addr < 0 || addr >= BREAKPOINTS_MAX) {
+        return;
+    }
+
+    breakpoints[addr] = false;
 }
 
 bool
@@ -100,7 +115,13 @@ vm_debug_broke(int addr)
         return false;
     }
 
-    return breakpoints[addr] != 0;
+    return breakpoints[addr];
+}
+
+void
+vm_debug_unbreak_all()
+{
+    memset(breakpoints, false, BREAKPOINTS_MAX);
 }
 
 char *
@@ -215,6 +236,11 @@ vm_debug_find_cmd(const char *str)
                                    sizeof(vm_debug_cmd), cmd_compar);
 }
 
+DEBUG_CMD(break)
+{
+    vm_debug_break(args->addr1);
+}
+
 DEBUG_CMD(help)
 {
     FILE *stream = (FILE *)vm_di_get(VM_OUTPUT);
@@ -279,4 +305,9 @@ DEBUG_CMD(writestate)
 DEBUG_CMD(quit)
 {
     exit(0);
+}
+
+DEBUG_CMD(unbreak)
+{
+    vm_debug_unbreak(args->addr1);
 }
