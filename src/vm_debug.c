@@ -95,6 +95,12 @@ vm_debug_addr(const char *str)
         return -1;
     }
 
+    // We do accept the $XX notation for hexadecimals; it's easy to do,
+    // since we can just skip past that part of the string.
+    if (*str == '$') {
+        str++;
+    }
+
     addr = strtol(str, NULL, 16);
     if (addr == 0 && errno == EINVAL) {
         return -1;
