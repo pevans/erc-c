@@ -26,6 +26,10 @@
  */
 static bool breakpoints[BREAKPOINTS_MAX];
 
+/*
+ * A table of commands that we support in the debugger. This list is
+ * printed out (in somewhat readable form) by the help/h command.
+ */
 vm_debug_cmd cmdtable[] = {
     { "break", "b", vm_debug_cmd_break, 1, "<addr>",
         "Add breakpoint at <addr>", },
@@ -53,6 +57,10 @@ vm_debug_cmd cmdtable[] = {
 
 #define CMDTABLE_SIZE (sizeof(cmdtable) / sizeof(vm_debug_cmd))
 
+/*
+ * Return the next argument in a string passed in for input with the
+ * debugger. All arguments are space-separated.
+ */
 char *
 vm_debug_next_arg(char **str)
 {
@@ -73,6 +81,11 @@ vm_debug_next_arg(char **str)
     return tok;
 }
 
+/*
+ * Given a string (str), parse it into a hexadecimal value. This
+ * function returns -1 if the string is invalid or was NULL to begin
+ * with.
+ */
 int
 vm_debug_addr(const char *str)
 {
@@ -90,6 +103,9 @@ vm_debug_addr(const char *str)
     return addr;
 }
 
+/*
+ * Add a breakpoint for addr
+ */
 void
 vm_debug_break(int addr)
 {
@@ -100,6 +116,9 @@ vm_debug_break(int addr)
     breakpoints[addr] = true;
 }
 
+/*
+ * Remove a breakpoint for addr, if one is set
+ */
 void
 vm_debug_unbreak(int addr)
 {
@@ -110,6 +129,9 @@ vm_debug_unbreak(int addr)
     breakpoints[addr] = false;
 }
 
+/*
+ * Return true if there is a breakpoint set for addr
+ */
 bool
 vm_debug_broke(int addr)
 {
@@ -120,12 +142,24 @@ vm_debug_broke(int addr)
     return breakpoints[addr];
 }
 
+/*
+ * Remove all breakpoints that have been set for any address. This
+ * function doesn't have a ton of functional value--it's main use is in
+ * testing, when we destroy all breakpoints in the singleton breakpoint
+ * array when tearing down for a given test.
+ */
 void
 vm_debug_unbreak_all()
 {
     memset(breakpoints, false, BREAKPOINTS_MAX);
 }
 
+/*
+ * Print a debugger prompt and return a newly-allocated string
+ * containing the contents of the input given from the user. (You
+ * _must_ free the string that is returned when you are done with it!
+ * Unless you're ok with memory leaks!)
+ */
 char *
 vm_debug_prompt()
 {
@@ -148,6 +182,10 @@ vm_debug_prompt()
     return strdup(buf);
 }
 
+/*
+ * Given a string (str), execute the command with any arguments given to
+ * it (assuming they are space-separated).
+ */
 void
 vm_debug_execute(const char *str)
 {
@@ -213,6 +251,11 @@ vm_debug_execute(const char *str)
     free(ebuf);
 }
 
+/*
+ * Compare a string key (k) with a vm_debug_cmd (elem) name or abbrev
+ * field. This is the function we use for bsearch() in
+ * vm_debug_find_cmd().
+ */
 static int
 cmd_compar(const void *k, const void *elem)
 {
@@ -238,11 +281,17 @@ vm_debug_find_cmd(const char *str)
                                    sizeof(vm_debug_cmd), cmd_compar);
 }
 
+/*
+ * Add a breakpoint at the address given in args->addr1
+ */
 DEBUG_CMD(break)
 {
     vm_debug_break(args->addr1);
 }
 
+/*
+ * Print a list of the commands we support (including this one!)
+ */
 DEBUG_CMD(help)
 {
     FILE *stream = (FILE *)vm_di_get(VM_OUTPUT);
@@ -255,6 +304,9 @@ DEBUG_CMD(help)
     }
 }
 
+/*
+ * Remove any breakpoint at the current PC and unpause execution
+ */
 DEBUG_CMD(resume)
 {
     mos6502 *cpu = (mos6502 *)vm_di_get(VM_CPU);
@@ -266,12 +318,18 @@ DEBUG_CMD(resume)
     vm_reflect_pause(NULL);
 }
 
+/*
+ * Print the state contents of the CPU and machine
+ */
 DEBUG_CMD(printstate)
 {
     vm_reflect_cpu_info(NULL);
     vm_reflect_machine_info(NULL);
 }
 
+/*
+ * Print the value at the address given in args->addr1
+ */
 DEBUG_CMD(printaddr)
 {
     // FIXME: This is... too machine-specific; we need to abstract this logic
@@ -282,6 +340,9 @@ DEBUG_CMD(printaddr)
     fprintf(stream, "$%02X\n", mos6502_get(cpu, args->addr1));
 }
 
+/*
+ * Jump from the current PC to one given in args->addr1
+ */
 DEBUG_CMD(jump)
 {
     // FIXME: same issue as for printaddr -- overall we need to refactor
@@ -291,12 +352,22 @@ DEBUG_CMD(jump)
     cpu->PC = args->addr1;
 }
 
+/*
+ * Write the byte value given in args->addr2 at the address given in
+ * args->addr1.
+ */
 DEBUG_CMD(writeaddr)
 {
     mos6502 *cpu = (mos6502 *)vm_di_get(VM_CPU);
     mos6502_set(cpu, args->addr1, args->addr2);
 }
 
+/*
+ * Change the machine state given in args->target to the value in
+ * args->addr2. Right now, you can only change CPU registers, but
+ * ultimately it'd be nice to change other things like strobe, display
+ * mode, etc.
+ */
 DEBUG_CMD(writestate)
 {
     mos6502 *cpu = (mos6502 *)vm_di_get(VM_CPU);
@@ -310,16 +381,26 @@ DEBUG_CMD(writestate)
     }
 }
 
+/*
+ * Quit the program entirely
+ */
 DEBUG_CMD(quit)
 {
     exit(0);
 }
 
+/*
+ * Remove the breakpoint at the given address
+ */
 DEBUG_CMD(unbreak)
 {
     vm_debug_unbreak(args->addr1);
 }
 
+/*
+ * Execute the current opcode at PC in the CPU, then break at the
+ * next opcode.
+ */
 DEBUG_CMD(step)
 {
     mos6502 *cpu = (mos6502 *)vm_di_get(VM_CPU);
