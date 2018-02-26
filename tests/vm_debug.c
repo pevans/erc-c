@@ -71,6 +71,40 @@ Test(vm_debug, execute)
     cr_assert_neq(strlen(buf), 0);
 }
 
+Test(vm_debug, next_arg)
+{
+    char *orig, *str = strdup("ok    hey");
+    orig = str;
+
+    cr_assert_str_eq(vm_debug_next_arg(&str), "ok");
+    cr_assert_str_eq(vm_debug_next_arg(&str), "hey");
+
+    free(orig);
+}
+
+/*
+ * Right now, there's not a great way of testing vm_debug_prompt() since
+ * it's dependent on stdin. Or, maybe there is with a hack, but I'd like
+ * to do something more appropriate in the future.
+ *
+ * Test(vm_debug, prompt)
+ */
+
+Test(vm_debug, addr)
+{
+    cr_assert_eq(vm_debug_addr("faaa"), 0xfaaa);
+    cr_assert_eq(vm_debug_addr("123"), 0x123);
+    cr_assert_eq(vm_debug_addr("$34"), 0x34);
+    cr_assert_eq(vm_debug_addr("hey"), -1);
+}
+
+/* 
+ * The find_cmd test also tests cmd_compar--at least, indirectly; that
+ * function is statically declared, and we don't have access to test it
+ * here.
+ *
+ * Test(vm_debug, cmd_compar) 
+ */
 Test(vm_debug, find_cmd)
 {
     vm_debug_cmd *cmd;
