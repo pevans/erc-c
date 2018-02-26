@@ -348,7 +348,6 @@ apple2_run_loop(apple2 *mach)
     }
 
     out = (FILE *)vm_di_get(VM_OUTPUT);
-    vm_reflect_pause(NULL);
 
     while (vm_screen_active(mach->screen)) {
         if (vm_debug_broke(mach->cpu->PC)) {
