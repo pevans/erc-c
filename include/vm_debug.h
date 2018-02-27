@@ -66,7 +66,9 @@ struct vm_debug_args {
 #define DEBUG_CMD(x) \
     void vm_debug_cmd_##x (vm_debug_args *args)
 
+extern int vm_debug_addr(const char *);
 extern bool vm_debug_broke(int);
+extern char *vm_debug_next_arg(char **);
 extern char *vm_debug_prompt();
 extern vm_debug_cmd *vm_debug_find_cmd(const char *);
 extern void vm_debug_break(int);
