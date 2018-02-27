@@ -209,7 +209,7 @@ DEFINE_INST(sbc)
     }
 
     MOS_CARRY_BIT();
-    SET_RESULT(cpu->A - oper - carry);
+    SET_RESULT(cpu->A - oper - (carry ? 0 : 1));
 
     // Carry is handled slightly differently in SBC; it's set if the
     // value is non-negative, and unset if negative. (It's essentially a
@@ -252,7 +252,7 @@ DEFINE_INST(sbc_dec)
     // carry is also a factor.
     int diff =
         ((a_msd * 10) + a_lsd) -
-        ((o_msd * 10) + o_lsd) - carry;
+        ((o_msd * 10) + o_lsd) - (carry ? 0 : 1);
 
     // Force C to high to begin with
     cpu->P |= MOS_CARRY;
