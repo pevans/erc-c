@@ -15,6 +15,12 @@ Test(mos6502_arith, adc)
     cpu->P &= ~MOS_CARRY;
     mos6502_handle_adc(cpu, 64);
     cr_assert_eq(cpu->A, 73);
+
+    // This should handle decimal mode without complaint
+    cpu->P |= MOS_DECIMAL;
+    cpu->A = 0x18;
+    mos6502_handle_adc(cpu, 0x3);
+    cr_assert_eq(cpu->A, 0x21);
 }
 
 Test(mos6502_arith, adc_dec)
