@@ -268,3 +268,13 @@ Test(vm_debug, cmd_step)
 }
 
 /* Test(vm_debug, cmd_quit) */
+
+Test(vm_debug, cmd_disassemble)
+{
+    cr_assert_eq(mach->disasm, false);
+    vm_debug_cmd_disasm(&args);
+    cr_assert_neq(strlen(buf), 0);
+    cr_assert_eq(mach->disasm, true);
+    vm_debug_cmd_disasm(&args);
+    cr_assert_eq(mach->disasm, false);
+}

@@ -78,6 +78,7 @@ extern void vm_debug_unbreak(int);
 extern void vm_debug_unbreak_all();
 
 extern DEBUG_CMD(break);
+extern DEBUG_CMD(disasm);
 extern DEBUG_CMD(help);
 extern DEBUG_CMD(jump);
 extern DEBUG_CMD(printaddr);

@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <strings.h>
 
+#include "apple2.h"
 #include "mos6502.h"
 #include "vm_debug.h"
 #include "vm_di.h"
@@ -33,6 +34,8 @@ static bool breakpoints[BREAKPOINTS_MAX];
 vm_debug_cmd cmdtable[] = {
     { "break", "b", vm_debug_cmd_break, 1, "<addr>",
         "Add breakpoint at <addr>", },
+    { "disasm", "d", vm_debug_cmd_disasm, 0, "",
+        "Toggle disassembly", },
     { "help", "h", vm_debug_cmd_help, 0, "",
         "Print out this list of commands", },
     { "jump", "j", vm_debug_cmd_jump, 1, "<addr>",
@@ -414,4 +417,14 @@ DEBUG_CMD(step)
     vm_debug_unbreak(cpu->PC);
     mos6502_execute(cpu);
     vm_debug_break(cpu->PC);
+}
+
+DEBUG_CMD(disasm)
+{
+    apple2 *mach = (apple2 *)vm_di_get(VM_MACHINE);
+    FILE *stream = (FILE *)vm_di_get(VM_OUTPUT);
+
+    vm_reflect_disasm(NULL);
+
+    fprintf(stream, "disassembly %s\n", mach->disasm ? "ON" : "OFF");
 }
