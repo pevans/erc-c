@@ -267,4 +267,4 @@ Test(vm_debug, cmd_step)
     cr_assert_eq(mach->cpu->PC, 2);
 }
 
-/* Test(vm_debug, quit) */
+/* Test(vm_debug, cmd_quit) */
