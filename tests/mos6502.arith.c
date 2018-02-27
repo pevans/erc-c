@@ -141,6 +141,11 @@ Test(mos6502_arith, sbc)
     cpu->A = 16;
     mos6502_handle_sbc(cpu, 8);
     cr_assert_eq(cpu->A, 7);
+
+    cpu->P |= MOS_DECIMAL;
+    cpu->A = 0x12;
+    mos6502_handle_sbc(cpu, 0x3);
+    cr_assert_eq(cpu->A, 0x9);
 }
 
 Test(mos6502_arith, sbc_dec)
