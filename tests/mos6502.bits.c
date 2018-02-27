@@ -22,6 +22,12 @@ Test(mos6502_bits, asl)
     mos6502_handle_asl(cpu, 5);
     cr_assert_eq(cpu->A, 10);
 
+    // Test if carry is set properly
+    cpu->P &= ~MOS_CARRY;
+    mos6502_handle_asl(cpu, 150);
+    cr_assert_eq(cpu->A, 44);
+    cr_assert_eq(cpu->P & MOS_CARRY, MOS_CARRY);
+
     cpu->eff_addr = 123;
     mos6502_handle_asl(cpu, 22);
     cr_assert_eq(mos6502_get(cpu, 123), 44);
