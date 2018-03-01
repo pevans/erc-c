@@ -93,7 +93,10 @@ DEFINE_INST(plp)
  */
 DEFINE_INST(plx)
 {
-    cpu->X = mos6502_pop_stack(cpu);
+    SET_RESULT(mos6502_pop_stack(cpu));
+
+    mos6502_modify_status(cpu, MOS_NZ, cpu->X, result);
+    cpu->X = result;
 }
 
 /*
@@ -101,7 +104,10 @@ DEFINE_INST(plx)
  */
 DEFINE_INST(ply)
 {
-    cpu->Y = mos6502_pop_stack(cpu);
+    SET_RESULT(mos6502_pop_stack(cpu));
+
+    mos6502_modify_status(cpu, MOS_NZ, cpu->Y, result);
+    cpu->Y = result;
 }
 
 /*
