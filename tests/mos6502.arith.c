@@ -12,7 +12,12 @@ Test(mos6502_arith, adc)
     mos6502_handle_adc(cpu, 3);
     cr_assert_eq(cpu->A, 9);
 
+    cpu->A = 0xfe;
+    mos6502_handle_adc(cpu, 0x5);
+    cr_assert_eq(cpu->A, (vm_8bit)(0xfe + 0x5));
+
     cpu->P &= ~MOS_CARRY;
+    cpu->A = 9;
     mos6502_handle_adc(cpu, 64);
     cr_assert_eq(cpu->A, 73);
 
@@ -30,8 +35,13 @@ Test(mos6502_arith, adc_dec)
     mos6502_handle_adc_dec(cpu, 0x10);
     cr_assert_eq(cpu->A, 0x15);
 
+    cpu->A = 0x98;
+    mos6502_handle_adc_dec(cpu, 0x3);
+    cr_assert_eq(cpu->A, 0x1);
+
     // Test that A + M + 1 works for carry
     cpu->P |= MOS_CARRY;
+    cpu->A = 0x15;
     mos6502_handle_adc_dec(cpu, 0x13);
     cr_assert_eq(cpu->A, 0x29);
 }
@@ -55,6 +65,10 @@ Test(mos6502_arith, cmp)
     cr_assert_eq(cpu->P & MOS_CARRY, MOS_CARRY);
     cr_assert_eq(cpu->P & MOS_NEGATIVE, MOS_NEGATIVE);
     cr_assert_eq(cpu->P & MOS_ZERO, 0);
+
+    cpu->A = 111;
+    mos6502_handle_cmp(cpu, 111);
+    cr_assert_eq(cpu->P & MOS_ZERO, MOS_ZERO);
 }
 
 Test(mos6502_arith, cpx)
@@ -89,6 +103,11 @@ Test(mos6502_arith, dec)
     // necessarily need for that to be so.
     mos6502_handle_dec(cpu, 44);
     cr_assert_eq(mos6502_get(cpu, 123), 43);
+
+    cpu->eff_addr = 0;
+    cpu->A = 0;
+    mos6502_handle_dec(cpu, 0);
+    cr_assert_eq(cpu->A, 0xff);
 }
 
 Test(mos6502_arith, dex)
@@ -115,6 +134,10 @@ Test(mos6502_arith, inc)
     cpu->eff_addr = 0;
     mos6502_handle_inc(cpu, 0);
     cr_assert_eq(cpu->A, 9);
+
+    cpu->A = 0xff;
+    mos6502_handle_inc(cpu, 0);
+    cr_assert_eq(cpu->A, 0);
 }
 
 Test(mos6502_arith, inx)
@@ -136,6 +159,10 @@ Test(mos6502_arith, sbc)
     cpu->A = 5;
     mos6502_handle_sbc(cpu, 3);
     cr_assert_eq(cpu->A, 2);
+
+    cpu->A = 0x3;
+    mos6502_handle_sbc(cpu, 5);
+    cr_assert_eq(cpu->A, (vm_8bit)(0x3 - 0x5));
 
     cpu->P &= ~MOS_CARRY;
     cpu->A = 16;
@@ -159,4 +186,8 @@ Test(mos6502_arith, sbc_dec)
     cpu->A = 0x12;
     mos6502_handle_sbc_dec(cpu, 0x2);
     cr_assert_eq(cpu->A, 0x10);
+
+    cpu->A = 0x2;
+    mos6502_handle_sbc_dec(cpu, 0x3);
+    cr_assert_eq(cpu->A, 0x99);
 }
