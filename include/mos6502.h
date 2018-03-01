@@ -53,6 +53,37 @@
 #define DECL_INST(x) \
     extern void mos6502_handle_##x (mos6502 *, vm_8bit)
 
+#define MOS_CHECK_Z(result) \
+    cpu->P &= ~MOS_ZERO; \
+    if ((vm_8bit)(result) == 0) cpu->P |= MOS_ZERO
+
+#define MOS_CHECK_N(result) \
+    cpu->P &= ~MOS_NEGATIVE; \
+    if ((vm_8bit)(result) & 0x80) cpu->P |= MOS_NEGATIVE
+
+#define MOS_CHECK_V(orig, result) \
+    cpu->P &= ~MOS_OVERFLOW; \
+    do { \
+        vm_8bit r = result; \
+        vm_8bit o = orig; \
+        if ((o & 0x80) ^ (r & 0x80)) { \
+            cpu->P |= MOS_OVERFLOW; \
+        } \
+    } while (0)
+
+#define MOS_CHECK_NV(orig, result) \
+    MOS_CHECK_N(result); \
+    MOS_CHECK_V(orig, result)
+
+#define MOS_CHECK_NZ(result) \
+    MOS_CHECK_N(result); \
+    MOS_CHECK_Z(result)
+
+#define MOS_CHECK_NVZ(orig, result) \
+    MOS_CHECK_N(result); \
+    MOS_CHECK_V(orig, result); \
+    MOS_CHECK_Z(result)
+
 typedef struct {
     /*
      * There are two different segment pointers for reading and writing,

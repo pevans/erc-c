@@ -14,7 +14,7 @@
  */
 DEFINE_INST(lda)
 {
-    mos6502_modify_status(cpu, MOS_NZ, cpu->A, oper);
+    MOS_CHECK_NZ(oper);
     cpu->A = oper;
 }
 
@@ -23,7 +23,7 @@ DEFINE_INST(lda)
  */
 DEFINE_INST(ldx)
 {
-    mos6502_modify_status(cpu, MOS_NZ, cpu->X, oper);
+    MOS_CHECK_NZ(oper);
     cpu->X = oper;
 }
 
@@ -32,7 +32,7 @@ DEFINE_INST(ldx)
  */
 DEFINE_INST(ldy)
 {
-    mos6502_modify_status(cpu, MOS_NZ, cpu->Y, oper);
+    MOS_CHECK_NZ(oper);
     cpu->Y = oper;
 }
 
@@ -74,9 +74,9 @@ DEFINE_INST(phy)
  */
 DEFINE_INST(pla)
 {
-    SET_RESULT(mos6502_pop_stack(cpu));
+    vm_8bit result = mos6502_pop_stack(cpu);
 
-    mos6502_modify_status(cpu, MOS_NZ, cpu->A, result);
+    MOS_CHECK_NZ(result);
     cpu->A = result;
 }
 
@@ -93,9 +93,9 @@ DEFINE_INST(plp)
  */
 DEFINE_INST(plx)
 {
-    SET_RESULT(mos6502_pop_stack(cpu));
+    vm_8bit result = mos6502_pop_stack(cpu);
 
-    mos6502_modify_status(cpu, MOS_NZ, cpu->X, result);
+    MOS_CHECK_NZ(result);
     cpu->X = result;
 }
 
@@ -104,9 +104,9 @@ DEFINE_INST(plx)
  */
 DEFINE_INST(ply)
 {
-    SET_RESULT(mos6502_pop_stack(cpu));
+    vm_8bit result = mos6502_pop_stack(cpu);
 
-    mos6502_modify_status(cpu, MOS_NZ, cpu->Y, result);
+    MOS_CHECK_NZ(result);
     cpu->Y = result;
 }
 
@@ -149,7 +149,7 @@ DEFINE_INST(stz)
  */
 DEFINE_INST(tax)
 {
-    mos6502_modify_status(cpu, MOS_NZ, cpu->X, cpu->A);
+    MOS_CHECK_NZ(cpu->A);
     cpu->X = cpu->A;
 }
 
@@ -158,7 +158,7 @@ DEFINE_INST(tax)
  */
 DEFINE_INST(tay)
 {
-    mos6502_modify_status(cpu, MOS_NZ, cpu->Y, cpu->A);
+    MOS_CHECK_NZ(cpu->A);
     cpu->Y = cpu->A;
 }
 
@@ -167,7 +167,7 @@ DEFINE_INST(tay)
  */
 DEFINE_INST(tsx)
 {
-    mos6502_modify_status(cpu, MOS_NZ, cpu->X, cpu->S);
+    MOS_CHECK_NZ(cpu->S);
     cpu->X = cpu->S;
 }
 
@@ -176,7 +176,7 @@ DEFINE_INST(tsx)
  */
 DEFINE_INST(txa)
 {
-    mos6502_modify_status(cpu, MOS_NZ, cpu->A, cpu->X);
+    MOS_CHECK_NZ(cpu->X);
     cpu->A = cpu->X;
 }
 
@@ -185,7 +185,7 @@ DEFINE_INST(txa)
  */
 DEFINE_INST(txs)
 {
-    mos6502_modify_status(cpu, MOS_NZ, cpu->S, cpu->X);
+    MOS_CHECK_NZ(cpu->X);
     cpu->S = cpu->X;
 }
 
@@ -194,6 +194,6 @@ DEFINE_INST(txs)
  */
 DEFINE_INST(tya)
 {
-    mos6502_modify_status(cpu, MOS_NZ, cpu->A, cpu->Y);
+    MOS_CHECK_NZ(cpu->Y);
     cpu->A = cpu->Y;
 }

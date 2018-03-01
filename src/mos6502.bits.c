@@ -14,10 +14,8 @@
  */
 DEFINE_INST(and)
 {
-    SET_RESULT(cpu->A & oper);
-
-    mos6502_modify_status(cpu, MOS_NZ, cpu->A, result);
-    cpu->A = result & 0xff;
+    MOS_CHECK_NZ(cpu->A & oper);
+    cpu->A &= oper;
 }
 
 /*
@@ -33,14 +31,18 @@ DEFINE_INST(and)
  */
 DEFINE_INST(asl)
 {
-    SET_RESULT(oper << 1);
+    vm_8bit result = oper << 1;
 
-    mos6502_modify_status(cpu, MOS_NZC, oper, result);
+    MOS_CHECK_NZ(result);
+    cpu->P &= ~MOS_CARRY;
+    if ((oper << 1) > 0xff) {
+        cpu->P |= MOS_CARRY;
+    }
 
     if (cpu->eff_addr) {
-        mos6502_set(cpu, cpu->eff_addr, result & 0xff);
+        mos6502_set(cpu, cpu->eff_addr, result);
     } else {
-        cpu->A = result & 0xff;
+        cpu->A = result;
     }
 }
 
@@ -96,10 +98,8 @@ DEFINE_INST(bim)
  */
 DEFINE_INST(eor)
 {
-    SET_RESULT(cpu->A ^ oper);
-
-    mos6502_modify_status(cpu, MOS_NZ, cpu->A, result);
-    cpu->A = result & 0xff;
+    MOS_CHECK_NZ(cpu->A ^ oper);
+    cpu->A ^= oper;
 }
 
 /*
@@ -111,27 +111,25 @@ DEFINE_INST(eor)
  */
 DEFINE_INST(lsr)
 {
-    SET_RESULT(oper >> 1);
+    vm_8bit result = oper >> 1;
 
-    // Set ZERO if it should apply; also inspect the NEGATIVE flag, but
-    // note that doing so will have the effect of _always_ unsetting the
-    // N flag, because literally any byte value shifted right will
-    // immediately lose the sign bit and be non-negative.
-    mos6502_modify_status(cpu, MOS_NZ, oper, result);
+    // The N flag is ALWAYS cleared in LSR, because a zero is always
+    // entered as bit 7
+    cpu->P &= ~MOS_NEGATIVE;
 
-    // However, we handle carry a bit differently here. The carry bit
-    // should be 1 if oper & 0x1; that is, when we shift right, we want
-    // the right-most bit to be captured in carry, in just the same way
-    // we want the left-most bit to be captured in carry for ASL.
+    MOS_CHECK_Z(result);
+
+    // Carry is set to the value of the bit we're "losing" in the shift
+    // operation
     cpu->P &= ~MOS_CARRY;
     if (oper & 0x1) {
         cpu->P |= MOS_CARRY;
     }
 
     if (cpu->eff_addr) {
-        mos6502_set(cpu, cpu->eff_addr, result & 0xff);
+        mos6502_set(cpu, cpu->eff_addr, result);
     } else {
-        cpu->A = result & 0xff;
+        cpu->A = result;
     }
 }
 
@@ -141,10 +139,8 @@ DEFINE_INST(lsr)
  */
 DEFINE_INST(ora)
 {
-    SET_RESULT(cpu->A | oper);
-
-    mos6502_modify_status(cpu, MOS_NZ, cpu->A, result);
-    cpu->A = result & 0xff;
+    MOS_CHECK_NZ(cpu->A | oper);
+    cpu->A |= oper;
 }
 
 /*
@@ -154,7 +150,7 @@ DEFINE_INST(ora)
  */
 DEFINE_INST(rol)
 {
-    SET_RESULT(oper << 1);
+    vm_8bit result = oper << 1;
 
     // Rotations are effectively _9-bit_. So we aren't rotating bit 7
     // into bit 0; we're rotating bit 7 into the carry bit, and we're
@@ -168,12 +164,12 @@ DEFINE_INST(rol)
         cpu->P |= MOS_CARRY;
     }
 
-    mos6502_modify_status(cpu, MOS_NZ, oper, result);
+    MOS_CHECK_NZ(result);
 
     if (cpu->eff_addr) {
-        mos6502_set(cpu, cpu->eff_addr, result & 0xff);
+        mos6502_set(cpu, cpu->eff_addr, result);
     } else {
-        cpu->A = result & 0xff;
+        cpu->A = result;
     }
 }
 
@@ -183,7 +179,7 @@ DEFINE_INST(rol)
  */
 DEFINE_INST(ror)
 {
-    SET_RESULT(oper >> 1);
+    vm_8bit result = oper >> 1;
 
     // See the code for ROL for my note on 9-bit rotation (vs. 8-bit).
     if (cpu->P & MOS_CARRY) {
@@ -195,12 +191,12 @@ DEFINE_INST(ror)
         cpu->P |= MOS_CARRY;
     }
 
-    mos6502_modify_status(cpu, MOS_NZ, oper, result);
+    MOS_CHECK_NZ(result);
 
     if (cpu->eff_addr) {
-        mos6502_set(cpu, cpu->eff_addr, result & 0xff);
+        mos6502_set(cpu, cpu->eff_addr, result);
     } else {
-        cpu->A = result & 0xff;
+        cpu->A = result;
     }
 }
 

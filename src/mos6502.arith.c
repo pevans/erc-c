@@ -21,11 +21,19 @@ DEFINE_INST(adc)
     }
 
     MOS_CARRY_BIT();
-    SET_RESULT(cpu->A + oper + carry);
 
-    mos6502_modify_status(cpu, MOS_NVZC, cpu->A, result);
+    vm_8bit result = cpu->A + oper + carry;
+    MOS_CHECK_NVZ(cpu->A, result);
 
-    cpu->A = result & 0xff;
+    // Carry has different meanings in different contexts... in ADC,
+    // carry is set if the result requires a ninth bit (the carry bit!)
+    // to be set.
+    cpu->P &= ~MOS_CARRY;
+    if ((cpu->A + oper + carry) > 0xff) {
+        cpu->P |= MOS_CARRY;
+    }
+    
+    cpu->A = result;
 }
 
 /*
@@ -65,17 +73,16 @@ DEFINE_INST(adc_dec)
     // And the final result has to be ported back into a "hexadecimal"
     // number; you see, BCD values are not just literally decimal, they
     // are decimal in hexadecimal form.
-    SET_RESULT(((modsum / 10) << 4) | (modsum % 10));
+    vm_8bit result = ((modsum / 10) << 4) | (modsum % 10);
 
-    // Because the rules for carry is a bit different, we'll handle it
-    // here.
+    // As you can see, decimal comports a different meaning for the
+    // carry bit than its binary version
     cpu->P &= ~MOS_CARRY;
     if (sum > 100) {
         cpu->P |= MOS_CARRY;
     }
 
-    // We'll check zero, but not negative or overflow.
-    mos6502_modify_status(cpu, MOS_ZERO, cpu->A, sum);
+    MOS_CHECK_Z(result);
 
     cpu->A = result;
 }
@@ -89,10 +96,10 @@ DEFINE_INST(adc_dec)
  */
 DEFINE_INST(cmp)
 {
-    mos6502_modify_status(cpu, MOS_NZ, cpu->A, cpu->A - oper);
+    MOS_CHECK_NZ(cpu->A - oper);
 
-    // Carry works slightly different with the cmp-style instructions;
-    // it's set if A >= oper.
+    // With CMP, carry is set if the difference between A and oper is
+    // not zero.
     cpu->P &= ~MOS_CARRY;
     if (cpu->A >= oper) {
         cpu->P |= MOS_CARRY;
@@ -105,7 +112,7 @@ DEFINE_INST(cmp)
  */
 DEFINE_INST(cpx)
 {
-    mos6502_modify_status(cpu, MOS_NZ, cpu->X, cpu->X - oper);
+    MOS_CHECK_NZ(cpu->X - oper);
 
     cpu->P &= ~MOS_CARRY;
     if (cpu->X >= oper) {
@@ -119,7 +126,7 @@ DEFINE_INST(cpx)
  */
 DEFINE_INST(cpy)
 {
-    mos6502_modify_status(cpu, MOS_NZ, cpu->Y, cpu->Y - oper);
+    MOS_CHECK_NZ(cpu->Y - oper);
 
     cpu->P &= ~MOS_CARRY;
     if (cpu->Y >= oper) {
@@ -134,7 +141,7 @@ DEFINE_INST(cpy)
 DEFINE_INST(dec) 
 {
     if (cpu->eff_addr) {
-        mos6502_modify_status(cpu, MOS_NZ, oper, oper - 1);
+        MOS_CHECK_NZ(oper - 1);
         mos6502_set(cpu, cpu->eff_addr, oper - 1);
         return;
     }
@@ -149,7 +156,7 @@ DEFINE_INST(dec)
  */
 DEFINE_INST(dex)
 {
-    mos6502_modify_status(cpu, MOS_NZ, cpu->X, cpu->X - 1);
+    MOS_CHECK_NZ(cpu->X - 1);
     cpu->X--;
 }
 
@@ -158,7 +165,7 @@ DEFINE_INST(dex)
  */
 DEFINE_INST(dey)
 {
-    mos6502_modify_status(cpu, MOS_NZ, cpu->Y, cpu->Y - 1);
+    MOS_CHECK_NZ(cpu->Y - 1);
     cpu->Y--;
 }
 
@@ -168,7 +175,7 @@ DEFINE_INST(dey)
 DEFINE_INST(inc)
 {
     if (cpu->eff_addr) {
-        mos6502_modify_status(cpu, MOS_NZ, oper, oper + 1);
+        MOS_CHECK_NZ(oper + 1);
         mos6502_set(cpu, cpu->eff_addr, oper + 1);
         return;
     }
@@ -181,7 +188,7 @@ DEFINE_INST(inc)
  */
 DEFINE_INST(inx)
 {
-    mos6502_modify_status(cpu, MOS_NZ, cpu->X, cpu->X + 1);
+    MOS_CHECK_NZ(cpu->X + 1);
     cpu->X++;
 }
 
@@ -190,7 +197,7 @@ DEFINE_INST(inx)
  */
 DEFINE_INST(iny)
 {
-    mos6502_modify_status(cpu, MOS_NZ, cpu->Y, cpu->Y + 1);
+    MOS_CHECK_NZ(cpu->Y + 1);
     cpu->Y++;
 }
 
@@ -209,7 +216,9 @@ DEFINE_INST(sbc)
     }
 
     MOS_CARRY_BIT();
-    SET_RESULT(cpu->A - oper - (carry ? 0 : 1));
+
+    vm_8bit result = cpu->A - oper - (carry ? 0 : 1);
+    MOS_CHECK_NVZ(cpu->A, result);
 
     // Carry is handled slightly differently in SBC; it's set if the
     // value is non-negative, and unset if negative. (It's essentially a
@@ -219,8 +228,7 @@ DEFINE_INST(sbc)
         cpu->P &= ~MOS_CARRY;
     }
 
-    mos6502_modify_status(cpu, MOS_NVZ, cpu->A, result);
-    cpu->A = result & 0xff;
+    cpu->A = result;
 }
 
 /*
@@ -267,9 +275,8 @@ DEFINE_INST(sbc_dec)
     // And the final result has to be ported back into a "hexadecimal"
     // number; you see, BCD values are not just literally decimal, they
     // are decimal in hexadecimal form.
-    SET_RESULT(((diff / 10) << 4) | (diff % 10));
-
-    mos6502_modify_status(cpu, MOS_ZERO, cpu->A, result);
+    vm_8bit result = ((diff / 10) << 4) | (diff % 10);
+    MOS_CHECK_Z(result);
 
     cpu->A = result;
 }
