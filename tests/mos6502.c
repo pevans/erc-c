@@ -37,24 +37,19 @@ Test(mos6502, pop_stack)
 
 Test(mos6502, modify_status)
 {
-    mos6502_modify_status(cpu, MOS_NEGATIVE, 130, 130);
+    MOS_CHECK_N(130);
     cr_assert_eq(cpu->P & MOS_NEGATIVE, MOS_NEGATIVE);
-    mos6502_modify_status(cpu, MOS_NEGATIVE, 123, 123);
+    MOS_CHECK_N(123);
     cr_assert_neq(cpu->P & MOS_NEGATIVE, MOS_NEGATIVE);
 
-    mos6502_modify_status(cpu, MOS_OVERFLOW, 123, 133);
+    MOS_CHECK_V(123, 133);
     cr_assert_eq(cpu->P & MOS_OVERFLOW, MOS_OVERFLOW);
-    mos6502_modify_status(cpu, MOS_OVERFLOW, 44, 44);
+    MOS_CHECK_V(44, 44);
     cr_assert_neq(cpu->P & MOS_OVERFLOW, MOS_OVERFLOW);
 
-    mos6502_modify_status(cpu, MOS_CARRY, 230, 260);
-    cr_assert_eq(cpu->P & MOS_CARRY, MOS_CARRY);
-    mos6502_modify_status(cpu, MOS_CARRY, 30, 190);
-    cr_assert_neq(cpu->P & MOS_CARRY, MOS_CARRY);
-
-    mos6502_modify_status(cpu, MOS_ZERO, 0, 0);
+    MOS_CHECK_Z(0);
     cr_assert_eq(cpu->P & MOS_ZERO, MOS_ZERO);
-    mos6502_modify_status(cpu, MOS_ZERO, 1, 1);
+    MOS_CHECK_Z(1);
     cr_assert_neq(cpu->P & MOS_ZERO, MOS_ZERO);
 }
 
