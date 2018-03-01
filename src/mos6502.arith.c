@@ -148,6 +148,7 @@ DEFINE_INST(dec)
 
     // If we get here, then this is ACC mode, and we should work off
     // that.
+    MOS_CHECK_NZ(cpu->A - 1);
     cpu->A--;
 }
 
@@ -180,6 +181,7 @@ DEFINE_INST(inc)
         return;
     }
 
+    MOS_CHECK_NZ(cpu->A + 1);
     cpu->A++;
 }
 
