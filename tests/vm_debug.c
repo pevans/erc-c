@@ -278,3 +278,12 @@ Test(vm_debug, cmd_disassemble)
     vm_debug_cmd_disasm(&args);
     cr_assert_eq(mach->disasm, false);
 }
+
+Test(vm_debug, cmd_dblock)
+{
+    mos6502_set(mach->cpu, 0, 0xEA);
+    args.addr1 = 0;
+    args.addr2 = 1;
+    vm_debug_cmd_dblock(&args);
+    cr_assert_neq(strlen(buf), 0);
+}

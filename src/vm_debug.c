@@ -11,6 +11,7 @@
 
 #include "apple2.h"
 #include "mos6502.h"
+#include "mos6502.dis.h"
 #include "vm_debug.h"
 #include "vm_di.h"
 #include "vm_reflect.h"
@@ -34,6 +35,8 @@ static bool breakpoints[BREAKPOINTS_MAX];
 vm_debug_cmd cmdtable[] = {
     { "break", "b", vm_debug_cmd_break, 1, "<addr>",
         "Add breakpoint at <addr>", },
+    { "dblock", "db", vm_debug_cmd_dblock, 2, "<from> <to>",
+        "Disassemble a block of code", },
     { "disasm", "d", vm_debug_cmd_disasm, 0, "",
         "Toggle disassembly", },
     { "help", "h", vm_debug_cmd_help, 0, "",
@@ -427,4 +430,16 @@ DEBUG_CMD(disasm)
     vm_reflect_disasm(NULL);
 
     fprintf(stream, "disassembly %s\n", mach->disasm ? "ON" : "OFF");
+}
+
+DEBUG_CMD(dblock)
+{
+    if (args->addr1 > args->addr2) {
+        return;
+    }
+
+    mos6502 *cpu = (mos6502 *)vm_di_get(VM_CPU);
+    FILE *stream = (FILE *)vm_di_get(VM_OUTPUT);
+
+    mos6502_dis_scan(cpu, stream, args->addr1, args->addr2);
 }
