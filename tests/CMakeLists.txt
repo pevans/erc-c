@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.9)
 project(erc-test)
 
 set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_COLOR_MAKEFILE OFF)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DHEADLESS -DTESTING")
 
