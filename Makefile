@@ -1,7 +1,7 @@
 STATIC_ANALYSIS=
 
 test:
-	cd tests/build && make && ./erc-test
+	cd tests/build && make && ./erc-test --ascii
 
 build:
 	cd build && make
