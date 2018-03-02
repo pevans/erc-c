@@ -115,9 +115,16 @@ Test(mos6502_bits, ora)
 
 Test(mos6502_bits, rol)
 {
-    mos6502_handle_rol(cpu, 8);
-    cr_assert_eq(cpu->A, 17);
+    cpu->P = 0;
+    cpu->A = 0xff;
+    mos6502_handle_rol(cpu, cpu->A);
+    cr_assert_eq(cpu->P & MOS_CARRY, MOS_CARRY);
+    cr_assert_eq(cpu->A, 0xfe);
+    mos6502_handle_rol(cpu, cpu->A);
+    cr_assert_eq(cpu->P & MOS_CARRY, MOS_CARRY);
+    cr_assert_eq(cpu->A, 0xfd);
 
+    cpu->P = 0;
     cpu->eff_addr = 234;
     mos6502_handle_rol(cpu, 128);
     cr_assert_eq(mos6502_get(cpu, 234), 0);
@@ -125,9 +132,16 @@ Test(mos6502_bits, rol)
 
 Test(mos6502_bits, ror)
 {
-    mos6502_handle_ror(cpu, 64);
-    cr_assert_eq(cpu->A, 160);
+    cpu->P = 0;
+    cpu->A = 0xff;
+    mos6502_handle_ror(cpu, cpu->A);
+    cr_assert_eq(cpu->P & MOS_CARRY, MOS_CARRY);
+    cr_assert_eq(cpu->A, 0x7f);
+    mos6502_handle_ror(cpu, cpu->A);
+    cr_assert_eq(cpu->P & MOS_CARRY, MOS_CARRY);
+    cr_assert_eq(cpu->A, 0xbf);
 
+    cpu->P = 0;
     cpu->eff_addr = 123;
     mos6502_handle_ror(cpu, 1);
     mos6502_handle_ror(cpu, 0);
