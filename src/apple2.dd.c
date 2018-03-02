@@ -14,6 +14,30 @@
 #include "apple2.enc.h"
 #include "apple2.h"
 
+// This is a small sort of state machine, which I adapted from AppleInPC
+// (https://github.com/sosaria7/appleinpc) because I could not honestly
+// think of a cleaner way of representing the step transitions that are
+// possible. All credit to that project.
+static int stepper_fsm[][8] =
+{
+	{  0,  0,  0,  0,  0,  0,  0,  0 },	// 0000
+	{  0, -1, -2, -3,  0,  3,  2,  1 },	// 1000
+	{  2,  1,  0, -1, -2, -3,  0,  3 },	// 0100
+	{  1,  0, -1, -2, -3,  0,  3,  2 },	// 1100
+	{  0,  3,  2,  1,  0, -1, -2, -3 },	// 0010
+	{  0, -1,  0,  1,  0, -1,  0,  1 },	// 1010
+	{  3,  2,  1,  0, -1, -2, -3,  0 },	// 0110
+	{  2,  1,  0, -1, -2, -3,  0,  3 },	// 1110
+	{ -2, -3,  0,  3,  2,  1,  0, -1 },	// 0001
+	{ -1, -2, -3,  0,  3,  2,  1,  0 },	// 1001
+	{  0,  1,  0, -1,  0,  1,  0, -1 },	// 0101
+	{  0, -1, -2, -3,  0,  3,  2,  1 },	// 1101
+	{ -3,  0,  3,  2,  1,  0, -1, -2 },	// 0011
+	{ -2, -3,  0,  3,  2,  1,  0, -1 },	// 1011
+	{  0,  3,  2,  1,  0, -1, -2, -3 },	// 0111
+	{  0,  0,  0,  0,  0,  0,  0,  0 }	// 1111
+};
+
 /*
  * Create a new disk drive. We do not create a memory segment for the
  * drive right away, as the size of said data can be variable based on
@@ -235,62 +259,15 @@ apple2_dd_phaser(apple2dd *drive)
 {
     int phase = drive->phase_state;
     int last = drive->last_phase;
-    int step = 0;
 
-    if (phase == (last << 1)) {
-        step++;
-    } else if (phase == 0x1 && last == 0x8) {
-        step++;
-    } else if (phase == (last >> 1)) {
-        step--;
-    } else if (phase == 0x8 && last == 0x1) {
-        step--;
-    }
-
-    if (phase == 0 && last == 0) {
-        step = 0;
-    }
-
-    if (phase == 1 && last == 0) {
-        step = 1;
-    }
-
-#if 0
-    // This is a bit of trickery; there is no phase state for 0x10 or
-    // 0x0, but we want to pretend like the phase is "next" to the bit
-    // we're operating with for the purpose of establishing a direction.
-    if (phase == 0x1 && last == 0x8) {
-        phase = 0x10;
-    } else if (phase == 0x8 && last == 0x1) {
-        phase = 0x0;
-    }
-
-    // We only want to respond to adjacent phases, so if the last phase
-    // shifted in _any_ direction is not equal to the phase state, then
-    // we should do nothing.
-    if (phase != 0 && (phase << 1) != last && (phase >> 1) != last) {
+    if (!drive->online) {
         return;
     }
 
-    // The above check works for non-zero phases, but for zero phases,
-    // the logic is a bit different.
-    if (phase == 0 && last != 0x1 && last != 0x8) {
-        return;
-    }
-#endif
-
-    apple2_dd_step(drive, step);
-
-#if 0
-    // If phase > last, then we must move the head forward by a half
-    // track. If it's < last, then we move the head backward, again by a
-    // half track.
-    if (phase > last) {
-        apple2_dd_step(drive, 1);
-    } else if (phase < last) {
-        apple2_dd_step(drive, -1);
-    }
-#endif
+    // Look up the number of steps to move according to the current
+    // phase and the current track position.
+    apple2_dd_step(drive, 
+                   stepper_fsm[phase][drive->track_pos & 0x7]);
 
     // Recall our trickery above with the phase variable? Because of it,
     // we have to save the phase_state field into last_phase, and not
@@ -420,6 +397,12 @@ apple2_dd_step(apple2dd *drive, int steps)
         drive->track_pos = MAX_DRIVE_STEPS;
     } else if (drive->track_pos < 0) {
         drive->track_pos = 0;
+    }
+
+    // The sector position is rehomed to zero whenever we step a
+    // non-zero length.
+    if (steps) {
+        drive->sector_pos = 0;
     }
 }
 

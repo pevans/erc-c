@@ -203,24 +203,25 @@ Test(apple2_dd, decode)
 
 Test(apple2_dd, phaser)
 {
+    // Test going backwards
+    drive->track_pos = 3;
     drive->phase_state = 1;
     drive->last_phase = 0;
+    drive->online = true;
 
     apple2_dd_phaser(drive);
 
-    cr_assert_eq(drive->track_pos, 1);
+    cr_assert_eq(drive->track_pos, 0);
     cr_assert_eq(drive->last_phase, 1);
 
-    // This shouldn't work--we should stay at the track_pos we begin
-    // with
-    drive->phase_state = 0x4;
+    // Forwards
+    drive->phase_state = 9;
+    drive->track_pos = 5;
+    drive->last_phase = 8;
     apple2_dd_phaser(drive);
-    cr_assert_eq(drive->track_pos, 1);
 
-    // And test that we can go backward
-    drive->phase_state = 0x2;
-    apple2_dd_phaser(drive);
-    cr_assert_eq(drive->track_pos, 0);
+    cr_assert_eq(drive->track_pos, 7);
+    cr_assert_eq(drive->last_phase, 9);
 }
 
 Test(apple2_dd, switch_phase)
