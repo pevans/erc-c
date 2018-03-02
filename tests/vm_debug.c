@@ -28,6 +28,7 @@ setup()
     }
 
     vm_di_set(VM_OUTPUT, stream);
+    log_open(stream);
 
     // Writing to stream will now write to buf
     setvbuf(stream, buf, _IOFBF, BUFSIZ);

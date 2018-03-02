@@ -231,6 +231,6 @@ Test(mos6502_dis, scan)
     // runtime operation) when you don't want it to, but as a standalone
     // disassembler, it feels less useful when PC isn't emulated.
     assert_buf("0000:29 38                     AND   #$38\n"
-               "0000:88                        DEY   \n"
-               "0000:6C 34 12                  JMP   ($1234)\n");
+               "0002:88                        DEY   \n"
+               "0003:6C 34 12                  JMP   ($1234)\n");
 }

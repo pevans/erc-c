@@ -439,7 +439,7 @@ DEBUG_CMD(dblock)
     }
 
     mos6502 *cpu = (mos6502 *)vm_di_get(VM_CPU);
-    FILE *stream = (FILE *)vm_di_get(VM_OUTPUT);
+    FILE *stream = log_stream();
 
     mos6502_dis_scan(cpu, stream, args->addr1, args->addr2);
 }

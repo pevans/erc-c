@@ -343,7 +343,13 @@ mos6502_dis_opcode(mos6502 *cpu, FILE *stream, int address)
 void
 mos6502_dis_scan(mos6502 *cpu, FILE *stream, int pos, int end)
 {
+    vm_16bit pc;
+
+    pc = cpu->PC;
     while (pos < end) {
+        cpu->PC = pos;
         pos += mos6502_dis_opcode(cpu, stream, pos);
     }
+
+    cpu->PC = pc;
 }
