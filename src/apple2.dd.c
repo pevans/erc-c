@@ -13,30 +13,7 @@
 #include "apple2.dec.h"
 #include "apple2.enc.h"
 #include "apple2.h"
-
-// This is a small sort of state machine, which I adapted from AppleInPC
-// (https://github.com/sosaria7/appleinpc) because I could not honestly
-// think of a cleaner way of representing the step transitions that are
-// possible. All credit to that project.
-static int stepper_fsm[][8] =
-{
-	{  0,  0,  0,  0,  0,  0,  0,  0 },	// 0000
-	{  0, -1, -2, -3,  0,  3,  2,  1 },	// 1000
-	{  2,  1,  0, -1, -2, -3,  0,  3 },	// 0100
-	{  1,  0, -1, -2, -3,  0,  3,  2 },	// 1100
-	{  0,  3,  2,  1,  0, -1, -2, -3 },	// 0010
-	{  0, -1,  0,  1,  0, -1,  0,  1 },	// 1010
-	{  3,  2,  1,  0, -1, -2, -3,  0 },	// 0110
-	{  2,  1,  0, -1, -2, -3,  0,  3 },	// 1110
-	{ -2, -3,  0,  3,  2,  1,  0, -1 },	// 0001
-	{ -1, -2, -3,  0,  3,  2,  1,  0 },	// 1001
-	{  0,  1,  0, -1,  0,  1,  0, -1 },	// 0101
-	{  0, -1, -2, -3,  0,  3,  2,  1 },	// 1101
-	{ -3,  0,  3,  2,  1,  0, -1, -2 },	// 0011
-	{ -2, -3,  0,  3,  2,  1,  0, -1 },	// 1011
-	{  0,  3,  2,  1,  0, -1, -2, -3 },	// 0111
-	{  0,  0,  0,  0,  0,  0,  0,  0 }	// 1111
-};
+#include "vm_di.h"
 
 /*
  * Create a new disk drive. We do not create a memory segment for the
@@ -257,17 +234,44 @@ apple2_dd_decode(apple2dd *drive)
 void
 apple2_dd_phaser(apple2dd *drive)
 {
-    int phase = drive->phase_state;
-    int last = drive->last_phase;
+    int next = drive->phase_state;
+    int prev = drive->last_phase;
+    int step = 0;
 
     if (!drive->online) {
         return;
     }
 
-    // Look up the number of steps to move according to the current
-    // phase and the current track position.
-    apple2_dd_step(drive, 
-                   stepper_fsm[phase][drive->track_pos & 0x7]);
+    // If PHASE1 is on and PHASE4 was previously on, then we want to
+    // mimic an inward step
+    if ((next & DD_PHASE1) && (prev & DD_PHASE4)) {
+        next = DD_PHASE4 << 1;
+    }
+
+    // If, however, PHASE4 is on and previously PHASE1 was on, then we
+    // want to mimic an outward step
+    if ((next & DD_PHASE4) && (prev & DD_PHASE1)) {
+        next = DD_PHASE1 >> 1;
+    }
+
+    // If an adjacent phase is on, add an inward or outward step. If
+    // _both_ adjacent phases are on, the step will count as zero (or no
+    // step).
+    if (next & (prev << 1)) {
+        step++;
+    }
+
+    if (next & (prev >> 1)) {
+        step--;
+    }
+
+    // If the opposite cog is also on, then our accounting is for
+    // naught; nullify the step movement.
+    if ((next & (prev << 2)) || (next & (prev >> 2))) {
+        step = 0;
+    }
+
+    apple2_dd_step(drive, step);
 
     // Recall our trickery above with the phase variable? Because of it,
     // we have to save the phase_state field into last_phase, and not
@@ -288,7 +292,7 @@ apple2_dd_position(apple2dd *drive)
         return 0;
     }
 
-    int track_offset = (drive->track_pos / 2) * ENC_ETRACK;
+    int track_offset = (drive->track_pos / 4) * ENC_ETRACK;
     return track_offset + drive->sector_pos;
 }
 

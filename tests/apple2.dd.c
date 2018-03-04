@@ -203,25 +203,30 @@ Test(apple2_dd, decode)
 
 Test(apple2_dd, phaser)
 {
+    // The drive must be online for any change to matter
+    drive->online = true;
+
     // Test going backwards
     drive->track_pos = 3;
     drive->phase_state = 1;
-    drive->last_phase = 0;
-    drive->online = true;
+    drive->last_phase = 2;
 
     apple2_dd_phaser(drive);
 
-    cr_assert_eq(drive->track_pos, 0);
+    cr_assert_eq(drive->track_pos, 2);
     cr_assert_eq(drive->last_phase, 1);
 
     // Forwards
-    drive->phase_state = 9;
+    drive->phase_state = 2;
     drive->track_pos = 5;
-    drive->last_phase = 8;
+    drive->last_phase = 1;
     apple2_dd_phaser(drive);
-
+    cr_assert_eq(drive->track_pos, 6);
+    cr_assert_eq(drive->last_phase, 2);
+    drive->phase_state = 4;
+    apple2_dd_phaser(drive);
     cr_assert_eq(drive->track_pos, 7);
-    cr_assert_eq(drive->last_phase, 9);
+    cr_assert_eq(drive->last_phase, 4);
 }
 
 Test(apple2_dd, switch_phase)

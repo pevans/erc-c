@@ -61,6 +61,16 @@ enum apple2_dd_mode {
  */
 #define MAX_SECTOR_POS 4095
 
+/*
+ * These are the possible phases that can energize the cogs in a disk
+ * drive motor. We represent them as bits, as more than one phase can be
+ * on at the same time.
+ */
+#define DD_PHASE1 0x1
+#define DD_PHASE2 0x2
+#define DD_PHASE3 0x4
+#define DD_PHASE4 0x8
+
 struct apple2dd {
     /*
      * Inside the disk drive there is a stepper motor, and it's
