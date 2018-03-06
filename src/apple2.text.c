@@ -15,15 +15,97 @@
 #include "apple2.text.h"
 
 /*
+ * This is the primary character set of display symbols. The order of
+ * characters generally follows ASCII order, but doesn't map to ASCII
+ * exactly. To begin with, you will note that lower-case characters are
+ * not found until the last two rows; moreover, control characters have
+ * letter-equivalents which may be displayed--for example, at boot time,
+ * when the display buffer is filled with zero-bytes (and the effect is
+ * that you see the screen is filled with at symbols).
+ */
+static char primary_display[] = {
+    // $00 - $3F
+    '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
+    'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', '\\', ']', '^', '_',
+    ' ', '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/',
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', 
+    // $40 - $7F
+    '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
+    'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', '\\', ']', '^', '_',
+    ' ', '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/',
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', 
+    // $80 - $BF
+    '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
+    'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', '\\', ']', '^', '_',
+    ' ', '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/',
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', 
+    // $C0 - $FF
+    '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
+    'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', '\\', ']', '^', '_',
+    '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
+    'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', '~', ' ', 
+};
+
+/*
+ * Following is the alternate character display set. It differs in some
+ * fundamental ways, and particularly it contains "MouseText" symbols
+ * (which are not yet implemented!); it also has lower-case symbols in
+ * different positions than the primary set.
+ */
+static char alternate_display[] = {
+    // $00 - $3F
+    '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
+    'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', '\\', ']', '^', '_',
+    ' ', '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/',
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', 
+    // $40 - $7F
+    // Note that $40 - $5F are actually the MouseText symbols, which are
+    // not yet implemented; note also that $60 - $7F are lower-case
+    '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
+    'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', '\\', ']', '^', '_',
+    '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
+    'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', '~', ' ', 
+    // $80 - $BF
+    '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
+    'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', '\\', ']', '^', '_',
+    ' ', '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/',
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', 
+    // $C0 - $FF
+    // Note here that, even though lower-case symbols are represented in
+    // $60 - $7F, they are repeated here in the same positions as they
+    // are in the primary set.
+    '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
+    'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', '\\', ']', '^', '_',
+    '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
+    'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', '~', ' ', 
+};
+
+char
+apple2_text_primary(char ch)
+{
+    return primary_display[ch];
+}
+
+char
+apple2_text_alternate(char ch)
+{
+    return alternate_display[ch];
+}
+
+/*
  * Draw a text character at the given address.
  */
 void
 apple2_text_draw(apple2 *mach, size_t addr)
 {
-    int err, bit7, bit6;
+    int err;
+    bool inverse, flashing;
     vm_8bit ch;
     vm_area dest;
     vm_bitfont *font;
+
+    // By default, use the primary display set
+    char *charset = primary_display;
 
     // If we're updating a page 2 address and we're not in some kind of
     // double resolution mode, then we shouldn't actually render the
@@ -43,14 +125,9 @@ apple2_text_draw(apple2 *mach, size_t addr)
     // What are we working with?
     ch = mos6502_get(mach->cpu, addr);
 
-    // Bit 7 and bit 6 mean different things in ALTCHAR
-    // and...non-ALTCHAR. 
-    bit7 = ch & 0x80;
-    bit6 = ch & 0x40;
-
     // The ASCII code we will use is only that which is composed of the
     // first 6 bits.
-    ch = ch & 0x7f;
+    //ch = ch & 0x7f;
 
     // We treat special characters as spaces for display purposes.
     if (ch < 0x20) {
@@ -58,33 +135,26 @@ apple2_text_draw(apple2 *mach, size_t addr)
         return;
     }
 
-    // If bit 7 is high, then we want to show inverse video. This is
-    // mostly true regardless of character set.
-    if (bit7) {
-        font = mach->invfont;
-    }
-
     if (mach->display_mode & DISPLAY_ALTCHAR) {
-        // The character here should be MouseText, so we'll need to use
-        // the _non_ inverted font for that.
-        if (ch >= 0x40 && ch <= 0x5F) {
+        if (ch < 0x40 || (ch >= 0x60 && ch < 0x7F)) {
+            font = mach->invfont;
+        } else if (ch >= 0x40 && ch <= 0x5F) {
             font = mach->sysfont;
         }
 
-        if (bit6) {
-            ch = tolower(ch);
-        }
+        charset = alternate_display;
     } else {
-        // FIXME: we should turn on flashing text here, but that's not
-        // yet implemented
-        if (bit6) {
-            // do something with flashing text
+        if (ch < 0x40) {
+            font = mach->invfont;
         }
+
+        // Note: < 0x80 is flashing, but we don't have that implemented
+        // yet
     }
 
     // Blank out the space on the screen, then show the character
     vm_bitfont_render(font, mach->screen, &dest, ' ');
-    vm_bitfont_render(font, mach->screen, &dest, ch);
+    vm_bitfont_render(font, mach->screen, &dest, charset[ch]);
 }
 
 /*
