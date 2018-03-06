@@ -129,12 +129,6 @@ apple2_text_draw(apple2 *mach, size_t addr)
     // first 6 bits.
     //ch = ch & 0x7f;
 
-    // We treat special characters as spaces for display purposes.
-    if (ch < 0x20) {
-        vm_bitfont_render(font, mach->screen, &dest, ' ');
-        return;
-    }
-
     if (mach->display_mode & DISPLAY_ALTCHAR) {
         if (ch < 0x40 || (ch >= 0x60 && ch < 0x7F)) {
             font = mach->invfont;
