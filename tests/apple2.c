@@ -116,3 +116,10 @@ Test(apple2, set_memory_mode)
     cr_assert_eq(mach->cpu->rmem, mach->main);
     cr_assert_eq(mach->cpu->wmem, mach->aux);
 }
+
+Test(apple2, notify_refresh)
+{
+    cr_assert_eq(mach->screen->dirty, false);
+    apple2_notify_refresh(mach);
+    cr_assert_eq(mach->screen->dirty, true);
+}
