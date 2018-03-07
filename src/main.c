@@ -12,6 +12,7 @@
 #include <unistd.h>
 
 #include "apple2.h"
+#include "apple2.draw.h"
 #include "apple2.reflect.h"
 #include "log.h"
 #include "option.h"
