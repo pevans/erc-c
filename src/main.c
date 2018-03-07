@@ -47,7 +47,6 @@ init(int argc, char **argv)
 
     vm_di_set(VM_OUTPUT, stdout);
 
-    // We're literally using stdout in this heavy phase of development.
     log_open(stdout);
 
     if (vm_screen_init() != OK) {
@@ -118,6 +117,8 @@ main(int argc, char **argv)
         fprintf(stderr, "Bootup failed!\n");
         exit(1);
     }
+
+    apple2_draw_40col(mach);
 
     // This will run for as long as we want to hang out in the emulated
     // machine.
