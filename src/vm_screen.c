@@ -15,6 +15,8 @@
 #include "vm_event.h"
 #include "vm_screen.h"
 
+struct timeval refresh_time;
+
 /*
  * Initialize the video of the vm_screen abstraction. This ends up being
  * something that depends on our third-party graphics library; in other
@@ -29,6 +31,8 @@ vm_screen_init()
         log_critical("Could not initialize video: %s", SDL_GetError());
         return ERR_GFXINIT;
     }
+
+    memset(&refresh_time, 0, sizeof(struct timeval));
 
     return OK;
 }
@@ -260,5 +264,23 @@ vm_screen_last_key(vm_screen *scr)
 bool
 vm_screen_dirty(vm_screen *scr)
 {
-    return scr->dirty;
+    struct timeval now;
+
+    if (scr->dirty) {
+        // If this returns an error, I have to assume the computer
+        // itself may be on fire, or has grown fangs and is presently
+        // nibbling on the user
+        if (gettimeofday(&now, NULL) < 0) {
+            return false;
+        }
+
+        if (now.tv_sec > refresh_time.tv_sec ||
+            (now.tv_usec > refresh_time.tv_usec + 33333)
+           ) {
+            memcpy(&refresh_time, &now, sizeof(struct timeval));
+            return true;
+        }
+    }
+
+    return false;
 }
