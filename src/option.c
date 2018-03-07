@@ -38,8 +38,8 @@ static char error_buffer[ERRBUF_SIZE] = "";
  * 640x480, but because the Apple II has a 4.375:3 aspect ratio, we had
  * to bump up the width to a number that respects that ratio.
  */
-static int width = 700;
-static int height = 480;
+static int width = 840;
+static int height = 576;
 
 static int flags = 0;
 
