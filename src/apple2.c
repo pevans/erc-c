@@ -391,6 +391,7 @@ apple2_run_loop(apple2 *mach)
         mos6502_execute(mach->cpu);
 
         if (vm_screen_dirty(mach->screen)) {
+            apple2_draw(mach);
             vm_screen_refresh(mach->screen);
         }
     }

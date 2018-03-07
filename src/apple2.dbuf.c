@@ -100,7 +100,7 @@ SEGMENT_WRITER(apple2_dbuf_write)
     segment->memory[addr] = value;
 
     if (mach->display_mode & DISPLAY_TEXT) {
-        apple2_draw_40col(mach);
+        apple2_notify_refresh(mach);
     }
 }
 

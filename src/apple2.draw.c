@@ -102,3 +102,28 @@ apple2_draw_40col(apple2 *mach)
         apple2_text_draw(mach, addr);
     }
 }
+
+/*
+ * Find the right draw method for the machine, based on its display
+ * mode, and use that to refresh the screen.
+ */
+void
+apple2_draw(apple2 *mach)
+{
+    if (mach->display_mode & DISPLAY_TEXT) {
+        apple2_draw_40col(mach);
+    }
+}
+
+/*
+ * Tell the screen that it has a change ready to be displayed. This
+ * function will not immediately redraw the screen, and when the screen
+ * is redrawn is up to our framerate cycle.
+ */
+void
+apple2_notify_refresh(apple2 *mach)
+{
+    if (mach && mach->screen) {
+        mach->screen->dirty = true;
+    }
+}

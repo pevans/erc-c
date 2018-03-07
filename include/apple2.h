@@ -350,13 +350,14 @@ extern bool apple2_is_double_video(apple2 *);
 extern int apple2_boot(apple2 *);
 extern void apple2_clear_strobe(apple2 *);
 extern void apple2_free(apple2 *);
+extern void apple2_notify_refresh(apple2 *);
 extern void apple2_press_key(apple2 *, vm_8bit);
 extern void apple2_release_key(apple2 *);
 extern void apple2_reset(apple2 *);
 extern void apple2_run_loop(apple2 *);
 extern void apple2_set_bank_switch(apple2 *, vm_8bit);
 extern void apple2_set_color(apple2 *, int);
-extern void apple2_set_memory_mode(apple2 *, vm_8bit);
 extern void apple2_set_display(apple2 *, vm_8bit);
+extern void apple2_set_memory_mode(apple2 *, vm_8bit);
 
 #endif
