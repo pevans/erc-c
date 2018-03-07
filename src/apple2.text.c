@@ -297,8 +297,6 @@ apple2_text_draw(apple2 *mach, size_t addr)
         // yet
     }
 
-    // Blank out the space on the screen, then show the character
-    vm_bitfont_render(font, mach->screen, &dest, ' ');
     vm_bitfont_render(font, mach->screen, &dest, charset[ch]);
 }
 
