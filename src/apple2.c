@@ -436,3 +436,16 @@ apple2_set_display(apple2 *mach, vm_8bit mode)
 
     vm_screen_set_logical_coords(mach->screen, width, height);
 }
+
+/*
+ * Tell the screen that it has a change ready to be displayed. This
+ * function will not immediately redraw the screen, and when the screen
+ * is redrawn is up to our framerate cycle.
+ */
+void
+apple2_notify_refresh(apple2 *mach)
+{
+    if (mach && mach->screen) {
+        mach->screen->dirty = true;
+    }
+}
