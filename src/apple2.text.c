@@ -225,12 +225,20 @@ static char alternate_display[] = {
     'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', '~', ' ', 
 };
 
+/*
+ * Return the primary character set representation matching the given
+ * character code.
+ */
 char
 apple2_text_primary(char ch)
 {
     return primary_display[ch];
 }
 
+/*
+ * Return the alternate character set representation matching the given
+ * character code.
+ */
 char
 apple2_text_alternate(char ch)
 {

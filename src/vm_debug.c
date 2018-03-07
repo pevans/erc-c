@@ -422,6 +422,10 @@ DEBUG_CMD(step)
     vm_debug_break(cpu->PC);
 }
 
+/*
+ * Toggle disassembly, and print a notice of the change and its new
+ * status.
+ */
 DEBUG_CMD(disasm)
 {
     apple2 *mach = (apple2 *)vm_di_get(VM_MACHINE);
@@ -432,6 +436,13 @@ DEBUG_CMD(disasm)
     fprintf(stream, "disassembly %s\n", mach->disasm ? "ON" : "OFF");
 }
 
+/*
+ * Disassemble a block of memory from one given address to another.
+ * Useful when you want to see what memory looks like in a given region.
+ * Note that the disassembler is a bit dumb, and can't tell what data
+ * are opcodes is meant to be standalone binary data (the sort you would
+ * get if you used "DFB" notation in an assembler).
+ */
 DEBUG_CMD(dblock)
 {
     if (args->addr1 > args->addr2) {
