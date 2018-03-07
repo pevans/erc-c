@@ -230,7 +230,7 @@ static char alternate_display[] = {
  * character code.
  */
 char
-apple2_text_primary(char ch)
+apple2_text_primary(vm_8bit ch)
 {
     return primary_display[ch];
 }
@@ -240,7 +240,7 @@ apple2_text_primary(char ch)
  * character code.
  */
 char
-apple2_text_alternate(char ch)
+apple2_text_alternate(vm_8bit ch)
 {
     return alternate_display[ch];
 }

@@ -46,3 +46,49 @@ Test(apple2_text, area)
     // yoff value I'm getting back is really out of whack, and I want to
     // do some more use-testing first
 }
+
+Test(apple2_text, primary)
+{
+    static char upper[] = {
+        '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
+        'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', '\\', ']', '^', '_',
+        ' ', '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/',
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', 
+    };
+
+    static char lower[] = {
+        '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
+        'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', '~', ' ', 
+    };
+
+    for (int i = 0; i < sizeof(upper); i++) {
+        cr_assert_eq(apple2_text_primary(i), upper[i]);
+    }
+
+    for (int i = 0; i < sizeof(lower); i++) {
+        cr_assert_eq(apple2_text_primary(i + 0xe0), lower[i]);
+    }
+}
+
+Test(apple2_text, alternate)
+{
+    static char upper[] = {
+        '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
+        'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', '\\', ']', '^', '_',
+        ' ', '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/',
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', 
+    };
+    
+    static char lower[] = {
+        '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
+        'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', '~', ' ', 
+    };
+
+    for (int i = 0; i < sizeof(upper); i++) {
+        cr_assert_eq(apple2_text_alternate(i + 0x80), upper[i]);
+    }
+
+    for (int i = 0; i < sizeof(lower); i++) {
+        cr_assert_eq(apple2_text_alternate(i + 0x60), lower[i]);
+    }
+}
