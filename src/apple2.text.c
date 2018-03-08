@@ -335,16 +335,7 @@ apple2_text_area(vm_area *area, vm_bitfont *font, size_t addr)
     // address indicates the place on the grid where text should go. We
     // don't care how it got there. Let's figure out that position
     // on-screen.
-
-    // The absolute column position will be the font width times the
-    // lsb.
     area->xoff = buffer_cols[addr - 0x400] * font->width;
-
-    // The absolute row position will be the font height times the msb
-    // minus the page base (because the height is the same regardless of
-    // what page we're in). So if we're msb $0400, then we're starting
-    // on pixel row 0; but if we're msb $0480, then we are starting on
-    // pixel row 8 (where the font height is 8); etc.
     area->yoff = buffer_rows[addr - 0x400] * font->height;
 
     // Our width and height must be that of the font.
