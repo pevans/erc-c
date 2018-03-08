@@ -7,26 +7,11 @@ static void
 setup()
 {
     option_set_error("");
-    option_set_input(1, NULL);
-    option_set_input(2, NULL);
 }
 
 static void
 teardown()
 {
-    FILE *stream;
-
-    for (int i = 1; i <= OPTION_MAX_DISKS; i++) {
-        stream = option_get_input(i);
-
-        if (stream 
-            && stream != stdout 
-            && stream != stderr 
-            && stream != stdin
-           ) {
-            fclose(stream);
-        }
-    }
 }
 
 TestSuite(options, .init = setup, .fini = teardown);
@@ -46,44 +31,30 @@ Test(option, error)
     cr_assert_str_eq(option_get_error(), str);
 }
 
-/* Test(option, get_input) */
-/* Test(option, set_input) */
-Test(option, input)
-{
-    cr_assert_eq(option_get_input(1), NULL);
-    cr_assert_eq(option_get_input(2), NULL);
-
-    option_set_input(2, stdout);
-    cr_assert_eq(option_get_input(2), stdout);
-
-    option_set_input(3, stderr);
-    cr_assert_eq(option_get_input(3), NULL);
-}
-
 Test(option, read_file)
 {
     char *str = "so much FUN";
     char *bad_file = "/tmp/BLEH";
     char *file = "/tmp/erc-test.txt";
     char buf[256];
-
-    cr_assert_eq(option_get_input(1), NULL);
+    FILE *stream_a;
+    FILE *stream_b;
 
     // Maybe we should use sterror(ENOENT)?
-    cr_assert_eq(option_read_file(1, bad_file), 0);
-    cr_assert_str_eq(option_get_error(), "--disk1: No such file or directory");
+    cr_assert_eq(option_read_file(&stream_a, bad_file), 0);
+    cr_assert_str_eq(option_get_error(), "--diskN: No such file or directory");
 
     option_set_error("");
 
-    FILE *stream;
-    stream = fopen(file, "w");
-    cr_assert_neq(stream, NULL);
-    fwrite(str, sizeof(char), strlen(str), stream);
-    fclose(stream);
+    stream_a = fopen(file, "w");
+    cr_assert_neq(stream_a, NULL);
+    fwrite(str, sizeof(char), strlen(str), stream_a);
+    fclose(stream_a);
 
-    option_read_file(1, file); 
-    fread(buf, sizeof(char), 255, option_get_input(1));
+    option_read_file(&stream_b, file); 
+    fread(buf, sizeof(char), 255, stream_b);
     cr_assert_str_eq(buf, str);
+    fclose(stream_b);
 
     unlink(file);
 }
@@ -103,35 +74,6 @@ Test(option, parse)
     };
 
     cr_assert_eq(option_parse(argc, argv), 0);
-}
-
-/*
- * The get_width and get_height tests also implicitly test the
- * option_set_size() function (which is called by option_parse()).
- * Test(option, set_size)
- */
-Test(option, get_width)
-{
-    int argc = 2;
-    char *argv[] = {
-        "prog_name",
-        "--size=875x600",
-    };
-
-    cr_assert_eq(option_parse(argc, argv), 1);
-    cr_assert_eq(option_get_width(), 875);
-}
-
-Test(option, get_height)
-{
-    int argc = 2;
-    char *argv[] = {
-        "prog_name",
-        "--size=875x600",
-    };
-
-    cr_assert_eq(option_parse(argc, argv), 1);
-    cr_assert_eq(option_get_height(), 600);
 }
 
 Test(option, flag)

@@ -95,10 +95,12 @@ main(int argc, char **argv)
     // successfully or if we run `exit()` from elsewhere in the program.
     atexit(finish);
 
+    int *width = (int *)vm_di_get(VM_WIDTH);
+    int *height = (int *)vm_di_get(VM_HEIGHT);
+
     // Let's build the basic machine, using the width and height
     // indicated by the user.
-    mach = apple2_create(option_get_width(),
-                         option_get_height());
+    mach = apple2_create(*width, *height);
 
     vm_di_set(VM_MACHINE, mach);
 

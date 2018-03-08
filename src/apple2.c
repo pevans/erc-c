@@ -235,7 +235,7 @@ apple2_boot(apple2 *mach)
     int err;
 
     // Do we have any disks?
-    stream = option_get_input(1);
+    stream = (FILE *)vm_di_get(VM_DISK1);
     if (stream) {
         err = apple2_dd_insert(mach->drive1, stream, DD_DOS33);
         if (err != OK) {
@@ -244,7 +244,7 @@ apple2_boot(apple2 *mach)
         }
     }
 
-    stream = option_get_input(2);
+    stream = (FILE *)vm_di_get(VM_DISK2);
     if (stream) {
         err = apple2_dd_insert(mach->drive2, stream, DD_DOS33);
         if (err != OK) {
@@ -341,13 +341,13 @@ apple2_free(apple2 *mach)
 void
 apple2_run_loop(apple2 *mach)
 {
-    FILE *out;
+    FILE *dlog;
 
     if (option_flag(OPTION_DISASSEMBLE)) {
         return;
     }
 
-    out = (FILE *)vm_di_get(VM_OUTPUT);
+    dlog = (FILE *)vm_di_get(VM_DISASM_LOG);
 
     while (vm_screen_active(mach->screen)) {
         if (vm_debug_broke(mach->cpu->PC)) {
@@ -360,7 +360,7 @@ apple2_run_loop(apple2 *mach)
                 mach->selected_drive->locked = true;
             }
 
-            mos6502_dis_opcode(mach->cpu, out, mach->cpu->PC);
+            mos6502_dis_opcode(mach->cpu, dlog, mach->cpu->PC);
 
             if (mach->selected_drive) {
                 mach->selected_drive->locked = false;
@@ -381,7 +381,7 @@ apple2_run_loop(apple2 *mach)
                 mach->selected_drive->locked = true;
             }
             
-            mos6502_dis_opcode(mach->cpu, out, mach->cpu->PC);
+            mos6502_dis_opcode(mach->cpu, dlog, mach->cpu->PC);
 
             if (mach->selected_drive) {
                 mach->selected_drive->locked = false;

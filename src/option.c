@@ -13,6 +13,7 @@
 
 #include "option.h"
 #include "log.h"
+#include "vm_di.h"
 
 /*
  * These are the file inputs we may have to the system. What their
@@ -21,6 +22,8 @@
  */
 static FILE *input1 = NULL;
 static FILE *input2 = NULL;
+
+static FILE *disasm_log = NULL;
 
 /*
  * The size of our error buffer for anything we want to record while our
@@ -61,7 +64,7 @@ enum options {
  * Here are the options we support for program execution.
  */
 static struct option long_options[] = {
-    { "disassemble", 0, NULL, DISASSEMBLE },
+    { "disassemble", 1, NULL, DISASSEMBLE },
     { "disk1", 1, NULL, DISK1 },
     { "disk2", 1, NULL, DISK2 },
     { "flash", 0, NULL, FLASH },
@@ -112,21 +115,32 @@ option_parse(int argc, char **argv)
     error_buffer[0] = '\0';
 
     do {
-        int input_source = 0;
-
         opt = getopt_long_only(argc, argv, "", long_options, &index);
 
         switch (opt) {
             case DISASSEMBLE:
                 flags |= OPTION_DISASSEMBLE;
+                if (!option_read_file(&disasm_log, optarg)) {
+                    return 0;
+                }
+
+                vm_di_set(VM_DISASM_LOG, disasm_log);
                 break;
 
             case DISK1:
-                input_source = 1;
+                if (!option_read_file(&input1, optarg)) {
+                    return 0;
+                }
+
+                vm_di_set(VM_DISK1, input1);
                 break;
 
             case DISK2:
-                input_source = 2;
+                if (!option_read_file(&input2, optarg)) {
+                    return 0;
+                }
+
+                vm_di_set(VM_DISK2, input2);
                 break;
 
             case FLASH:
@@ -145,13 +159,6 @@ option_parse(int argc, char **argv)
                 }
                 break;
         }
-
-        // We seem to have a request to load a file, so let's do so.
-        if (input_source) {
-            if (!option_read_file(input_source, optarg)) {
-                return 0;
-            }
-        }
     } while (opt != -1);
 
     return 1;
@@ -164,60 +171,25 @@ option_parse(int argc, char **argv)
  * 0 if not.
  */
 int
-option_read_file(int source, const char *file)
+option_read_file(FILE **stream, const char *file)
 {
-    FILE *stream;
-
     if (!file) {
         snprintf(error_buffer,
                  ERRBUF_SIZE, 
-                 "No file given for --disk%d\n", 
-                 source);
+                 "No file given for --diskN\n");
         return 0;
     }
 
-    stream = fopen(file, "r+");
-    if (stream == NULL) {
+    *stream = fopen(file, "r+");
+    if (*stream == NULL) {
         snprintf(error_buffer,
                  ERRBUF_SIZE,
-                 "--disk%d: %s", 
-                 source, 
+                 "--diskN: %s", 
                  strerror(errno));
         return 0;
     }
 
-    option_set_input(source, stream);
-
     return 1;
-}
-
-/*
- * Return the FILE stream for a given input, or NULL if none can be
- * found. NULL may also be returned if the input has not previously been
- * assigned.
- */
-FILE *
-option_get_input(int source)
-{
-    switch (source) {
-        case 1: return input1;
-        case 2: return input2;
-    }
-
-    return NULL;
-}
-
-/*
- * Set the given input source to a given FILE stream. If the input
- * source is invalid, then nothing is done.
- */
-void
-option_set_input(int source, FILE *stream)
-{
-    switch (source) {
-        case 1: input1 = stream;
-        case 2: input2 = stream;
-    }
 }
 
 /*
@@ -230,7 +202,7 @@ option_print_help()
     fprintf(stderr, "Usage: erc [options...]\n");
     fprintf(stderr, "Options:\n");
     fprintf(stderr, "\
-  --disassemble               Print assembly notation from CPU memory\n\
+  --disassemble=FILE          Write assembly notation into FILE\n\
   --disk1=FILE                Load FILE into disk drive 1\n\
   --disk2=FILE                Load FILE into disk drive 2\n\
   --flash                     Flash CPU memory with contents of drive 1\n\
@@ -255,29 +227,14 @@ option_set_size(const char *size)
     } else if (strcmp(size, "875x600") == 0) {
         width = 875;
         height = 600;
+
+        vm_di_set(VM_WIDTH, &width);
+        vm_di_set(VM_HEIGHT, &height);
         return OK;
     }
 
     snprintf(error_buffer, ERRBUF_SIZE, "Ignoring bad window size: %s", size);
     return ERR_BADOPT;
-}
-
-/*
- * Return the window width we've been configured to use.
- */
-int
-option_get_width()
-{
-    return width;
-}
-
-/*
- * Return the window height we want.
- */
-int
-option_get_height()
-{
-    return height;
 }
 
 /*

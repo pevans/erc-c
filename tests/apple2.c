@@ -3,6 +3,7 @@
 #include "apple2.h"
 #include "mos6502.enums.h"
 #include "option.h"
+#include "vm_di.h"
 
 static apple2 *mach;
 
@@ -47,12 +48,23 @@ Test(apple2, boot)
     // ][e" at the bottom.
     cr_assert_eq(apple2_boot(mach), OK);
 
+    FILE *stream1, *stream2;
+
     // And, as you may guess, it's ok to reboot the machine.
-    option_read_file(1, "../data/zero.img");
+    option_read_file(&stream1, "../data/zero.img");
+    vm_di_set(VM_DISK1, stream1);
+
     cr_assert_eq(apple2_boot(mach), OK);
 
-    option_read_file(2, "../data/bad.img");
+    option_read_file(&stream2, "../data/bad.img");
+    vm_di_set(VM_DISK2, stream2);
     cr_assert_neq(apple2_boot(mach), OK);
+
+    fclose(stream1);
+    fclose(stream2);
+
+    vm_di_set(VM_DISK1, NULL);
+    vm_di_set(VM_DISK2, NULL);
 }
 
 Test(apple2, set_color)
