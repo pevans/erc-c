@@ -325,10 +325,10 @@ mos6502_dis_opcode(mos6502 *cpu, FILE *stream, int address)
         } else {
             snprintf(s_bytes, sizeof(s_bytes) - 1, "%02X", opcode);
         }
-    }
 
-    fprintf(stream, "%04X:%-9s%20s   %s\n",
-            cpu->PC, s_bytes, s_inst, s_operand);
+        fprintf(stream, "%04X:%-9s%20s   %s\n",
+                cpu->PC, s_bytes, s_inst, s_operand);
+    }
 
     // The expected number of bytes here is for the operand, but we need
     // to add one for the opcode to return the true number that this
