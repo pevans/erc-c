@@ -114,6 +114,9 @@ option_parse(int argc, char **argv)
     // To begin with, let's (effectively) NUL-out the error buffer.
     error_buffer[0] = '\0';
 
+    vm_di_set(VM_WIDTH, &width);
+    vm_di_set(VM_HEIGHT, &height);
+
     do {
         opt = getopt_long_only(argc, argv, "", long_options, &index);
 
@@ -227,9 +230,6 @@ option_set_size(const char *size)
     } else if (strcmp(size, "875x600") == 0) {
         width = 875;
         height = 600;
-
-        vm_di_set(VM_WIDTH, &width);
-        vm_di_set(VM_HEIGHT, &height);
         return OK;
     }
 
