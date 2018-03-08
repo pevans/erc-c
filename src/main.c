@@ -62,12 +62,15 @@ init(int argc, char **argv)
 static void
 finish()
 {
-    // Close any file sources we had opened
-    for (int i = 1; i <= OPTION_MAX_DISKS; i++) {
-        FILE *stream = option_get_input(i);
+    FILE *stream[3];
 
-        if (stream != NULL) {
-            fclose(stream);
+    stream[0] = (FILE *)vm_di_get(VM_DISK1);
+    stream[1] = (FILE *)vm_di_get(VM_DISK2);
+    stream[2] = (FILE *)vm_di_get(VM_DISASM_LOG);
+
+    for (int i = 0; i < 3; i++) {
+        if (stream[i]) {
+            fclose(stream[i]);
         }
     }
 
