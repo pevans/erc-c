@@ -320,7 +320,13 @@ apple2_text_area(vm_area *area, vm_bitfont *font, size_t addr)
     // (0x0800-0x0BFF) respectively. If the given address is not in
     // those (contiguous) ranges, then let's bail.
     if (addr < 0x0400 || addr > 0x0BFF) {
-        return 0;
+        return ERR_INVALID;
+    }
+
+    // Certain addresses are not meant to be displayable, and are
+    // actually used for system data
+    if (buffer_rows[addr] == -1 || buffer_cols[addr] == -1) {
+        return ERR_INVALID;
     }
 
     // In a given page for 40-column mode, you get 960 grid parts that
