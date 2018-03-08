@@ -360,7 +360,7 @@ apple2_run_loop(apple2 *mach)
                 mach->selected_drive->locked = true;
             }
 
-            mos6502_dis_opcode(mach->cpu, dlog, mach->cpu->PC);
+            mos6502_dis_opcode(mach->cpu, stdout, mach->cpu->PC);
 
             if (mach->selected_drive) {
                 mach->selected_drive->locked = false;
