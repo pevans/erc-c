@@ -123,7 +123,7 @@ option_parse(int argc, char **argv)
         switch (opt) {
             case DISASSEMBLE:
                 flags |= OPTION_DISASSEMBLE;
-                if (!option_read_file(&disasm_log, optarg)) {
+                if (!option_open_file(&disasm_log, optarg, "w")) {
                     return 0;
                 }
 
@@ -131,7 +131,7 @@ option_parse(int argc, char **argv)
                 break;
 
             case DISK1:
-                if (!option_read_file(&input1, optarg)) {
+                if (!option_open_file(&input1, optarg, "r+")) {
                     return 0;
                 }
 
@@ -139,7 +139,7 @@ option_parse(int argc, char **argv)
                 break;
 
             case DISK2:
-                if (!option_read_file(&input2, optarg)) {
+                if (!option_open_file(&input2, optarg, "r+")) {
                     return 0;
                 }
 
@@ -174,21 +174,21 @@ option_parse(int argc, char **argv)
  * 0 if not.
  */
 int
-option_read_file(FILE **stream, const char *file)
+option_open_file(FILE **stream, const char *file, const char *opts)
 {
     if (!file) {
         snprintf(error_buffer,
                  ERRBUF_SIZE, 
-                 "No file given for --diskN\n");
+                 "No file given\n");
         return 0;
     }
 
-    *stream = fopen(file, "r+");
+    *stream = fopen(file, opts);
     if (*stream == NULL) {
         snprintf(error_buffer,
                  ERRBUF_SIZE,
-                 "--diskN: %s", 
-                 strerror(errno));
+                 "open file for %s: %s", 
+                 file, strerror(errno));
         return 0;
     }
 

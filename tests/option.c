@@ -41,8 +41,8 @@ Test(option, read_file)
     FILE *stream_b;
 
     // Maybe we should use sterror(ENOENT)?
-    cr_assert_eq(option_read_file(&stream_a, bad_file), 0);
-    cr_assert_str_eq(option_get_error(), "--diskN: No such file or directory");
+    cr_assert_eq(option_open_file(&stream_a, bad_file, "r"), 0);
+    cr_assert_str_eq(option_get_error(), "open file for /tmp/BLEH: No such file or directory");
 
     option_set_error("");
 
@@ -51,7 +51,7 @@ Test(option, read_file)
     fwrite(str, sizeof(char), strlen(str), stream_a);
     fclose(stream_a);
 
-    option_read_file(&stream_b, file); 
+    option_open_file(&stream_b, file, "r"); 
     fread(buf, sizeof(char), 255, stream_b);
     cr_assert_str_eq(buf, str);
     fclose(stream_b);

@@ -18,7 +18,7 @@ extern bool option_flag(int);
 extern FILE *option_get_input(int);
 extern const char *option_get_error();
 extern int option_parse(int, char **);
-extern int option_read_file(FILE **, const char *);
+extern int option_open_file(FILE **, const char *, const char *);
 extern int option_set_size(const char *);
 extern void option_print_help();
 extern void option_set_error(const char *);
