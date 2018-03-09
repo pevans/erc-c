@@ -51,12 +51,12 @@ Test(apple2, boot)
     FILE *stream1, *stream2;
 
     // And, as you may guess, it's ok to reboot the machine.
-    option_read_file(&stream1, "../data/zero.img");
+    option_open_file(&stream1, "../data/zero.img", "r");
     vm_di_set(VM_DISK1, stream1);
 
     cr_assert_eq(apple2_boot(mach), OK);
 
-    option_read_file(&stream2, "../data/bad.img");
+    option_open_file(&stream2, "../data/bad.img", "r");
     vm_di_set(VM_DISK2, stream2);
     cr_assert_neq(apple2_boot(mach), OK);
 
