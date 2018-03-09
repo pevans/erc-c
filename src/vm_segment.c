@@ -7,6 +7,7 @@
  * etc.
  */
 
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -351,4 +352,34 @@ vm_segment_set16(vm_segment *segment, size_t addr, vm_16bit value)
     // OK, but is not OK after the msb set, then we'll return with that
     // code.
     return err;
+}
+
+void
+vm_segment_hexdump(vm_segment *seg, FILE *stream, size_t from, size_t to)
+{
+    char nbuf[51], sbuf[17];
+    int ni = 0, si = 0;
+    int bytes = 0;
+    vm_8bit byte;
+
+    while (from < to) {
+        byte = vm_segment_get(seg, from);
+
+        ni += sprintf(nbuf + ni, "%02X ", byte);
+        si += sprintf(sbuf + si, "%c", isprint(byte) ? byte : '.');
+
+        from++;
+        bytes++;
+
+        if (bytes == 8) {
+            ni += sprintf(nbuf + ni, " ");
+        }
+
+        if (bytes >= 16) {
+            fprintf(stream, "%08zX    %s  [%s]\n", from - bytes, nbuf, sbuf);
+            bytes = 0;
+            ni = 0; 
+            si = 0;
+        }
+    }
 }
