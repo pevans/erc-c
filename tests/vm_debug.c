@@ -288,3 +288,17 @@ Test(vm_debug, cmd_dblock)
     vm_debug_cmd_dblock(&args);
     cr_assert_neq(strlen(buf), 0);
 }
+
+Test(vm_debug, cmd_hdump)
+{
+    for (int i = 0; i < 16; i++) {
+        mos6502_set(mach->cpu, i, i + 0x30);
+    }
+
+    args.addr1 = 0;
+    args.addr2 = 32;
+
+    vm_debug_cmd_hdump(&args);
+
+    cr_assert_neq(strlen(buf), 0);
+}

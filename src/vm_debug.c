@@ -39,6 +39,8 @@ vm_debug_cmd cmdtable[] = {
         "Disassemble a block of code", },
     { "disasm", "d", vm_debug_cmd_disasm, 0, "",
         "Toggle disassembly", },
+    { "hdump", "hd", vm_debug_cmd_hdump, 2, "<from> <to>",
+        "Hex dump memory in a given region", },
     { "help", "h", vm_debug_cmd_help, 0, "",
         "Print out this list of commands", },
     { "jump", "j", vm_debug_cmd_jump, 1, "<addr>",
@@ -453,4 +455,19 @@ DEBUG_CMD(dblock)
     FILE *stream = log_stream();
 
     mos6502_dis_scan(cpu, stream, args->addr1, args->addr2);
+}
+
+/*
+ * Print a hex dump of a region of memory
+ */
+DEBUG_CMD(hdump)
+{
+    if (args->addr1 > args->addr2) {
+        return;
+    }
+
+    mos6502 *cpu = (mos6502 *)vm_di_get(VM_CPU);
+    FILE *stream = log_stream();
+
+    vm_segment_hexdump(cpu->rmem, stream, args->addr1, args->addr2);
 }
