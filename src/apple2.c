@@ -258,10 +258,6 @@ apple2_boot(apple2 *mach)
     vm_segment_set16(mach->main, APPLE2_RESET_VECTOR,
                      APPLE2_APPLESOFT_MAIN);
 
-    if (option_flag(OPTION_DISASSEMBLE)) {
-        mos6502_dis_scan(mach->cpu, stdout, 0, mach->main->size);
-    }
-
     // Run the reset routine to get the machine ready to go.
     apple2_reset(mach);
 
@@ -341,13 +337,12 @@ apple2_free(apple2 *mach)
 void
 apple2_run_loop(apple2 *mach)
 {
-    FILE *dlog;
+    FILE *dlog = NULL;
 
     if (option_flag(OPTION_DISASSEMBLE)) {
-        return;
+        dlog = (FILE *)vm_di_get(VM_DISASM_LOG);
+        vm_reflect_disasm(NULL);
     }
-
-    dlog = (FILE *)vm_di_get(VM_DISASM_LOG);
 
     while (vm_screen_active(mach->screen)) {
         if (vm_debug_broke(mach->cpu->PC)) {
