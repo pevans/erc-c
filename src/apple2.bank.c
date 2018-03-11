@@ -175,44 +175,49 @@ SEGMENT_READER(apple2_bank_switch_read)
         // but simply to change the bank switch mode.
         case 0xC080:
             apple2_set_bank_switch(mach, BANK_RAM | BANK_RAM2);
-            break;
+            return 0x80;
 
         case 0xC081:
             if (last_addr == addr) {
                 apple2_set_bank_switch(mach, BANK_WRITE | BANK_RAM2);
+                return 0x80;
             }
-            break;
+            return 0x00;
+
         case 0xC082:
             apple2_set_bank_switch(mach, BANK_RAM2);
-            break;
+            return 0x80;
 
         case 0xC083:
             if (last_addr == addr) {
                 apple2_set_bank_switch(mach, BANK_RAM | BANK_WRITE | BANK_RAM2);
+                return 0x80;
             }
-            break;
+            return 0x00;
 
         // Conversely, the $C088 - $C08B range control memory access
         // while using bank 1 RAM.
         case 0xC088:
             apple2_set_bank_switch(mach, BANK_RAM);
-            break;
+            return 0x80;
 
         case 0xC089:
             if (last_addr == addr) {
                 apple2_set_bank_switch(mach, BANK_WRITE);
+                return 0x80;
             }
-            break;
+            return 0x00;
 
         case 0xC08A:
             apple2_set_bank_switch(mach, BANK_DEFAULT);
-            break;
+            return 0x80;
 
         case 0xC08B:
             if (last_addr == addr) {
                 apple2_set_bank_switch(mach, BANK_RAM | BANK_WRITE);
+                return 0x80;
             }
-            break;
+            return 0x00;
 
         // Return high on the 7th bit if we're using bank 2 memory
         case 0xC011:

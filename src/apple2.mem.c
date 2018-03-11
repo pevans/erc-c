@@ -204,27 +204,27 @@ SEGMENT_READER(apple2_mem_switch_read)
         case 0xC055:
             apple2_set_memory_mode(mach,
                                    mach->memory_mode | MEMORY_PAGE2);
-            break;
+            return 0x80;
 
         case 0xC054:
             apple2_set_memory_mode(mach,
                                    mach->memory_mode & ~MEMORY_PAGE2);
-            break;
+            return 0x00;
 
         case 0xC059:
         case 0xC057:
             apple2_set_memory_mode(mach,
                                    mach->memory_mode | MEMORY_HIRES);
-            break;
+            return 0x80;
 
         case 0xC056:
             apple2_set_memory_mode(mach,
                                    mach->memory_mode & ~MEMORY_HIRES);
-            break;
+            return 0x00;
     }
 
     // ???
-    return 0;
+    return 0x00;
 }
 
 /*

@@ -192,40 +192,42 @@ SEGMENT_READER(apple2_dbuf_switch_read)
         case 0xC050:
             apple2_set_display(mach,
                                mach->display_mode & ~DISPLAY_TEXT);
-            break;
+            return 0x00;
 
         case 0xC051:
             apple2_set_display(mach,
                                mach->display_mode | DISPLAY_TEXT);
-            break;
+            return 0x80;
 
         case 0xC052:
             apple2_set_display(mach,
                                mach->display_mode & ~DISPLAY_MIXED);
-            break;
+            return 0x00;
 
         case 0xC053:
             apple2_set_display(mach,
                                mach->display_mode | DISPLAY_MIXED);
-            break;
+            return 0x80;
 
         case 0xC05E:
             if (mach->display_mode & DISPLAY_IOUDIS) {
                 apple2_set_display(mach,
                                    mach->display_mode | DISPLAY_DHIRES);
+                return 0x80;
             }
-            break;
+            return 0x00;
 
         case 0xC05F:
             if (mach->display_mode & DISPLAY_IOUDIS) {
                 apple2_set_display(mach,
                                    mach->display_mode & ~DISPLAY_DHIRES);
+                return 0x80;
             }
-            break;
+            return 0x00;
     }
 
     // ???
-    return 0;
+    return 0x00;
 }
 
 /*
