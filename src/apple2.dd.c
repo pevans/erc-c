@@ -9,6 +9,8 @@
  * itself.
  */
 
+#include <stdlib.h>
+
 #include "apple2.dd.h"
 #include "apple2.dec.h"
 #include "apple2.enc.h"
@@ -598,7 +600,7 @@ SEGMENT_READER(apple2_dd_switch_read)
         apple2_dd_switch_latch(drive, 0);
     }
 
-    return 0;
+    return (vm_8bit)(arc4random() & 0xff);
 }
 
 /*
