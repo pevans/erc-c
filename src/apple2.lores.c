@@ -54,6 +54,10 @@ apple2_lores_draw(apple2 *mach, size_t addr)
     int row = apple2_text_row(addr),
         col = apple2_text_col(addr);
 
+    if (row == -1 || col == -1) {
+        return;
+    }
+
     // In low-resolution mode, the row number is analagous to the text
     // row number, like so:
     row *= 2;
