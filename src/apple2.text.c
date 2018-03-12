@@ -231,7 +231,7 @@ static char alternate_display[] = {
 int
 apple2_text_row(size_t addr)
 {
-    return buffer_rows[addr];
+    return buffer_rows[addr - 0x400];
 }
 
 /*
@@ -240,7 +240,7 @@ apple2_text_row(size_t addr)
 int
 apple2_text_col(size_t addr)
 {
-    return buffer_cols[addr];
+    return buffer_cols[addr - 0x400];
 }
 
 /*
