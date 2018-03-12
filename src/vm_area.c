@@ -16,7 +16,7 @@
  * width and height.
  */
 inline void
-vm_area_set(vm_area *area, int xoff, int yoff, int width, int height)
+vm_area_set(vm_area *area, uint32_t xoff, uint32_t yoff, uint32_t width, uint32_t height)
 {
     area->xoff = xoff;
     area->yoff = yoff;

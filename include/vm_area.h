@@ -1,6 +1,8 @@
 #ifndef _VM_AREA_H_
 #define _VM_AREA_H_
 
+#include <stdlib.h>
+
 typedef struct {
     /*
      * These are the x and y coordinate offsets in the logical dimension
@@ -8,8 +10,8 @@ typedef struct {
      * top-left; (5, 5) would be 5 pixels down, and 5 pixels to the
      * right, of that top-left corner.
      */
-    int xoff;
-    int yoff;
+    uint32_t xoff;
+    uint32_t yoff;
 
     /*
      * These are the width and height of the area we're defining. A
@@ -17,8 +19,8 @@ typedef struct {
      * (1, 1); use larger numbers to indicate a larger square (if the
      * two are equal) or rectangle (if unequal).
      */
-    int width;
-    int height;
+    uint32_t width;
+    uint32_t height;
 } vm_area;
 
 /*
@@ -40,6 +42,6 @@ typedef struct {
     SDL_Rect name; \
     SET_SDL_RECT(name, a)
 
-extern void vm_area_set(vm_area *, int, int, int, int);
+extern void vm_area_set(vm_area *, uint32_t, uint32_t, uint32_t, uint32_t);
 
 #endif
