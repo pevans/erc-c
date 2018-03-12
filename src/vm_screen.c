@@ -216,7 +216,7 @@ void
 vm_screen_set_color(vm_screen *scr, vm_color clr)
 {
     if (scr->render) {
-        SDL_SetRenderDrawColor(scr->render, clr.r, clr.g, clr.g,
+        SDL_SetRenderDrawColor(scr->render, clr.r, clr.g, clr.b,
                                SDL_ALPHA_OPAQUE);
     }
 }
