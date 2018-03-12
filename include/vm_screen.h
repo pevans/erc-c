@@ -9,6 +9,20 @@
 
 typedef struct {
     /*
+     * Red, green, blue
+     */
+    vm_8bit r, g, b;
+
+    /*
+     * This is alpha, which would be the degree of transparency of the
+     * graphics. This is here only if needed--for example, the Apple II
+     * doesn't have any alpha channel.
+     */
+    vm_8bit a;
+} vm_color;
+
+typedef struct {
+    /*
      * This is the window in SDL that we're displaying. It's fine for a
      * screen to be headless; that is, not to have a window. Screen
      * functions which deal with SDL will simply not run that code if
@@ -65,7 +79,7 @@ extern void vm_screen_finish();
 extern void vm_screen_free(vm_screen *);
 extern void vm_screen_prepare(vm_screen *);
 extern void vm_screen_refresh(vm_screen *);
-extern void vm_screen_set_color(vm_screen *, uint8_t, uint8_t, uint8_t, uint8_t);
+extern void vm_screen_set_color(vm_screen *, vm_color);
 extern void vm_screen_set_logical_coords(vm_screen *, int, int);
 
 #endif

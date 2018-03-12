@@ -129,7 +129,10 @@ vm_screen_add_window(vm_screen *screen, int width, int height)
     // the set_logical_coords function with different values.
     vm_screen_set_logical_coords(screen, width, height);
 
-    vm_screen_set_color(screen, 0, 0, 0, 0);
+    vm_color clr;
+    memset(&clr, 0, sizeof(vm_color));
+
+    vm_screen_set_color(screen, clr);
     vm_screen_prepare(screen);
 
     return OK;
@@ -210,14 +213,11 @@ vm_screen_refresh(vm_screen *screen)
  * Set the color of a screen screen to a given RGBA value.
  */
 void
-vm_screen_set_color(vm_screen *screen,
-                    uint8_t red,
-                    uint8_t green,
-                    uint8_t blue,
-                    uint8_t alpha)
+vm_screen_set_color(vm_screen *scr, vm_color clr)
 {
-    if (screen->render) {
-        SDL_SetRenderDrawColor(screen->render, red, green, blue, alpha);
+    if (scr->render) {
+        SDL_SetRenderDrawColor(scr->render, clr.r, clr.g, clr.g,
+                               SDL_ALPHA_OPAQUE);
     }
 }
 

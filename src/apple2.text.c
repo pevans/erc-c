@@ -226,6 +226,24 @@ static char alternate_display[] = {
 };
 
 /*
+ * Return the row where the given address will be displayed.
+ */
+int
+apple2_text_row(size_t addr)
+{
+    return buffer_rows[addr];
+}
+
+/*
+ * Return the column where the given address will be displayed.
+ */
+int
+apple2_text_col(size_t addr)
+{
+    return buffer_cols[addr];
+}
+
+/*
  * Return the primary character set representation matching the given
  * character code.
  */

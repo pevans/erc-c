@@ -8,6 +8,8 @@
 extern char apple2_text_alternate(vm_8bit);
 extern char apple2_text_primary(vm_8bit);
 extern int apple2_text_area(vm_area *, vm_bitfont *, size_t);
+extern int apple2_text_col(size_t);
+extern int apple2_text_row(size_t);
 extern void apple2_text_draw(apple2 *, size_t);
 
 #endif

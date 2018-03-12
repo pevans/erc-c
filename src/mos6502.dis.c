@@ -258,6 +258,7 @@ mos6502_dis_opcode(mos6502 *cpu, FILE *stream, int address)
     int addr_mode;
     int inst_code;
     int expected;
+    char status[9];
 
     memset(s_bytes, 0, sizeof(s_bytes));
     memset(s_inst, 0, sizeof(s_inst));
@@ -326,8 +327,18 @@ mos6502_dis_opcode(mos6502 *cpu, FILE *stream, int address)
             snprintf(s_bytes, sizeof(s_bytes) - 1, "%02X", opcode);
         }
 
-        fprintf(stream, "%04X:%-9s%20s   %s\n",
-                cpu->PC, s_bytes, s_inst, s_operand);
+        snprintf(status, sizeof(status), "%c%c_%c%c%c%c%c",
+                 cpu->P & MOS_NEGATIVE ? 'N' : '_',
+                 cpu->P & MOS_OVERFLOW ? 'V' : '_',
+                 cpu->P & MOS_BREAK ? 'B' : '_',
+                 cpu->P & MOS_DECIMAL ? 'D' : '_',
+                 cpu->P & MOS_INTERRUPT ? 'I' : '_',
+                 cpu->P & MOS_ZERO ? 'Z' : '_',
+                 cpu->P & MOS_CARRY ? 'C' : '_');
+
+        fprintf(stream, "%04X:%-9s%20s   %-20s; A:%02X X:%02X Y:%02X P:%02X<%s> S:%02X\n",
+                cpu->PC, s_bytes, s_inst, s_operand,
+                cpu->A, cpu->X, cpu->Y, cpu->P, status, cpu->S);
     }
 
     // The expected number of bytes here is for the operand, but we need

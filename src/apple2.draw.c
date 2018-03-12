@@ -7,32 +7,8 @@
  */
 
 #include "apple2.h"
+#include "apple2.lores.h"
 #include "apple2.text.h"
-
-/*
- * These are the color codes for the lo-res colors that are available.
- * Each pixel in lo-res indicates one color. These are colors I found
- * somewhere online -- I'm not sure if they are exact matches, and are
- * subject to change.
- */
-static int lores_colors[][3] = {
-    { 0x00, 0x00, 0x00 },   // black
-    { 0xff, 0x28, 0x97 },   // magenta
-    { 0x60, 0x4d, 0xbc },   // dark blue
-    { 0xff, 0x44, 0xfd },   // purple
-    { 0x00, 0xa3, 0x60 },   // dark green
-    { 0x9c, 0x9c, 0x9c },   // gray
-    { 0x14, 0xcf, 0xfd },   // medium blue
-    { 0xd0, 0xc3, 0xff },   // light blue
-    { 0x60, 0x72, 0x03 },   // brown
-    { 0xff, 0x6a, 0x3c },   // orange
-    { 0x9c, 0x9c, 0x9c },   // gray
-    { 0xff, 0xa0, 0xd0 },   // pink
-    { 0x14, 0xf5, 0x3c },   // light green
-    { 0xd0, 0xdd, 0x81 },   // yellow
-    { 0x72, 0xff, 0xd0 },   // aquamarine
-    { 0xff, 0xff, 0xff },   // white
-};
 
 /*
  * Draw a pixel on screen at the given address.
@@ -55,6 +31,7 @@ apple2_draw_pixel(apple2 *mach, vm_16bit addr)
 void
 apple2_draw_pixel_lores(apple2 *mach, vm_16bit addr)
 {
+#if 0
     vm_8bit color = vm_segment_get(mach->main, addr);
     vm_8bit top, bottom;
     vm_area loc;
@@ -85,6 +62,7 @@ apple2_draw_pixel_lores(apple2 *mach, vm_16bit addr)
     colors = lores_colors[bottom];
     vm_screen_set_color(mach->screen, colors[0], colors[1], colors[2], 255);
     vm_screen_draw_rect(mach->screen, &loc);
+#endif
 }
 
 /*
@@ -104,6 +82,21 @@ apple2_draw_40col(apple2 *mach)
 }
 
 /*
+ * Draw low-resolution graphics on the screen
+ */
+void
+apple2_draw_lores(apple2 *mach)
+{
+    size_t addr;
+
+    vm_screen_prepare(mach->screen);
+    
+    for (addr = 0x400; addr < 0x800; addr++) {
+        apple2_lores_draw(mach, addr);
+    }
+}
+
+/*
  * Find the right draw method for the machine, based on its display
  * mode, and use that to refresh the screen.
  */
@@ -112,5 +105,8 @@ apple2_draw(apple2 *mach)
 {
     if (mach->display_mode & DISPLAY_TEXT) {
         apple2_draw_40col(mach);
+        return;
     }
+
+    apple2_draw_lores(mach);
 }
