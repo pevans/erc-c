@@ -74,11 +74,7 @@ vm_debug_next_arg(char **str)
 {
     char *tok;
 
-    while ((tok = strsep(str, " "))){
-        if (tok == NULL) {
-            return NULL;
-        }
-
+    while ((tok = strsep(str, " "))) {
         if (*tok == '\0') {
             continue;
         }
