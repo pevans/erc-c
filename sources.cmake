@@ -6,6 +6,7 @@ set(erc_sources
 	apple2.dec.c
 	apple2.draw.c
 	apple2.enc.c
+	apple2.hires.c
 	apple2.kb.c
 	apple2.lores.c
 	apple2.mem.c

@@ -7,6 +7,7 @@
  */
 
 #include "apple2.h"
+#include "apple2.hires.h"
 #include "apple2.lores.h"
 #include "apple2.text.h"
 
@@ -97,6 +98,21 @@ apple2_draw_lores(apple2 *mach)
 }
 
 /*
+ * Draw high-resolution graphics on the screen
+ */
+void
+apple2_draw_hires(apple2 *mach)
+{
+    size_t addr;
+
+    vm_screen_prepare(mach->screen);
+
+    for (addr = 0x2000; addr < 0x4000; addr++) {
+        apple2_hires_draw(mach, addr);
+    }
+}
+
+/*
  * Find the right draw method for the machine, based on its display
  * mode, and use that to refresh the screen.
  */
@@ -106,7 +122,11 @@ apple2_draw(apple2 *mach)
     if (mach->display_mode & DISPLAY_TEXT) {
         apple2_draw_40col(mach);
         return;
+    } else if (mach->memory_mode & MEMORY_HIRES) {
+        apple2_draw_hires(mach);
+        return;
     }
 
+    // The fallback mode is to draw lores graphics
     apple2_draw_lores(mach);
 }
