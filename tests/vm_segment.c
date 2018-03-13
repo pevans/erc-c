@@ -194,3 +194,27 @@ Test(vm_segment, fwrite)
 
     fclose(stream);
 }
+
+Test(vm_segment, hexdump)
+{
+    vm_segment_set(segment, 0, 'H');
+    vm_segment_set(segment, 1, 'e');
+    vm_segment_set(segment, 2, 'l');
+    vm_segment_set(segment, 3, 'l');
+    vm_segment_set(segment, 4, 'o');
+    vm_segment_set(segment, 5, ' ');
+    vm_segment_set(segment, 6, 'N');
+    vm_segment_set(segment, 7, 'e');
+    vm_segment_set(segment, 8, 'r');
+    vm_segment_set(segment, 9, 'd');
+    vm_segment_set(segment, 10, 's');
+
+    FILE *stream = fopen("/dev/null", "w");
+    char buf[512];
+
+    setvbuf(stream, buf, _IOFBF, BUFSIZ);
+    vm_segment_hexdump(segment, stream, 0, 16);
+
+    cr_assert_str_eq(buf, 
+                     "00000000    48 65 6C 6C 6F 20 4E 65  72 64 73 00 00 00 00 00   [Hello Nerds.....]\n");
+}
