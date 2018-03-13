@@ -121,13 +121,6 @@ mos6502_dis_operand(mos6502 *cpu,
                     vm_16bit value)
 {
     int rel_address;
-    vm_8bit eff_value = 0;
-    mos6502_address_resolver resolv;
-
-    resolv = mos6502_get_address_resolver(addr_mode);
-    if (resolv) {
-        eff_value = resolv(cpu);
-    }
 
     switch (addr_mode) {
         case ACC:
