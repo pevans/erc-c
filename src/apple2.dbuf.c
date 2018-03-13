@@ -99,9 +99,7 @@ SEGMENT_WRITER(apple2_dbuf_write)
     // 80STORE is low. 
     segment->memory[addr] = value;
 
-    if (mach->display_mode & DISPLAY_TEXT) {
-        apple2_notify_refresh(mach);
-    }
+    apple2_notify_refresh(mach);
 }
 
 /*
