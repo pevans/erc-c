@@ -211,7 +211,7 @@ Test(mos6502_dis, opcode)
     mos6502_set(cpu, 1, 0x38);
 
     bytes = mos6502_dis_opcode(cpu, stream, 0);
-    assert_buf("0000:29 38                     AND   #$38\n");
+    assert_buf("0000:29 38                     AND   #$38                ; A:00 X:00 Y:00 P:C7<NV___IZC> S:FF\n");
     cr_assert_eq(bytes, 2);
 }
 
@@ -230,7 +230,7 @@ Test(mos6502_dis, scan)
     // I'm honestly not sure. There are definitely times (e.g. during
     // runtime operation) when you don't want it to, but as a standalone
     // disassembler, it feels less useful when PC isn't emulated.
-    assert_buf("0000:29 38                     AND   #$38\n"
-               "0002:88                        DEY   \n"
-               "0003:6C 34 12                  JMP   ($1234)\n");
+    assert_buf("0000:29 38                     AND   #$38                ; A:00 X:00 Y:00 P:C7<NV___IZC> S:FF\n"
+               "0002:88                        DEY                       ; A:00 X:00 Y:00 P:C7<NV___IZC> S:FF\n"
+               "0003:6C 34 12                  JMP   ($1234)             ; A:00 X:00 Y:00 P:C7<NV___IZC> S:FF\n");
 }
