@@ -92,3 +92,27 @@ Test(apple2_text, alternate)
         cr_assert_eq(apple2_text_alternate(i + 0x60), lower[i]);
     }
 }
+
+Test(apple2_text, row)
+{
+    static int rows[] = {
+        0x400, 0x480, 0x500, 0x59e, 0x60c, 0x6a2,
+    };
+
+    int len = sizeof(rows) / sizeof(int);
+    for (int i = 0; i < len; i++) {
+        cr_assert_eq(apple2_text_row(rows[i]), i);
+    }
+}
+
+Test(apple2_text, col)
+{
+    static int cols[] = {
+        0x400, 0x481, 0x502, 0x583, 0x604, 0x685,
+    };
+
+    int len = sizeof(cols) / sizeof(int);
+    for (int i = 0; i < len; i++) {
+        cr_assert_eq(apple2_text_col(cols[i]), i);
+    }
+}
