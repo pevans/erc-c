@@ -5,9 +5,9 @@
  * low-resolution graphics. Where one byte can hold the color data for
  * two onscreen cells in lores graphics, in hires, each _bit_
  * corresponds to a pixel. The colors you can show depend on the pattern
- * of high and low bits within a given data byte. Certain rows have
- * black, purple, or blue available; alternating rows can be black,
- * green, or orange. 
+ * of high and low bits within a given data byte. Certain columns can be
+ * used to display black, purple, or blue; other columns  can be used to
+ * show black, green, or orange.
  *
  * Some of this has to do with the space constraints available to the
  * Apple II: the hires graphics buffer is held between $2000 and $3FFF,
