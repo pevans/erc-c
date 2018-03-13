@@ -7,3 +7,4 @@
 /* Test(apple2_draw, text) */
 /* Test(apple2_draw, 40col) */
 /* Test(apple2_draw, apple2_draw) */
+/* Test(apple2_draw, lores) */
