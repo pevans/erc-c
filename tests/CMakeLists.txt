@@ -12,7 +12,7 @@ if(DEFINED ENV{STATIC_ANALYSIS})
 endif()
 
 if(CMAKE_C_FLAGS MATCHES "--analyze")
-	set(CMAKE_C_LINK_EXECUTABLE "echo 'Will not execute binary when running static analysis'")
+	set(CMAKE_C_LINK_EXECUTABLE "echo 'Will not execute binary when running static analysis'; rm -f ./erc-test")
 endif()
 
 if(APPLE)
