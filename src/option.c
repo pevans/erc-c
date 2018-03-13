@@ -55,7 +55,6 @@ enum options {
     DISK1,
     DISK2,
     HELP,
-    SIZE,
     FLASH,
     DISASSEMBLE,
 };
@@ -69,7 +68,6 @@ static struct option long_options[] = {
     { "disk2", 1, NULL, DISK2 },
     { "flash", 0, NULL, FLASH },
     { "help", 0, NULL, HELP },
-    { "size", 1, NULL, SIZE },
 };
 
 /*
@@ -155,12 +153,6 @@ option_parse(int argc, char **argv)
                 
                 // The help option should terminate normal execution
                 return 0;
-
-            case SIZE:
-                if (option_set_size(optarg) != OK) {
-                    return 0;
-                }
-                break;
         }
     } while (opt != -1);
 
@@ -212,29 +204,6 @@ option_print_help()
   --help                      Print this help message\n\
   --size=WIDTHxHEIGHT         Use WIDTH and HEIGHT for window size\n\
                               (only 700x480 and 875x600 are supported)\n");
-}
-
-/*
- * Set the size of our window in visible width and height. The size
- * string is expected to be in the form of WIDTHxHEIGHT, where WIDTH
- * and HEIGHT are integers representing the window width and height
- * respectively. Arbitrary values for width and height are not
- * necessarily allowed; generally, we can only support values which
- * respect the aspect ratio used by the machine we are emulating.
- */
-int
-option_set_size(const char *size)
-{
-    if (strcmp(size, "700x480") == 0) {
-        return OK;
-    } else if (strcmp(size, "875x600") == 0) {
-        width = 875;
-        height = 600;
-        return OK;
-    }
-
-    snprintf(error_buffer, ERRBUF_SIZE, "Ignoring bad window size: %s", size);
-    return ERR_BADOPT;
 }
 
 /*
