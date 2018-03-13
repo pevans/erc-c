@@ -31,7 +31,7 @@ Test(option, error)
     cr_assert_str_eq(option_get_error(), str);
 }
 
-Test(option, read_file)
+Test(option, open_file)
 {
     char *str = "so much FUN";
     char *bad_file = "/tmp/BLEH";
