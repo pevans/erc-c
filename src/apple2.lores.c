@@ -91,6 +91,14 @@ apple2_lores_draw(apple2 *mach, size_t addr)
     vm_screen_draw_rect(mach->screen, &dest);
 }
 
+/*
+ * Return the color that corresponds to the value in the given byte.
+ * Even though we receive a byte, lores color data is stored two cells
+ * to a byte, so all we ever get here will be contained within the first
+ * four bits; therefore we mask the byte as we index the lores colors
+ * table, to ensure a bad value doesn't end up returning a value out of
+ * bounds.
+ */
 vm_color
 apple2_lores_color(vm_8bit byte)
 {

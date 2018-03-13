@@ -354,6 +354,13 @@ vm_segment_set16(vm_segment *segment, size_t addr, vm_16bit value)
     return err;
 }
 
+/*
+ * Print a hex dump of the region of memory between from and to into the
+ * given file stream. This looks vaguely like the output of the hexdump
+ * Unix command, except that the hex values are upper-case, and we use
+ * brackets instead of vertical bars to delimit the ASCII output because
+ * WHY NOT.
+ */
 void
 vm_segment_hexdump(vm_segment *seg, FILE *stream, size_t from, size_t to)
 {
