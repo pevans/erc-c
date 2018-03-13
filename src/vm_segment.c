@@ -382,7 +382,7 @@ vm_segment_hexdump(vm_segment *seg, FILE *stream, size_t from, size_t to)
             ni += sprintf(nbuf + ni, " ");
         }
 
-        if (bytes >= 16) {
+        if (bytes >= 16 || from >= to) {
             fprintf(stream, "%08zX    %s  [%s]\n", from - bytes, nbuf, sbuf);
             bytes = 0;
             ni = 0; 
