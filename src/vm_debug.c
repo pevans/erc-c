@@ -199,17 +199,18 @@ vm_debug_prompt()
 void
 vm_debug_execute(const char *str)
 {
-    char *tok, *ebuf;
+    char *tok, *ebuf, *orig;
     vm_debug_cmd *cmd;
     vm_debug_args args;
 
-    ebuf = strdup(str);
+    orig = ebuf = strdup(str);
     cmd = NULL;
 
     tok = vm_debug_next_arg(&ebuf);
 
     // No input
     if (tok == NULL) {
+        free(orig);
         return;
     }
 
@@ -217,6 +218,7 @@ vm_debug_execute(const char *str)
 
     // No command found
     if (cmd == NULL) {
+        free(orig);
         return;
     }
 
@@ -236,6 +238,7 @@ vm_debug_execute(const char *str)
 
             // But if this is -1, then something went wrong
             if (args.addr2 == -1) {
+                free(orig);
                 return;
             }
 
@@ -246,6 +249,7 @@ vm_debug_execute(const char *str)
 
             // Oh no
             if (args.addr1 == -1) {
+                free(orig);
                 return;
             }
 
@@ -258,7 +262,7 @@ vm_debug_execute(const char *str)
 
     cmd->handler(&args);
 
-    free(ebuf);
+    free(orig);
 }
 
 /*
