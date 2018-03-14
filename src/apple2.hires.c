@@ -588,7 +588,7 @@ apple2_hires_row(size_t addr)
 int
 apple2_hires_col(size_t addr)
 {
-    return apple2_text_col(addr);
+    return apple2_text_col((addr - 0x1600) % 0x400);
 }
 
 /*
@@ -602,7 +602,40 @@ apple2_hires_draw(apple2 *mach, size_t addr)
     int row = apple2_hires_row(addr),
         col = apple2_hires_col(addr);
 
-    row = col;
+    if (row == -1 || col == -1) {
+        return;
+    }
+    
+    // Each byte encodes 7 pixels, with the 8th bit reserved to choose
+    // the color palette.
+    col *= 7;
+
+    vm_8bit byte = mos6502_get(mach->cpu, addr);
+    vm_area area;
+
+    area.width = 1;
+    area.height = 1;
+    area.xoff = col;
+    area.yoff = row;
+
+    //printf("draw { w:%d, h:%d, xoff:%d, yoff:%d }\n", area.width, area.height, area.xoff, area.yoff);
+
+    for (int i = 0; i < 7; i++, area.xoff++) {
+        vm_8bit dot = byte >> i;
+        vm_8bit lsb = byte & 0x1;
+        vm_color clr = (byte & 0x80)
+            ? COLOR_H1(byte >> i)
+            : COLOR_H0(byte >> i);
+        
+        if (i > 0) {
+            if (clr.r == clr.g && clr.r == clr.b && clr.r == 0 && lsb) {
+                clr = COLOR_H1(3);
+            }
+        }
+
+        vm_screen_set_color(mach->screen, clr);
+        vm_screen_draw_rect(mach->screen, &area);
+    }
 }
 
 /*
