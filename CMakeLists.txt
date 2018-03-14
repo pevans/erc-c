@@ -5,7 +5,7 @@ project(erc)
 
 include(sources.cmake)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O3")
 set(CMAKE_COLOR_MAKEFILE OFF)
 
 if(DEFINED ENV{STATIC_ANALYSIS})
