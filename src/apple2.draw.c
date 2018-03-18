@@ -103,12 +103,10 @@ apple2_draw_lores(apple2 *mach)
 void
 apple2_draw_hires(apple2 *mach)
 {
-    size_t addr;
-
     vm_screen_prepare(mach->screen);
 
-    for (addr = 0x2000; addr < 0x4000; addr++) {
-        apple2_hires_draw(mach, addr);
+    for (int row = 0; row < 192; row++) {
+        apple2_hires_draw(mach, row);
     }
 }
 
