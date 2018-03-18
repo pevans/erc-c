@@ -275,7 +275,7 @@ vm_screen_dirty(vm_screen *scr)
         }
 
         if (now.tv_sec > refresh_time.tv_sec ||
-            (now.tv_usec > refresh_time.tv_usec + 33333)
+            (now.tv_usec > refresh_time.tv_usec + 50000)
            ) {
             memcpy(&refresh_time, &now, sizeof(struct timeval));
             return true;
