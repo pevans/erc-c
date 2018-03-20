@@ -34,6 +34,14 @@ static vm_8bit gcr62[] = {
 };
 
 /*
+ * Define the physical sector order in which we write encoded data
+ */
+static int physical_order[] = {
+    0x0, 0xD, 0xB, 0x9, 0x7, 0x5, 0x3, 0x1,
+    0xE, 0xC, 0xA, 0x8, 0x6, 0x4, 0x2, 0xF,
+};
+
+/*
  * Encode the given DOS-formatted segment with 6-and-2 encoding. This
  * can work for both DOS 3.3 and ProDOS images, but would fail with DOS
  * 3.2 and 3.1 (which use 5-and-3 encoding).
@@ -119,7 +127,11 @@ apple2_enc_track(int sectype, vm_segment *dest, vm_segment *src,
     }
 
     for (sect = 0; sect < 16; sect++) {
-        soff = toff + (ENC_DSECTOR * apple2_dd_sector_num(sectype, sect));
+        int logsec = apple2_dd_sector_num(sectype, sect);
+        int physec = physical_order[sect];
+
+        soff = toff + (ENC_DSECTOR * logsec);
+        doff = orig + (ENC_ESECTOR * physec) + 48;
 
         // Each sector has a header with some metadata, plus some
         // markers and padding.
@@ -127,7 +139,7 @@ apple2_enc_track(int sectype, vm_segment *dest, vm_segment *src,
         doff += apple2_enc_sector(dest, src, doff, soff);
     }
 
-    return doff - orig;
+    return ENC_ETRACK;
 }
 
 /*
@@ -232,8 +244,8 @@ apple2_enc_sector(vm_segment *dest, vm_segment *src,
     vm_segment_set(dest, doff++, 0xaa);
     vm_segment_set(dest, doff++, 0xeb);
 
-    // At the conclusion of a sector, we write 27 self-sync bytes.
-    for (i = 0; i < 27; i++) {
+    // At the conclusion of a sector, we write 48 self-sync bytes.
+    for (i = 0; i < 48; i++) {
         vm_segment_set(dest, doff++, 0xff);
     }
 
@@ -290,7 +302,7 @@ apple2_enc_sector_header(vm_segment *seg, int off,
 
     // Write six (exactly six!) self-sync bytes following the epilogue,
     // because the Disk II controller/RWTS method expect to find it.
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 5; i++) {
         vm_segment_set(seg, off++, 0xff);
     }
 

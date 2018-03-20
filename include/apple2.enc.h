@@ -37,13 +37,13 @@
  * An encoded sector is 396 bytes long, and is comprised of a sector
  * header plus padding bytes both before _and_ after the data field.
  */
-#define ENC_ESECTOR 0x18c
+#define ENC_ESECTOR 0x1a0
 
 /*
  * An encoded track contains 16 sectors, as mentioned for ENC_DTRACK.
  * But it also contains some additional padding (48 bytes-worth).
  */
-#define ENC_ETRACK 0x18f0
+#define ENC_ETRACK 0x1a00
 
 /*
  * A sector header consists of some byte markers--all byte markers in
