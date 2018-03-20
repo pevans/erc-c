@@ -663,14 +663,25 @@ apple2_hires_draw(apple2 *mach, int row)
         curr = dots[i] & 1;
         next = (i < 279) ? (dots[i+1] & 1) : 0;
 
-        // Do we need to emit a white color?
-        if (prev & curr & next) {
+        if (curr) {
             vm_screen_set_color(mach->screen, colors[HIRES_WHITE]);
+        } else {
+            vm_screen_set_color(mach->screen, colors[HIRES_BLACK]);
+        }
+
+#if 0
+        // Do we need to emit a white color?
+        if ((prev & curr) || (curr & next)) {
+            vm_screen_set_color(mach->screen, colors[HIRES_WHITE]);
+        }
+
+        else if (!(prev & curr) || !(curr & next)) {
+            vm_screen_set_color(mach->screen, colors[HIRES_BLACK]);
         }
         
         // We need to emit _some_ color, but not white.
-        else if (prev | curr | next) {
-            int colorindex = (i % 2 == 0) ? 1 : 0;
+        else /*if (prev | curr | next)*/ {
+            int colorindex = (i % 2 == 0) ? 0 : 1;
 
             if (!curr) {
                 colorindex = !colorindex;
@@ -686,11 +697,7 @@ apple2_hires_draw(apple2 *mach, int row)
 
             vm_screen_set_color(mach->screen, colors[colorindex]);
         }
-
-        // We should emit no color (which is to say, emit black)
-        else {
-            vm_screen_set_color(mach->screen, colors[HIRES_BLACK]);
-        }
+#endif
 
         area.xoff = i;
         vm_screen_draw_rect(mach->screen, &area);
