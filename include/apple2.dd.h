@@ -53,7 +53,7 @@ enum apple2_dd_mode {
  */
 #define _240K_ 245760
 
-#define MAX_DRIVE_STEPS 70
+#define MAX_DRIVE_STEPS 140
 
 /*
  * This is the last _accessible_ sector position within a track (you can
