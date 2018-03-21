@@ -269,7 +269,9 @@ apple2_dd_phaser(apple2dd *drive)
 
     // If the opposite cog is also on, then our accounting is for
     // naught; nullify the step movement.
-    if ((next & (prev << 2)) || (next & (prev >> 2))) {
+    if (((next & DD_PHASE1) && (next & DD_PHASE3)) ||
+        ((next & DD_PHASE2) && (next & DD_PHASE4))
+       ) {
         step = 0;
     }
 
