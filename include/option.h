@@ -5,8 +5,7 @@
 #include <stdio.h>
 
 enum option_flags {
-    OPTION_FLASH = 1,
-    OPTION_DISASSEMBLE = 2,
+    OPTION_DISASSEMBLE = 1,
 };
 
 /*

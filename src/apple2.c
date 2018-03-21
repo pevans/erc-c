@@ -337,10 +337,9 @@ apple2_free(apple2 *mach)
 void
 apple2_run_loop(apple2 *mach)
 {
-    FILE *dlog = NULL;
+    FILE *dlog = (FILE *)vm_di_get(VM_DISASM_LOG);
 
-    if (option_flag(OPTION_DISASSEMBLE)) {
-        dlog = (FILE *)vm_di_get(VM_DISASM_LOG);
+    if (dlog != NULL) {
         vm_reflect_disasm(NULL);
     }
 

@@ -75,16 +75,3 @@ Test(option, parse)
 
     cr_assert_eq(option_parse(argc, argv), 0);
 }
-
-Test(option, flag)
-{
-    int argc = 2;
-    char *argv[] = {
-        "prog_name",
-        "--flash",
-    };
-
-    cr_assert_eq(option_flag(OPTION_FLASH), false);
-    cr_assert_eq(option_parse(argc, argv), 1);
-    cr_assert_eq(option_flag(OPTION_FLASH), true);
-}

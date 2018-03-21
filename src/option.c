@@ -44,8 +44,6 @@ static char error_buffer[ERRBUF_SIZE] = "";
 static int width = 840;
 static int height = 576;
 
-static int flags = 0;
-
 /*
  * These are all of the options we allow in our long-form options. It's
  * a bit faster to identify them by integer symbols than to do string
@@ -55,7 +53,6 @@ enum options {
     DISK1,
     DISK2,
     HELP,
-    FLASH,
     DISASSEMBLE,
 };
 
@@ -66,7 +63,6 @@ static struct option long_options[] = {
     { "disassemble", 1, NULL, DISASSEMBLE },
     { "disk1", 1, NULL, DISK1 },
     { "disk2", 1, NULL, DISK2 },
-    { "flash", 0, NULL, FLASH },
     { "help", 0, NULL, HELP },
 };
 
@@ -120,7 +116,6 @@ option_parse(int argc, char **argv)
 
         switch (opt) {
             case DISASSEMBLE:
-                flags |= OPTION_DISASSEMBLE;
                 if (!option_open_file(&disasm_log, optarg, "w")) {
                     return 0;
                 }
@@ -142,10 +137,6 @@ option_parse(int argc, char **argv)
                 }
 
                 vm_di_set(VM_DISK2, input2);
-                break;
-
-            case FLASH:
-                flags |= OPTION_FLASH;
                 break;
 
             case HELP:
@@ -200,17 +191,7 @@ option_print_help()
   --disassemble=FILE          Write assembly notation into FILE\n\
   --disk1=FILE                Load FILE into disk drive 1\n\
   --disk2=FILE                Load FILE into disk drive 2\n\
-  --flash                     Flash CPU memory with contents of drive 1\n\
   --help                      Print this help message\n\
   --size=WIDTHxHEIGHT         Use WIDTH and HEIGHT for window size\n\
                               (only 700x480 and 875x600 are supported)\n");
-}
-
-/*
- * Return true if the given option flag is set.
- */
-bool
-option_flag(int flag)
-{
-    return flags & flag;
 }
