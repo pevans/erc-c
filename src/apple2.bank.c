@@ -58,7 +58,9 @@ SEGMENT_READER(apple2_bank_read)
     // arbitrator; if it's on, we have to use aux, and if not, we have
     // to use main. Whatever the segment was that was passed in will
     // turn out to be immaterial.
-    segment = (mach->bank_switch & BANK_ALTZP) ? mach->aux : mach->main;
+    if ((mach->bank_switch & BANK_ALTZP) && addr < 0x200) {
+        segment = mach->aux;
+    }
 
     if (~mach->bank_switch & BANK_RAM) {
         // We need to account for the difference in address location
@@ -97,7 +99,9 @@ SEGMENT_WRITER(apple2_bank_write)
     }
 
     // See my spiel in the read bank mapper; the same applies here.
-    segment = (mach->bank_switch & BANK_ALTZP) ? mach->aux : mach->main;
+    if ((mach->bank_switch & BANK_ALTZP) && addr < 0x200) {
+        segment = mach->aux;
+    }
 
     // You will note, if we've gotten here, that it's possible to write
     // to the bank-switch addresses even if the ROM flag is 1. It's
