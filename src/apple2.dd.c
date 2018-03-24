@@ -16,6 +16,7 @@
 #include "apple2.enc.h"
 #include "apple2.h"
 #include "vm_di.h"
+#include "vm_reflect.h"
 
 /*
  * Create a new disk drive. We do not create a memory segment for the
@@ -45,8 +46,7 @@ apple2_dd_create()
     drive->online = false;
     drive->write_protect = true;
     drive->mode = DD_READ;
-    drive->phase_state = 0;
-    drive->last_phase = 0;
+    drive->phase = 0;
     drive->image_type = DD_NOTYPE;
 
     return drive;
@@ -234,53 +234,55 @@ apple2_dd_decode(apple2dd *drive)
  * phase to be the current phase state if the step was successful.
  */
 void
-apple2_dd_phaser(apple2dd *drive)
+apple2_dd_phaser(apple2dd *drive, int phase)
 {
-    int next = drive->phase_state;
-    int prev = drive->last_phase;
-    int step = 0;
+    /*
+     * There are four stepper motor phases, and you can transition from
+     * one phase to another. While it's possible--and necessary!--to
+     * have more than one phase energized in the drive, the thing that
+     * matters is the number you ultimately get to. For example:
+     *
+     * Phase 1 is on. You energize phase 2. Now both phases 1 and 2 are
+     * on; you then de-energize phase 1. Now only phase 2 is on.
+     *
+     * This sequence describes the steps necessary to step the head in
+     * by one half-track. As you can see, at some point, you have two
+     * phases on; but ultimately what is necessary is you get from phase
+     * 1 to phase 2. As such, we track only a single phase to keep
+     * things simple.
+     *
+     * It's definitely possible to have Shenanigans; that is to say, you
+     * can energize three or all four phases. We may not handle this
+     * accurately at this time; but this method is preferred at the
+     * moment for its clarity of intent.
+     *
+     * The table below both defines and documents what the phase
+     * transitions do; you can see, if phase 1 is energized, we will
+     * step in one half-track when phase 2 is energized, and step out
+     * one half-track when phase 4 is energized. If phase 1 alone
+     * remains energized, we do nothing; if phase 3 is energized--being
+     * opposite to phase 1, in a circular array--we do nothing.
+     */
+    static int transitions[] = {
+//       0   1   2   3   4     phase transition
+         0,  0,  0,  0,  0, // no phases
+         0,  0,  1,  0, -1, // phase 1
+         0, -1,  0,  1,  0, // phase 2
+         0,  0, -1,  0,  1, // phase 3
+         0,  1,  0, -1,  0, // phase 4
+    };
 
-    if (!drive->online) {
+    // You can transition only to phases 1-4, and alternatively to no
+    // phase. Also, if the motor is off, then don't bother.
+    if (phase < 0 || phase > 4 || !drive->online) {
         return;
     }
 
-    // If PHASE1 is on and PHASE4 was previously on, then we want to
-    // mimic an inward step
-    if ((next & DD_PHASE1) && (prev & DD_PHASE4)) {
-        next = DD_PHASE4 << 1;
-    }
-
-    // If, however, PHASE4 is on and previously PHASE1 was on, then we
-    // want to mimic an outward step
-    if ((next & DD_PHASE4) && (prev & DD_PHASE1)) {
-        next = DD_PHASE1 >> 1;
-    }
-
-    // If an adjacent phase is on, add an inward or outward step. If
-    // _both_ adjacent phases are on, the step will count as zero (or no
-    // step).
-    if (next & (prev << 1)) {
-        step++;
-    }
-
-    if (next & (prev >> 1)) {
-        step--;
-    }
-
-    // If the opposite cog is also on, then our accounting is for
-    // naught; nullify the step movement.
-    if (((next & DD_PHASE1) && (next & DD_PHASE3)) ||
-        ((next & DD_PHASE2) && (next & DD_PHASE4))
-       ) {
-        step = 0;
-    }
-
+    int step = transitions[(drive->phase * 5) + phase];
     apple2_dd_step(drive, step);
 
-    // Recall our trickery above with the phase variable? Because of it,
-    // we have to save the phase_state field into last_phase, and not
-    // the pseudo-value we assigned to phase.
-    drive->last_phase = drive->phase_state;
+    // Record this new phase for the next time we make a transition
+    drive->phase = phase;
 }
 
 /*
@@ -296,7 +298,7 @@ apple2_dd_position(apple2dd *drive)
         return 0;
     }
 
-    int track_offset = (drive->track_pos / 4) * ENC_ETRACK;
+    int track_offset = (drive->track_pos / 2) * ENC_ETRACK;
     return track_offset + drive->sector_pos;
 }
 
@@ -406,12 +408,6 @@ apple2_dd_step(apple2dd *drive, int steps)
     } else if (drive->track_pos < 0) {
         drive->track_pos = 0;
     }
-
-    // The sector position is rehomed to zero whenever we step a
-    // non-zero length.
-    if (steps) {
-        drive->sector_pos = 0;
-    }
 }
 
 /*
@@ -461,18 +457,16 @@ apple2_dd_write_protect(apple2dd *drive, bool protect)
 void
 apple2_dd_switch_phase(apple2dd *drive, size_t addr)
 {
+    int phase = -1;
+
     switch (addr & 0xF) {
-        case 0x0: drive->phase_state &= ~0x1; break;
-        case 0x1: drive->phase_state |=  0x1; break;
-        case 0x2: drive->phase_state &= ~0x2; break;
-        case 0x3: drive->phase_state |=  0x2; break;
-        case 0x4: drive->phase_state &= ~0x4; break;
-        case 0x5: drive->phase_state |=  0x4; break;
-        case 0x6: drive->phase_state &= ~0x8; break;
-        case 0x7: drive->phase_state |=  0x8; break;
+        case 0x1: phase = 1; break;
+        case 0x3: phase = 2; break;
+        case 0x5: phase = 3; break;
+        case 0x7: phase = 4; break;
     }
 
-    apple2_dd_phaser(drive);
+    apple2_dd_phaser(drive, phase);
 }
 
 /*

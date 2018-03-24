@@ -53,7 +53,7 @@ enum apple2_dd_mode {
  */
 #define _240K_ 245760
 
-#define MAX_DRIVE_STEPS 140
+#define MAX_DRIVE_STEPS 70
 
 /*
  * This is the last _accessible_ sector position within a track (you can
@@ -98,8 +98,7 @@ struct apple2dd {
      * laid it out as a flat line, but still with those points defined.
      * Does that make sense?
      */
-    vm_8bit phase_state;
-    vm_8bit last_phase;
+    vm_8bit phase;
     
     /*
      * Data is written via a "latch", and happens in two steps; one, you
@@ -205,7 +204,7 @@ extern vm_8bit apple2_dd_switch_rw(apple2dd *);
 extern void apple2_dd_eject(apple2dd *);
 extern void apple2_dd_free(apple2dd *);
 extern void apple2_dd_map(vm_segment *);
-extern void apple2_dd_phaser(apple2dd *);
+extern void apple2_dd_phaser(apple2dd *, int);
 extern void apple2_dd_save(apple2dd *);
 extern void apple2_dd_set_mode(apple2dd *, int);
 extern void apple2_dd_shift(apple2dd *, int);
