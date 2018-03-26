@@ -140,7 +140,7 @@ DEFINE_INST(cpy)
  */
 DEFINE_INST(dec) 
 {
-    bool opcode = mos6502_get(cpu, cpu->PC);
+    vm_8bit opcode = mos6502_get(cpu, cpu->PC);
     bool is_acc = mos6502_addr_mode(opcode) == ACC;
 
     if (!is_acc) {
@@ -178,7 +178,7 @@ DEFINE_INST(dey)
  */
 DEFINE_INST(inc)
 {
-    bool opcode = mos6502_get(cpu, cpu->PC);
+    vm_8bit opcode = mos6502_get(cpu, cpu->PC);
     bool is_acc = mos6502_addr_mode(opcode) == ACC;
 
     if (!is_acc) {

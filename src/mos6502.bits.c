@@ -31,6 +31,9 @@ DEFINE_INST(and)
  */
 DEFINE_INST(asl)
 {
+    vm_8bit opcode = mos6502_get(cpu, cpu->PC);
+    bool is_acc = mos6502_addr_mode(opcode) == ACC;
+
     vm_8bit result = oper << 1;
 
     MOS_CHECK_NZ(result);
@@ -39,7 +42,7 @@ DEFINE_INST(asl)
         cpu->P |= MOS_CARRY;
     }
 
-    if (cpu->eff_addr) {
+    if (!is_acc) {
         mos6502_set(cpu, cpu->eff_addr, result);
     } else {
         cpu->A = result;
@@ -111,6 +114,9 @@ DEFINE_INST(eor)
  */
 DEFINE_INST(lsr)
 {
+    vm_8bit opcode = mos6502_get(cpu, cpu->PC);
+    bool is_acc = mos6502_addr_mode(opcode) == ACC;
+
     vm_8bit result = oper >> 1;
 
     // The N flag is ALWAYS cleared in LSR, because a zero is always
@@ -126,7 +132,7 @@ DEFINE_INST(lsr)
         cpu->P |= MOS_CARRY;
     }
 
-    if (cpu->eff_addr) {
+    if (!is_acc) {
         mos6502_set(cpu, cpu->eff_addr, result);
     } else {
         cpu->A = result;
@@ -150,6 +156,9 @@ DEFINE_INST(ora)
  */
 DEFINE_INST(rol)
 {
+    vm_8bit opcode = mos6502_get(cpu, cpu->PC);
+    bool is_acc = mos6502_addr_mode(opcode) == ACC;
+
     vm_8bit result = oper << 1;
 
     // Rotations are effectively _9-bit_. So we aren't rotating bit 7
@@ -166,7 +175,7 @@ DEFINE_INST(rol)
 
     MOS_CHECK_NZ(result);
 
-    if (cpu->eff_addr) {
+    if (!is_acc) {
         mos6502_set(cpu, cpu->eff_addr, result);
     } else {
         cpu->A = result;
@@ -179,6 +188,9 @@ DEFINE_INST(rol)
  */
 DEFINE_INST(ror)
 {
+    vm_8bit opcode = mos6502_get(cpu, cpu->PC);
+    bool is_acc = mos6502_addr_mode(opcode) == ACC;
+
     vm_8bit result = oper >> 1;
 
     // See the code for ROL for my note on 9-bit rotation (vs. 8-bit).
@@ -193,7 +205,7 @@ DEFINE_INST(ror)
 
     MOS_CHECK_NZ(result);
 
-    if (cpu->eff_addr) {
+    if (!is_acc) {
         mos6502_set(cpu, cpu->eff_addr, result);
     } else {
         cpu->A = result;
