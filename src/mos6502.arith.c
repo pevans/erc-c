@@ -140,7 +140,10 @@ DEFINE_INST(cpy)
  */
 DEFINE_INST(dec) 
 {
-    if (cpu->eff_addr) {
+    bool opcode = mos6502_get(cpu, cpu->PC);
+    bool is_acc = mos6502_addr_mode(opcode) == ACC;
+
+    if (!is_acc) {
         MOS_CHECK_NZ(oper - 1);
         mos6502_set(cpu, cpu->eff_addr, oper - 1);
         return;
@@ -175,7 +178,10 @@ DEFINE_INST(dey)
  */
 DEFINE_INST(inc)
 {
-    if (cpu->eff_addr) {
+    bool opcode = mos6502_get(cpu, cpu->PC);
+    bool is_acc = mos6502_addr_mode(opcode) == ACC;
+
+    if (!is_acc) {
         MOS_CHECK_NZ(oper + 1);
         mos6502_set(cpu, cpu->eff_addr, oper + 1);
         return;
