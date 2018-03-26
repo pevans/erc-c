@@ -43,7 +43,7 @@ enum apple2_dd_mode {
  * it is nibbilized with 6-and-2 encoding.
  */
 #define _140K_ 143360
-#define _140K_NIB_ 233008
+#define _140K_NIB_ 250000
 
 /*
  * And this is the length of a disk that has been formatted as a nibble
