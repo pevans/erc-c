@@ -5,5 +5,6 @@
 #include "vm_bits.h"
 
 extern void apple2_hires_draw(apple2 *, int);
+extern void apple2_hires_dump(apple2 *, FILE *);
 
 #endif

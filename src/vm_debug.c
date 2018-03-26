@@ -10,6 +10,7 @@
 #include <strings.h>
 
 #include "apple2.h"
+#include "apple2.hires.h"
 #include "mos6502.h"
 #include "mos6502.dis.h"
 #include "vm_debug.h"
@@ -43,6 +44,8 @@ vm_debug_cmd cmdtable[] = {
         "Print out this list of commands", },
     { "hdump", "hd", vm_debug_cmd_hdump, 2, "<from> <to>",
         "Hex dump memory in a given region", },
+    { "hidump", "hid", vm_debug_cmd_hidump, 1, "<file>",
+        "Dump hires graphics memory to file", },
     { "jump", "j", vm_debug_cmd_jump, 1, "<addr>",
         "Jump to <addr> for next execution", },
     { "printaddr", "pa", vm_debug_cmd_printaddr, 1, "<addr>",
@@ -245,13 +248,8 @@ vm_debug_execute(const char *str)
             break;
 
         case 1:
-            args.addr1 = vm_debug_addr(vm_debug_next_arg(&ebuf));
-
-            // Oh no
-            if (args.addr1 == -1) {
-                free(orig);
-                return;
-            }
+            args.target = vm_debug_next_arg(&ebuf);
+            args.addr1 = vm_debug_addr(args.target);
 
             break;
 
@@ -470,4 +468,19 @@ DEBUG_CMD(hdump)
     FILE *stream = log_stream();
 
     vm_segment_hexdump(cpu->rmem, stream, args->addr1, args->addr2);
+}
+
+DEBUG_CMD(hidump)
+{
+    FILE *stream;
+
+    stream = fopen(args->target, "w");
+    if (stream == NULL) {
+        return;
+    }
+
+    apple2 *mach = (apple2 *)vm_di_get(VM_MACHINE);
+    apple2_hires_dump(mach, stream);
+
+    fclose(stream);
 }

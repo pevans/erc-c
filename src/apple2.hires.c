@@ -705,3 +705,47 @@ apple2_hires_draw(apple2 *mach, int row)
         prev = curr;
     }
 }
+
+void
+apple2_hires_dump(apple2 *mach, FILE *stream)
+{
+    int row, col, base, bit;
+    char dotsym;
+    vm_8bit byte;
+
+    fprintf(stream, "HIRES DUMP\n\nBytes:\n");
+
+    for (row = 0; row < 192; row++) {
+        base = addresses[row];
+
+        fprintf(stream, "%3d  [", row);
+
+        for (col = 0; col < 40; col++) {
+            fprintf(stream, "%02X", mos6502_get(mach->cpu, base + col));
+
+            if (col < 39) {
+                fprintf(stream, " ");
+            }
+        }
+
+        fprintf(stream, "]\n");
+    }
+
+    fprintf(stream, "\nDots:\n");
+
+    for (row = 0; row < 192; row++) {
+        base = addresses[row];
+
+        fprintf(stream, "%3d  [", row);
+
+        for (col = 0; col < 40; col++) {
+            byte = mos6502_get(mach->cpu, base + col);
+            dotsym = (byte & 0x80) ? '#' : '%';
+            for (bit = 0; bit < 7; bit++) {
+                fprintf(stream, "%c", ((byte >> bit) & 1) ? dotsym : '_');
+            }
+        }
+
+        fprintf(stream, "]\n");
+    }
+}

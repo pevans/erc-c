@@ -82,6 +82,7 @@ extern DEBUG_CMD(dblock);
 extern DEBUG_CMD(disasm);
 extern DEBUG_CMD(hdump);
 extern DEBUG_CMD(help);
+extern DEBUG_CMD(hidump);
 extern DEBUG_CMD(jump);
 extern DEBUG_CMD(printaddr);
 extern DEBUG_CMD(printstate);
