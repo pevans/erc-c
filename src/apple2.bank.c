@@ -59,7 +59,7 @@ SEGMENT_READER(apple2_bank_read)
     // to use main. Whatever the segment was that was passed in will
     // turn out to be immaterial.
     if ((mach->bank_switch & BANK_ALTZP) && addr < 0x200) {
-        segment = mach->aux;
+        return mach->aux->memory[addr];
     }
 
     if (~mach->bank_switch & BANK_RAM) {
@@ -100,7 +100,8 @@ SEGMENT_WRITER(apple2_bank_write)
 
     // See my spiel in the read bank mapper; the same applies here.
     if ((mach->bank_switch & BANK_ALTZP) && addr < 0x200) {
-        segment = mach->aux;
+        mach->aux->memory[addr] = value;
+        return;
     }
 
     // You will note, if we've gotten here, that it's possible to write
