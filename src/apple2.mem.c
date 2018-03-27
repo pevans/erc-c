@@ -212,6 +212,8 @@ SEGMENT_READER(apple2_mem_switch_read)
             return 0x00;
 
         case 0xC059:
+            break;
+
         case 0xC057:
             apple2_set_memory_mode(mach,
                                    mach->memory_mode | MEMORY_HIRES);
@@ -282,6 +284,8 @@ SEGMENT_WRITER(apple2_mem_switch_write)
         // consistent when mentioning soft switches in more than one
         // table.
         case 0xC059:
+            break;
+
         case 0xC057:
             apple2_set_memory_mode(mach,
                                    mach->memory_mode | MEMORY_HIRES);
