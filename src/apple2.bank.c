@@ -54,14 +54,6 @@ SEGMENT_READER(apple2_bank_read)
 
     mach = (apple2 *)_mach;
     
-    // In the case of bank-switchable memory, BANK_ALTZP is the ultimate
-    // arbitrator; if it's on, we have to use aux, and if not, we have
-    // to use main. Whatever the segment was that was passed in will
-    // turn out to be immaterial.
-    if ((mach->bank_switch & BANK_ALTZP) && addr < 0x200) {
-        return mach->aux->memory[addr];
-    }
-
     if (~mach->bank_switch & BANK_RAM) {
         // We need to account for the difference in address location
         // before we can successfully get any data from ROM.
@@ -95,12 +87,6 @@ SEGMENT_WRITER(apple2_bank_write)
 
     // No writes are allowed... sorry!
     if (~mach->bank_switch & BANK_WRITE) {
-        return;
-    }
-
-    // See my spiel in the read bank mapper; the same applies here.
-    if ((mach->bank_switch & BANK_ALTZP) && addr < 0x200) {
-        mach->aux->memory[addr] = value;
         return;
     }
 
