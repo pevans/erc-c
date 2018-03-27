@@ -38,7 +38,7 @@ DEFINE_INST(asl)
 
     MOS_CHECK_NZ(result);
     cpu->P &= ~MOS_CARRY;
-    if ((oper << 1) > 0xff) {
+    if (oper & 0x80) {
         cpu->P |= MOS_CARRY;
     }
 
