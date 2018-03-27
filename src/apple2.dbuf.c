@@ -10,6 +10,7 @@
 
 #include "apple2.dbuf.h"
 #include "apple2.draw.h"
+#include "vm_reflect.h"
 
 static size_t switch_reads[] = {
     0xC01A,
@@ -58,11 +59,12 @@ SEGMENT_READER(apple2_dbuf_read)
         // in hires graphics page 1, then that must also use aux memory
         // if _both_ the PAGE2 and HIRES bits are set.
         if (addr >= 0x400 && addr < 0x800 && 
-            mach->memory_mode & MEMORY_PAGE2
+            (mach->memory_mode & MEMORY_PAGE2)
            ) {
             segment = mach->aux;
         } else if (addr >= 0x2000 && addr < 0x4000 &&
-                   mach->memory_mode & MEMORY_PAGE2 & MEMORY_HIRES
+                   (mach->memory_mode & MEMORY_PAGE2) &&
+                   (mach->memory_mode & MEMORY_HIRES)
                   ) {
             segment = mach->aux;
         }
@@ -84,12 +86,12 @@ SEGMENT_WRITER(apple2_dbuf_write)
 
     if (mach->memory_mode & MEMORY_80STORE) {
         if (addr >= 0x400 && addr < 0x800 && 
-            mach->memory_mode & MEMORY_PAGE2
+            (mach->memory_mode & MEMORY_PAGE2)
            ) {
             segment = mach->aux;
         } else if (addr >= 0x2000 && addr < 0x4000 &&
-                   mach->memory_mode & MEMORY_PAGE2 &&
-                   mach->memory_mode & MEMORY_HIRES
+                   (mach->memory_mode & MEMORY_PAGE2) &&
+                   (mach->memory_mode & MEMORY_HIRES)
                   ) {
             segment = mach->aux;
         }
