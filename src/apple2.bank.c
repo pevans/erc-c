@@ -23,6 +23,9 @@
  * bank_switch_read function.
  */
 static size_t switch_reads[] = {
+    0xC011,
+    0xC012,
+    0xC016,
     0xC080,
     0xC081,
     0xC082,
@@ -31,9 +34,6 @@ static size_t switch_reads[] = {
     0xC089,
     0xC08A,
     0xC08B,
-    0xC011,
-    0xC012,
-    0xC016,
 };
 
 /*
