@@ -48,7 +48,12 @@ init(int argc, char **argv)
 
     vm_di_set(VM_OUTPUT, stdout);
 
-    log_open(stdout);
+    FILE *stream = fopen(LOG_FILENAME, "w");
+    if (stream == NULL) {
+        perror("Can't open log file");
+    }
+
+    log_open(stream);
 
     if (vm_screen_init() != OK) {
         fprintf(stderr, "Couldn't initialize video\n");
