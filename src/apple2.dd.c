@@ -396,7 +396,7 @@ apple2_dd_shift(apple2dd *drive, int pos)
 
     drive->sector_pos += pos;
 
-    if (drive->sector_pos > ENC_ETRACK) {
+    if (drive->sector_pos >= ENC_ETRACK) {
         // We need to reset the sector pos to zero, because...
         drive->sector_pos = 0;
     }
