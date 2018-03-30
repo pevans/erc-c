@@ -138,6 +138,7 @@ apple2_dd_insert(apple2dd *drive, FILE *stream, int type)
     // If we have any data, get rid of it. We'll start fresh here.
     apple2_dd_eject(drive);
 
+    drive->online = true;
     drive->image = vm_segment_create(finfo.st_size);
     drive->track_pos = 0;
     drive->sector_pos = 0;
@@ -439,8 +440,7 @@ apple2_dd_turn_on(apple2dd *drive, bool online)
 void
 apple2_dd_write(apple2dd *drive)
 {
-    // If there's no disk in the drive, then we can't write anything
-    if (drive->data == NULL) {
+    if (drive->data == NULL || !drive->online) {
         return;
     }
 
@@ -592,6 +592,10 @@ SEGMENT_READER(apple2_dd_switch_read)
     if (drive == NULL) {
         drive = mach->drive1;
     }
+
+    if (!drive->online) {
+        return 0x00;
+    }
     
     // In the first if block, we will handle 0x0..0x8; in the second if,
     // we'll do 0x9..0xB, 0xE, and 0xF.
@@ -631,6 +635,10 @@ SEGMENT_WRITER(apple2_dd_switch_write)
 
     if (drive == NULL) {
         drive = mach->drive1;
+    }
+    
+    if (!drive->online) {
+        return;
     }
     
     if (nib < 0x8) {
