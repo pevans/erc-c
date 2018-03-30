@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <sys/syslog.h>
 
 #define LOG_FILENAME "/tmp/emp.log"
 
@@ -29,5 +30,14 @@ extern void log_write(int, const char *, ...);
  */
 #define log_critical(...) log_write(0, __VA_ARGS__)
 #define log_error(...) log_write(0, __VA_ARGS__)
+
+#define log_alert(...) log_write(LOG_ALERT, __VA_ARGS__)
+#define log_crit(...) log_write(LOG_CRIT, __VA_ARGS__)
+#define log_debug(...) log_write(LOG_DEBUG, __VA_ARGS__)
+#define log_emerg(...) log_write(LOG_EMERG, __VA_ARGS__)
+#define log_err(...) log_write(LOG_ERR, __VA_ARGS__)
+#define log_info(...) log_write(LOG_INFO, __VA_ARGS__)
+#define log_notice(...) log_write(LOG_NOTICE, __VA_ARGS__)
+#define log_warning(...) log_write(LOG_WARNING, __VA_ARGS__)
 
 #endif
