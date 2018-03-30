@@ -6,7 +6,7 @@
 #include <errno.h>
 #include <sys/syslog.h>
 
-#define LOG_FILENAME "/tmp/emp.log"
+#define LOG_FILENAME "/tmp/erc.log"
 
 enum log_errcode {
     OK = 1,
