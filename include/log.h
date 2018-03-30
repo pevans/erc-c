@@ -28,9 +28,6 @@ extern void log_write(int, const char *, ...);
  * Here we have a couple of convenience macros that abstracts the log
  * level number.
  */
-#define log_critical(...) log_write(0, __VA_ARGS__)
-#define log_error(...) log_write(0, __VA_ARGS__)
-
 #define log_alert(...) log_write(LOG_ALERT, __VA_ARGS__)
 #define log_crit(...) log_write(LOG_CRIT, __VA_ARGS__)
 #define log_debug(...) log_write(LOG_DEBUG, __VA_ARGS__)

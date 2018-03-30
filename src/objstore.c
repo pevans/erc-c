@@ -49,7 +49,7 @@ objstore_init()
 
     // If the copy didn't work out somehow...
     if (!objstore_ready()) {
-        log_critical("Object store initialization failed with bad data");
+        log_crit("Object store initialization failed with bad data");
         return ERR_BADFILE;
     }
 

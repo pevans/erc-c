@@ -17,7 +17,7 @@
  */
 DEFINE_INST(bad)
 {
-    log_critical("Invalid instruction: %2x @ %4x",
+    log_crit("Invalid instruction: %2x @ %4x",
                   mos6502_get(cpu, cpu->PC), cpu->PC);
     exit(1);
 }

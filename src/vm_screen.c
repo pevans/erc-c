@@ -28,7 +28,7 @@ int
 vm_screen_init()
 {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        log_critical("Could not initialize video: %s", SDL_GetError());
+        log_crit("Could not initialize video: %s", SDL_GetError());
         return ERR_GFXINIT;
     }
 
@@ -59,7 +59,7 @@ vm_screen_create()
 
     screen = (vm_screen *)malloc(sizeof(vm_screen));
     if (screen == NULL) {
-        log_critical("Failed to allocate vm_screen");
+        log_crit("Failed to allocate vm_screen");
         exit(1);
     }
 
@@ -114,7 +114,7 @@ vm_screen_add_window(vm_screen *screen, int width, int height)
         width, height, 0, &screen->window, &screen->render);
 
     if (screen->window == NULL || screen->render == NULL) {
-        log_critical("Could not create window: %s", SDL_GetError());
+        log_crit("Could not create window: %s", SDL_GetError());
         return ERR_GFXINIT;
     }
 #endif

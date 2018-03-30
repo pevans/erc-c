@@ -23,7 +23,7 @@ vm_reflect_create()
 
     ref = malloc(sizeof(vm_reflect));
     if (ref == NULL) {
-        log_critical("Could not allocate memory for vm_reflect");
+        log_crit("Could not allocate memory for vm_reflect");
         return NULL;
     }
 

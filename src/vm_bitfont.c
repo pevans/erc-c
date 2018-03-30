@@ -39,7 +39,7 @@ vm_bitfont_create(vm_screen *screen,
     // function.
     rw = SDL_RWFromConstMem(fontdata, fontsize);
     if (rw == NULL) {
-        log_critical("Failed to create RWops from font data: %s", 
+        log_crit("Failed to create RWops from font data: %s", 
                      SDL_GetError());
         return NULL;
     }
@@ -48,14 +48,14 @@ vm_bitfont_create(vm_screen *screen,
     // of getting a bitmap from memory rather than loading from a file.
     surf = SDL_LoadBMP_RW(rw, 0);
     if (surf == NULL) {
-        log_critical("Failed to create bitmap from RWops: %s",
+        log_crit("Failed to create bitmap from RWops: %s",
                      SDL_GetError());
         return NULL;
     }
 
     font = malloc(sizeof(vm_bitfont));
     if (font == NULL) {
-        log_critical("Could not allocate memory for font");
+        log_crit("Could not allocate memory for font");
         return NULL;
     }
 
@@ -131,7 +131,7 @@ vm_bitfont_render(vm_bitfont *font,
         if (SDL_RenderCopy(screen->render, font->texture, 
                            &src_rect, &dest_rect) < 0
            ) {
-            log_critical("Failed to render glyph: %s", SDL_GetError());
+            log_crit("Failed to render glyph: %s", SDL_GetError());
             return ERR_GFXOP;
         }
     }

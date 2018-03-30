@@ -110,7 +110,7 @@ apple2_mem_init_sys_rom(apple2 *mach)
     err = vm_segment_copy_buf(mach->rom, sysrom, 
                               0, 0, APPLE2_SYSROM_SIZE);
     if (err != OK) {
-        log_critical("Could not copy apple2 system rom");
+        log_crit("Could not copy apple2 system rom");
         return ERR_BADFILE;
     }
 
@@ -118,7 +118,7 @@ apple2_mem_init_sys_rom(apple2 *mach)
                               APPLE2_SYSROM_SIZE, 0, 
                               APPLE2_PERIPHERAL_SIZE);
     if (err != OK) {
-        log_critical("Could not copy apple2 peripheral rom");
+        log_crit("Could not copy apple2 peripheral rom");
         return ERR_BADFILE;
     }
 

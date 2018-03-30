@@ -30,7 +30,7 @@ apple2_dd_create()
 
     drive = malloc(sizeof(apple2dd));
     if (drive == NULL) {
-        log_critical("Could not malloc space for apple2 disk drive");
+        log_crit("Could not malloc space for apple2 disk drive");
         return NULL;
     }
 
@@ -120,18 +120,18 @@ apple2_dd_insert(apple2dd *drive, FILE *stream, int type)
     int err;
 
     if (stream == NULL) {
-        log_critical("File stream is null");
+        log_crit("File stream is null");
         return ERR_BADFILE;
     }
 
     // How large is this data set? Let's get the stat info.
     if (fstat(fileno(stream), &finfo)) {
-        log_critical("Couldn't inspect file stream: %s", strerror(errno));
+        log_crit("Couldn't inspect file stream: %s", strerror(errno));
         return ERR_BADFILE;
     }
 
     if (finfo.st_size != _140K_) {
-        log_critical("Unexpected file format (file size = %d)", finfo.st_size);
+        log_crit("Unexpected file format (file size = %d)", finfo.st_size);
         return ERR_BADFILE;
     }
 
@@ -145,7 +145,7 @@ apple2_dd_insert(apple2dd *drive, FILE *stream, int type)
     // Read the data from the stream and write into the memory segment
     err = vm_segment_fread(drive->image, stream, 0, finfo.st_size);
     if (err != OK) {
-        log_critical("Could not read data into disk drive");
+        log_crit("Could not read data into disk drive");
         return err;
     }
 
@@ -177,7 +177,7 @@ apple2_dd_encode(apple2dd *drive)
             break;
 
         default:
-            log_critical("Unknown image type");
+            log_crit("Unknown image type");
             return ERR_INVALID;
     }
 
@@ -220,7 +220,7 @@ apple2_dd_decode(apple2dd *drive)
             break;
 
         default:
-            log_critical("Unknown image type");
+            log_crit("Unknown image type");
             return ERR_INVALID;
     }
 

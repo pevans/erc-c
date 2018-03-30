@@ -41,14 +41,14 @@ vm_segment_create(size_t size)
 
     // Ack! We couldn't get the memory we wanted. Let's bail.
     if (segment == NULL) {
-        log_critical("Couldn't allocate enough space for vm_segment");
+        log_crit("Couldn't allocate enough space for vm_segment");
         return NULL;
     }
 
     segment->memory = malloc(sizeof(vm_8bit) * size);
     if (segment->memory == NULL) {
         free(segment);
-        log_critical("Couldn't allocate enough space for vm_segment");
+        log_crit("Couldn't allocate enough space for vm_segment");
         return NULL;
     }
 
@@ -58,14 +58,14 @@ vm_segment_create(size_t size)
 
     segment->read_table = malloc(sizeof(vm_segment_read_fn) * size);
     if (segment->read_table == NULL) {
-        log_critical("Couldn't allocate enough space for segment read_table");
+        log_crit("Couldn't allocate enough space for segment read_table");
         vm_segment_free(segment);
         return NULL;
     }
 
     segment->write_table = malloc(sizeof(vm_segment_write_fn) * size);
     if (segment->write_table == NULL) {
-        log_critical("Couldn't allocate enough space for segment write_table");
+        log_crit("Couldn't allocate enough space for segment write_table");
         vm_segment_free(segment);
         return NULL;
     }
@@ -103,7 +103,7 @@ vm_segment_set(vm_segment *segment, size_t index, vm_8bit value)
 {
     // Some bounds checking.
     if (!vm_segment_bounds_check(segment, index)) {
-        log_critical(
+        log_crit(
             "Attempt to set segment index (%d) greater than bounds (%d)",
             index,
             segment->size);
@@ -130,7 +130,7 @@ vm_8bit
 vm_segment_get(vm_segment *segment, size_t index)
 {
     if (!vm_segment_bounds_check(segment, index)) {
-        log_critical(
+        log_crit(
             "Attempt to get segment index (%d) greater than bounds (%d)",
             index,
             segment->size);
@@ -178,7 +178,7 @@ vm_segment_copy(vm_segment *dest,
             size_t length)
 {
     if (src_index + length > src->size) {
-        log_critical(
+        log_crit(
             "Attempt to copy beyond bounds of vm_segment (%d + %d >= %d)",
             src_index,
             length,
@@ -188,7 +188,7 @@ vm_segment_copy(vm_segment *dest,
     }
 
     if (dest_index + length > dest->size) {
-        log_critical(
+        log_crit(
             "Attempt to copy beyond bounds of vm_segment (%d + %d >= %d)",
             dest_index,
             length,
@@ -216,7 +216,7 @@ vm_segment_copy_buf(vm_segment *dest, const vm_8bit *src,
                     size_t destoff, size_t srcoff, size_t len)
 {
     if (destoff + len > dest->size) {
-        log_critical("Attempt to copy buffer out of bounds (%d + %d >= %d)",
+        log_crit("Attempt to copy buffer out of bounds (%d + %d >= %d)",
                      destoff, len, dest->size);
         return ERR_OOB;
     }
@@ -280,7 +280,7 @@ vm_segment_fread(vm_segment *segment, FILE *stream, size_t offset, size_t len)
     // count on just that to tell us something went wrong (especially if
     // len was not a valid length for the file to begin with).
     if (ferror(stream)) {
-        log_critical("Could not read file stream: %s\n", strerror(errno));
+        log_crit("Could not read file stream: %s\n", strerror(errno));
         return ERR_BADFILE;
     }
 
@@ -298,7 +298,7 @@ vm_segment_fwrite(vm_segment *seg, FILE *stream, size_t off, size_t len)
     fwrite(seg->memory + off, sizeof(vm_8bit), len, stream);
 
     if (ferror(stream)) {
-        log_critical("Could not write to the file stream: %s", strerror(errno));
+        log_crit("Could not write to the file stream: %s", strerror(errno));
         return ERR_BADFILE;
     }
 

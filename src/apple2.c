@@ -80,14 +80,14 @@ apple2_create(int width, int height)
 
     mach->main = vm_segment_create(APPLE2_MEMORY_SIZE);
     if (mach->main == NULL) {
-        log_critical("Could not initialize main RAM!");
+        log_crit("Could not initialize main RAM!");
         apple2_free(mach);
         return NULL;
     }
 
     mach->cpu = mos6502_create(mach->main, mach->main);
     if (mach->cpu == NULL) {
-        log_critical("Could not create CPU!");
+        log_crit("Could not create CPU!");
         apple2_free(mach);
         return NULL;
     }
@@ -96,7 +96,7 @@ apple2_create(int width, int height)
     mach->rom = vm_segment_create(APPLE2_ROM_SIZE);
     mach->aux = vm_segment_create(APPLE2_MEMORY_SIZE);
     if (mach->rom == NULL || mach->aux == NULL) {
-        log_critical("Could not initialize ROM / AUX!");
+        log_crit("Could not initialize ROM / AUX!");
         apple2_free(mach);
         return NULL;
     }
@@ -106,7 +106,7 @@ apple2_create(int width, int height)
     apple2_mem_map(mach, mach->aux);
 
     if (apple2_mem_init_sys_rom(mach) != OK) {
-        log_critical("Could not initialize apple2 ROM");
+        log_crit("Could not initialize apple2 ROM");
         apple2_free(mach);
         return NULL;
     }
@@ -117,7 +117,7 @@ apple2_create(int width, int height)
     mach->drive2 = apple2_dd_create();
 
     if (mach->drive1 == NULL || mach->drive2 == NULL) {
-        log_critical("Could not create disk drives!");
+        log_crit("Could not create disk drives!");
         apple2_free(mach);
         return NULL;
     }
@@ -128,7 +128,7 @@ apple2_create(int width, int height)
     // Let's build our screen abstraction!
     mach->screen = vm_screen_create();
     if (mach->screen == NULL) {
-        log_critical("Screen creation failed!");
+        log_crit("Screen creation failed!");
         apple2_free(mach);
         return NULL;
     }
@@ -137,7 +137,7 @@ apple2_create(int width, int height)
     // graphics.
     err = vm_screen_add_window(mach->screen, width, height);
     if (err != OK) {
-        log_critical("Window creation failed!");
+        log_crit("Window creation failed!");
         apple2_free(mach);
         return NULL;
     }
@@ -161,7 +161,7 @@ apple2_create(int width, int height)
                                       0x7f);
     if (mach->sysfont == NULL || mach->invfont == NULL) {
         apple2_free(mach);
-        log_critical("Could not initialize apple2: bad font");
+        log_crit("Could not initialize apple2: bad font");
         return NULL;
     }
 
@@ -239,7 +239,7 @@ apple2_boot(apple2 *mach)
     if (stream) {
         err = apple2_dd_insert(mach->drive1, stream, DD_DOS33);
         if (err != OK) {
-            log_critical("Unable to insert disk1 into drive");
+            log_crit("Unable to insert disk1 into drive");
             return err;
         }
     }
@@ -248,7 +248,7 @@ apple2_boot(apple2 *mach)
     if (stream) {
         err = apple2_dd_insert(mach->drive2, stream, DD_DOS33);
         if (err != OK) {
-            log_critical("Unable to insert disk2 into drive");
+            log_crit("Unable to insert disk2 into drive");
             return err;
         }
     }

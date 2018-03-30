@@ -164,7 +164,7 @@ mos6502_create(vm_segment *rmem, vm_segment *wmem)
    
     cpu = malloc(sizeof(mos6502));
     if (cpu == NULL) {
-        log_critical("Not enough memory to allocate mos6502");
+        log_crit("Not enough memory to allocate mos6502");
         exit(1);
     }
 
