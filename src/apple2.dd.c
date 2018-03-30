@@ -281,6 +281,10 @@ apple2_dd_phaser(apple2dd *drive, int phase)
     int step = transitions[(drive->phase * 5) + phase];
     apple2_dd_step(drive, step);
 
+    log_info("Phase %1d, step %2d, track %2d, sector pos %05x, segment position %05x",
+             phase, step, drive->track_pos / 2, drive->sector_pos,
+             apple2_dd_position(drive));
+
     // Record this new phase for the next time we make a transition
     drive->phase = phase;
 }
@@ -316,6 +320,12 @@ apple2_dd_read(apple2dd *drive)
     }
 
     vm_8bit byte = vm_segment_get(drive->data, apple2_dd_position(drive));
+    drive->latch = byte;
+
+    log_info("Read byte %02x at track %2d, sector %2d, position %05x",
+             byte, drive->track_pos / 2, drive->sector_pos / ENC_ESECTOR,
+             apple2_dd_position(drive));
+
     apple2_dd_shift(drive, 1);
 
     return byte;
@@ -385,7 +395,7 @@ apple2_dd_shift(apple2dd *drive, int pos)
 
     drive->sector_pos += pos;
 
-    if (drive->sector_pos >= ENC_ETRACK) {
+    if (drive->sector_pos > ENC_ETRACK) {
         // We need to reset the sector pos to zero, because...
         drive->sector_pos = 0;
     }
@@ -408,6 +418,8 @@ apple2_dd_step(apple2dd *drive, int steps)
     } else if (drive->track_pos < 0) {
         drive->track_pos = 0;
     }
+
+    drive->sector_pos = 0;
 }
 
 /*
@@ -464,6 +476,10 @@ apple2_dd_switch_phase(apple2dd *drive, size_t addr)
         case 0x3: phase = 2; break;
         case 0x5: phase = 3; break;
         case 0x7: phase = 4; break;
+    }
+
+    if (phase == -1) {
+        log_info("Phase addr %02x, operation skipped", addr & 0xf);
     }
 
     apple2_dd_phaser(drive, phase);
@@ -579,7 +595,7 @@ SEGMENT_READER(apple2_dd_switch_read)
     
     // In the first if block, we will handle 0x0..0x8; in the second if,
     // we'll do 0x9..0xB, 0xE, and 0xF.
-    if (nib < 0x9) {
+    if (nib < 0x8) {
         apple2_dd_switch_phase(drive, nib);
     } else if (nib < 0xC || nib > 0xD) {
         apple2_dd_switch_drive(mach, nib);
@@ -617,7 +633,7 @@ SEGMENT_WRITER(apple2_dd_switch_write)
         drive = mach->drive1;
     }
     
-    if (nib < 0x9) {
+    if (nib < 0x8) {
         apple2_dd_switch_phase(drive, nib);
     } else if (nib < 0xC || nib > 0xD) {
         apple2_dd_switch_drive(mach, nib);
