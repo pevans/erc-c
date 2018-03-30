@@ -116,6 +116,8 @@ DEFINE_INST(ply)
  */
 DEFINE_INST(sta)
 {
+    log_debug("STA eff_addr:%04x next:%02x prev:%02x", 
+              cpu->eff_addr, cpu->A, mos6502_get(cpu, cpu->eff_addr));
     mos6502_set(cpu, cpu->eff_addr, cpu->A);
 }
 
@@ -124,6 +126,8 @@ DEFINE_INST(sta)
  */
 DEFINE_INST(stx)
 {
+    log_debug("STA eff_addr:%04x next:%02x prev:%02x", 
+              cpu->eff_addr, cpu->X, mos6502_get(cpu, cpu->eff_addr));
     mos6502_set(cpu, cpu->eff_addr, cpu->X);
 }
 
@@ -132,6 +136,8 @@ DEFINE_INST(stx)
  */
 DEFINE_INST(sty)
 {
+    log_debug("STA eff_addr:%04x next:%02x prev:%02x", 
+              cpu->eff_addr, cpu->Y, mos6502_get(cpu, cpu->eff_addr));
     mos6502_set(cpu, cpu->eff_addr, cpu->Y);
 }
 
