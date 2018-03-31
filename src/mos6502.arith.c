@@ -23,7 +23,14 @@ DEFINE_INST(adc)
     MOS_CARRY_BIT();
 
     vm_8bit result = cpu->A + oper + carry;
-    MOS_CHECK_NVZ(cpu->A, result);
+    MOS_CHECK_NZ(result);
+
+    cpu->P &= ~MOS_OVERFLOW;
+    if (((cpu->A ^ oper) & 0x80) &&
+        ((cpu->A ^ result) & 0x80)
+       ) {
+        cpu->P |= MOS_OVERFLOW;
+    }
 
     // Carry has different meanings in different contexts... in ADC,
     // carry is set if the result requires a ninth bit (the carry bit!)
@@ -74,6 +81,13 @@ DEFINE_INST(adc_dec)
     // number; you see, BCD values are not just literally decimal, they
     // are decimal in hexadecimal form.
     vm_8bit result = ((modsum / 10) << 4) | (modsum % 10);
+
+    cpu->P &= ~MOS_OVERFLOW;
+    if (((cpu->A ^ sum) & 0x80) &&
+        ((cpu->A ^ result) & 0x80)
+       ) {
+        cpu->P |= MOS_OVERFLOW;
+    }
 
     // As you can see, decimal comports a different meaning for the
     // carry bit than its binary version
@@ -242,8 +256,8 @@ DEFINE_INST(sbc)
     }
 
     cpu->P &= ~MOS_OVERFLOW;
-    if ((cpu->A & 0x80) != (oper & 0x80) &&
-        (cpu->A & 0x80) != (result8 & 0x80)
+    if (((cpu->A ^ oper) & 0x80) &&
+        ((cpu->A ^ result8) & 0x80)
        ) {
         cpu->P |= MOS_OVERFLOW;
     }
@@ -297,6 +311,16 @@ DEFINE_INST(sbc_dec)
     // are decimal in hexadecimal form.
     vm_8bit result = ((diff / 10) << 4) | (diff % 10);
     MOS_CHECK_Z(result);
+
+    // This is a bit of an odd sequence... but overflow in decimal is a
+    // bit odd to begin with. I ended up replicating the behavior of
+    // AppleWin here.
+    cpu->P &= ~MOS_OVERFLOW;
+    if (((cpu->A ^ diff) & 0x80) &&
+        ((cpu->A ^ result) & 0x80)
+       ) {
+        cpu->P |= MOS_OVERFLOW;
+    }
 
     cpu->A = result;
 }
