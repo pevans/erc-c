@@ -275,7 +275,7 @@ apple2_dd_phaser(apple2dd *drive, int phase)
 
     // You can transition only to phases 1-4, and alternatively to no
     // phase. Also, if the motor is off, then don't bother.
-    if (phase < 0 || phase > 4 || !drive->online) {
+    if (phase < 0 || phase > 4) {
         return;
     }
 
@@ -437,7 +437,7 @@ apple2_dd_turn_on(apple2dd *drive, bool online)
 void
 apple2_dd_write(apple2dd *drive)
 {
-    if (drive->data == NULL || !drive->online) {
+    if (drive->data == NULL) {
         return;
     }
 
@@ -584,10 +584,6 @@ SEGMENT_READER(apple2_dd_switch_read)
         drive = mach->drive1;
     }
 
-    if (!drive->online) {
-        return 0x00;
-    }
-    
     // In the first if block, we will handle 0x0..0x8; in the second if,
     // we'll do 0x9..0xB, 0xE, and 0xF.
     if (nib < 0x8) {
@@ -626,10 +622,6 @@ SEGMENT_WRITER(apple2_dd_switch_write)
 
     if (drive == NULL) {
         drive = mach->drive1;
-    }
-    
-    if (!drive->online) {
-        return;
     }
     
     if (nib < 0x8) {
