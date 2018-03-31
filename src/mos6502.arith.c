@@ -225,18 +225,30 @@ DEFINE_INST(sbc)
 
     MOS_CARRY_BIT();
 
-    vm_8bit result = cpu->A - oper - (carry ? 0 : 1);
-    MOS_CHECK_NVZ(cpu->A, result);
+    int result32 = cpu->A - oper - (carry ? 0 : 1);
+    vm_8bit result8 = cpu->A - oper - (carry ? 0 : 1);
+
+    MOS_CHECK_Z(result8);
 
     // Carry is handled slightly differently in SBC; it's set if the
     // value is non-negative, and unset if negative. (It's essentially a
     // mirror of the N flag in that sense.)
     cpu->P |= MOS_CARRY;
-    if (result >= 0x80) {
+    cpu->P &= ~MOS_NEGATIVE;
+
+    if (result32 < 0) {
         cpu->P &= ~MOS_CARRY;
+        cpu->P |= MOS_NEGATIVE;
     }
 
-    cpu->A = result;
+    cpu->P &= ~MOS_OVERFLOW;
+    if ((cpu->A & 0x80) != (oper & 0x80) &&
+        (cpu->A & 0x80) != (result8 & 0x80)
+       ) {
+        cpu->P |= MOS_OVERFLOW;
+    }
+
+    cpu->A = result8;
 }
 
 /*
