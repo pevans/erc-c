@@ -323,10 +323,6 @@ apple2_dd_read(apple2dd *drive)
     vm_8bit byte = vm_segment_get(drive->data, apple2_dd_position(drive));
     drive->latch = byte;
 
-    log_info("Read byte %02x at track %2d, sector %2d, position %05x",
-             byte, drive->track_pos / 2, drive->sector_pos / ENC_ESECTOR,
-             apple2_dd_position(drive));
-
     apple2_dd_shift(drive, 1);
 
     return byte;
@@ -429,6 +425,7 @@ apple2_dd_step(apple2dd *drive, int steps)
 void
 apple2_dd_turn_on(apple2dd *drive, bool online)
 {
+    log_debug("Turn drive on/off (%d)", online);
     drive->online = online;
 }
 
@@ -478,10 +475,6 @@ apple2_dd_switch_phase(apple2dd *drive, size_t addr)
         case 0x7: phase = 4; break;
     }
 
-    if (phase == -1) {
-        log_info("Phase addr %02x, operation skipped", addr & 0xf);
-    }
-
     apple2_dd_phaser(drive, phase);
 }
 
@@ -492,6 +485,10 @@ apple2_dd_switch_phase(apple2dd *drive, size_t addr)
 void
 apple2_dd_switch_drive(apple2 *mach, size_t addr)
 {
+    apple2dd *seldrive = mach->selected_drive
+        ? mach->selected_drive
+        : mach->drive1;
+
     switch (addr) {
         case 0x8:
             apple2_dd_turn_on(mach->drive1, false);
@@ -499,9 +496,7 @@ apple2_dd_switch_drive(apple2 *mach, size_t addr)
             break;
 
         case 0x9:
-            if (mach->selected_drive) {
-                apple2_dd_turn_on(mach->selected_drive, true);
-            }
+            apple2_dd_turn_on(seldrive, true);
             break;
 
         case 0xA:
@@ -513,15 +508,11 @@ apple2_dd_switch_drive(apple2 *mach, size_t addr)
             break;
 
         case 0xE:
-            if (mach->selected_drive) {
-                mach->selected_drive->mode = DD_READ;
-            }
+            seldrive->mode = DD_READ;
             break;
 
         case 0xF:
-            if (mach->selected_drive) {
-                mach->selected_drive->mode = DD_WRITE;
-            }
+            seldrive->mode = DD_WRITE;
             break;
     }
 }
