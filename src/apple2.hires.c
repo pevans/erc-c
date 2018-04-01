@@ -62,6 +62,12 @@ static int addresses[] = {
     0x23D0, 0x27D0, 0x2BD0, 0x2FD0, 0x33D0, 0x37D0, 0x3BD0, 0x3FD0, // 184-191
 };
 
+/*
+ * This table indicates whether an address needs to be updated
+ * (updated[i] == 1) or not (updated[i] == 0).
+ */
+static int updated[0x2000];
+
 #if 0
 /*
  * This table maps an address (across the entire hires graphics buffer
@@ -620,6 +626,30 @@ static vm_color colors[] = {
 };
 
 /*
+ * Mark the given address as one that requires an update on the screen.
+ */
+int
+apple2_hires_update(size_t addr, int needed)
+{
+    if (addr < 0x2000 || addr >= 0x4000) {
+        return ERR_INVALID;
+    }
+
+    updated[addr - 0x2000] = needed;
+    return OK;
+}
+
+int
+apple2_hires_updated(size_t addr)
+{
+    if (addr < 0x2000 || addr >= 0x4000) {
+        return 0;
+    }
+
+    return updated[addr - 0x2000];
+}
+
+/*
  * Draw a single row of hires graphics.
  */
 void
@@ -637,11 +667,19 @@ apple2_hires_draw(apple2 *mach, int row)
 
     for (int i = 0; i < 40; i++) {
         vm_8bit byte = mos6502_get(mach->cpu, addr + i);
+        vm_8bit is_updated = apple2_hires_updated(addr + i);
 
         for (int pos = 0; pos < 7; pos++) {
-            dots[(i * 7) + pos] = 
+            vm_8bit dotval =
+                (is_updated ? 4 : 0) |
                 ((byte & 0x80) ? 2 : 0) |
                 ((byte >> pos) & 1);
+
+            dots[(i * 7) + pos] = dotval;
+        }
+
+        if (is_updated) {
+            apple2_hires_update(addr + i, 0);
         }
     }
 
@@ -650,6 +688,10 @@ apple2_hires_draw(apple2 *mach, int row)
             curr = 0;
 
     for (int i = 0; i < 279; i++) {
+        if (dots[i] & 4) {
+            continue;
+        }
+
         curr = dots[i] & 1;
         next = dots[i+1] & 1;
 

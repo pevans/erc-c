@@ -10,6 +10,7 @@
 
 #include "apple2.dbuf.h"
 #include "apple2.draw.h"
+#include "apple2.hires.h"
 #include "vm_reflect.h"
 
 static size_t switch_reads[] = {
@@ -83,18 +84,22 @@ SEGMENT_READER(apple2_dbuf_read)
 SEGMENT_WRITER(apple2_dbuf_write)
 {
     apple2 *mach = (apple2 *)_mach;
+    bool is_lores = (addr >= 0x400 && addr < 0x800);
+    bool is_hires =
+        (addr >= 0x2000 && addr < 0x4000) &&
+        (mach->memory_mode & MEMORY_HIRES);
+    bool is_page2 = (mach->memory_mode & MEMORY_PAGE2);
 
     if (mach->memory_mode & MEMORY_80STORE) {
-        if (addr >= 0x400 && addr < 0x800 && 
-            (mach->memory_mode & MEMORY_PAGE2)
-           ) {
+        if (is_lores && is_page2) {
             segment = mach->aux;
-        } else if (addr >= 0x2000 && addr < 0x4000 &&
-                   (mach->memory_mode & MEMORY_PAGE2) &&
-                   (mach->memory_mode & MEMORY_HIRES)
-                  ) {
+        } else if (is_hires && is_page2) {
             segment = mach->aux;
         }
+    }
+
+    if (is_hires) {
+        apple2_hires_update(addr, 1);
     }
 
     // Again, segment is allowed to be that which was passed in if
