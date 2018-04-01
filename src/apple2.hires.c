@@ -601,10 +601,10 @@ static int cols[] = {
  * data byte is low.
  */
 static vm_color colors[] = {
-    { 0xd0, 0x43, 0xe5, 0x00 },     // purple
     { 0x2f, 0xbc, 0x1a, 0x00 },     // green
-    { 0x2f, 0x95, 0xe5, 0x00 },     // blue
+    { 0xd0, 0x43, 0xe5, 0x00 },     // purple
     { 0xd0, 0x6a, 0x1a, 0x00 },     // orange
+    { 0x2f, 0x95, 0xe5, 0x00 },     // blue
     { 0x00, 0x00, 0x00, 0x00 },     // black
     { 0xff, 0xff, 0xff, 0x00 },     // white
 };
@@ -659,45 +659,42 @@ apple2_hires_draw(apple2 *mach, int row)
             next = 0,
             curr = 0;
 
-    for (int i = 0; i < 280; i++) {
+    for (int i = 0; i < 279; i++) {
         curr = dots[i] & 1;
-        next = (i < 279) ? (dots[i+1] & 1) : 0;
+        next = dots[i+1] & 1;
 
-        if (curr) {
+        if (curr && next) {
             vm_screen_set_color(mach->screen, colors[HIRES_WHITE]);
-        } else {
-            vm_screen_set_color(mach->screen, colors[HIRES_BLACK]);
-        }
+        } 
 
-#if 0
-        // Do we need to emit a white color?
-        if ((prev & curr) || (curr & next)) {
-            vm_screen_set_color(mach->screen, colors[HIRES_WHITE]);
-        }
-
-        else if (!(prev & curr) || !(curr & next)) {
+        else if (!curr && !next) {
             vm_screen_set_color(mach->screen, colors[HIRES_BLACK]);
         }
         
         // We need to emit _some_ color, but not white.
-        else /*if (prev | curr | next)*/ {
-            int colorindex = (i % 2 == 0) ? 0 : 1;
+        else {
+            int colorindex = 0;
 
-            if (!curr) {
-                colorindex = !colorindex;
-
-                if ((next && dots[i+1] & 2) ||
-                    (prev && dots[i-1] & 2)
-                   ) {
-                    colorindex <<= 1;
+            if (curr) {
+                if (i % 2 == 0) {
+                    colorindex++;
                 }
-            } else if (dots[i] & 2) {
-                colorindex <<= 1;
+
+                if (dots[i] & 2) {
+                    colorindex += 2;
+                }
+            } else {
+                if ((i+1) % 2 == 0) {
+                    colorindex++;
+                }
+
+                if (dots[i+1] & 2) {
+                    colorindex += 2;
+                }
             }
 
             vm_screen_set_color(mach->screen, colors[colorindex]);
         }
-#endif
 
         area.xoff = i;
         vm_screen_draw_rect(mach->screen, &area);
