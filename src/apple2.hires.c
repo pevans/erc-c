@@ -22,24 +22,18 @@
 #include "apple2.text.h"
 
 enum hires_color {
-    HIRES_PURPLE,
     HIRES_GREEN,
-    HIRES_BLUE,
+    HIRES_PURPLE,
     HIRES_ORANGE,
+    HIRES_BLUE,
     HIRES_BLACK,
     HIRES_WHITE,
 };
 
-enum hires_state {
-    HIRES_DARK,
-    HIRES_LIGHT,
-    HIRES_ALTCOLOR,
-};
-
-typedef struct {
-    int color;
-} hires_pixel;
-
+/*
+ * This table maps a row number to a base address in the hires graphics
+ * buffer. From there, (base + i) maps to column i in that row.
+ */
 static int addresses[] = {
     //   0       1       2       3       4       5       6       7
     0x2000, 0x2400, 0x2800, 0x2C00, 0x3000, 0x3400, 0x3800, 0x3C00, // 0-7
@@ -68,6 +62,13 @@ static int addresses[] = {
     0x23D0, 0x27D0, 0x2BD0, 0x2FD0, 0x33D0, 0x37D0, 0x3BD0, 0x3FD0, // 184-191
 };
 
+#if 0
+/*
+ * This table maps an address (across the entire hires graphics buffer
+ * range!) to a row. We're not using it at the moment, but I'm keeping
+ * it around in case we need it down the road. (Similar situation to the
+ * cols table.)
+ */
 static int rows[] = {
 //    0    1    2    3    4    5    6    7    8    9    A    B    C    D    E    F
       0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, // $2000
@@ -583,7 +584,15 @@ static int rows[] = {
     191, 191, 191, 191, 191, 191, 191, 191, 191, 191, 191, 191, 191, 191, 191, 191, // $3FE0
     191, 191, 191, 191, 191, 191, 191, 191,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1, // $3FF0
 };
+#endif
 
+#if 0
+/*
+ * This table maps an address to a column, but it's a bit incomplete. We
+ * don't use it right now--I built it for an earlier version of my
+ * code--but I'm keeping it on the chance that I may want this somewhere
+ * down the road.
+ */
 static int cols[] = {
 //   0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
      0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,     // $00
@@ -595,6 +604,7 @@ static int cols[] = {
     16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,     // $60
     32, 33, 34, 35, 36, 37, 38, 39, -1, -1, -1, -1, -1, -1, -1, -1,     // $70
 };
+#endif
 
 /*
  * Define the colors that are indicated by a bit-pair when bit 7 of a
@@ -608,26 +618,6 @@ static vm_color colors[] = {
     { 0x00, 0x00, 0x00, 0x00 },     // black
     { 0xff, 0xff, 0xff, 0x00 },     // white
 };
-
-#define COLOR(b, h) \
-    (h) ? colors[((b) & 0x3) | 0x4] : colors[(b) & 0x3]
-
-int
-apple2_hires_row(size_t addr)
-{
-    return rows[addr - 0x2000];
-}
-
-/*
- * Return the column offset of pixels (more than one pixel is in a
- * column-cell) for high-resolution graphics. As it turns out, this is
- * exactly the same as the text column number.
- */
-int
-apple2_hires_col(size_t addr)
-{
-    return cols[addr % 0x80];
-}
 
 /*
  * Draw a single row of hires graphics.
@@ -703,6 +693,10 @@ apple2_hires_draw(apple2 *mach, int row)
     }
 }
 
+/*
+ * Print a representation of the machine's hires graphics buffer to the
+ * given file stream.
+ */
 void
 apple2_hires_dump(apple2 *mach, FILE *stream)
 {
