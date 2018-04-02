@@ -110,11 +110,21 @@ vm_screen_add_window(vm_screen *screen, int width, int height)
     // If HEADLESS is defined, we will assume we _don't_ want an actual
     // drawing surface, but want to pretend we've added one. 
 #ifndef HEADLESS
-    SDL_CreateWindowAndRenderer(
-        width, height, 0, &screen->window, &screen->render);
+    screen->window = SDL_CreateWindow("erc",
+                                      SDL_WINDOWPOS_UNDEFINED,
+                                      SDL_WINDOWPOS_UNDEFINED,
+                                      width, height, 0);
 
-    if (screen->window == NULL || screen->render == NULL) {
+    if (screen->window == NULL) {
         log_crit("Could not create window: %s", SDL_GetError());
+        return ERR_GFXINIT;
+    }
+
+    screen->render = SDL_CreateRenderer(screen->window, -1, 
+                                        SDL_RENDERER_SOFTWARE);
+
+    if (screen->render == NULL) {
+        log_crit("Could not create renderer: %s", SDL_GetError());
         return ERR_GFXINIT;
     }
 #endif
@@ -195,7 +205,7 @@ vm_screen_active(vm_screen *scr)
 void
 vm_screen_prepare(vm_screen *scr)
 {
-    SDL_RenderClear(scr->render);
+    //SDL_RenderClear(scr->render);
 }
 
 /*
