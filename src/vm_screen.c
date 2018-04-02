@@ -12,10 +12,20 @@
 #include <sys/time.h>
 
 #include "log.h"
+#include "vm_di.h"
 #include "vm_event.h"
 #include "vm_screen.h"
 
 struct timeval refresh_time;
+
+SDL_Texture *texture = NULL;
+
+int *pixels;
+int pitch;
+
+int width, height;
+
+uint32_t color;
 
 /*
  * Initialize the video of the vm_screen abstraction. This ends up being
@@ -105,8 +115,11 @@ vm_screen_set_logical_coords(vm_screen *screen, int xcoords, int ycoords)
  * graphics library.
  */
 int
-vm_screen_add_window(vm_screen *screen, int width, int height)
+vm_screen_add_window(vm_screen *screen, int _width, int _height)
 {
+    width = _width;
+    height = _height;
+
     // If HEADLESS is defined, we will assume we _don't_ want an actual
     // drawing surface, but want to pretend we've added one. 
 #ifndef HEADLESS
@@ -117,6 +130,23 @@ vm_screen_add_window(vm_screen *screen, int width, int height)
         log_crit("Could not create window: %s", SDL_GetError());
         return ERR_GFXINIT;
     }
+
+    texture = SDL_CreateTexture(screen->render, SDL_PIXELFORMAT_RGBA8888,
+                                SDL_TEXTUREACCESS_STREAMING, width, height);
+
+    if (texture == NULL) {
+        log_crit("Could not create texture: %s", SDL_GetError());
+        return ERR_GFXINIT;
+    }
+
+    pixels = malloc(sizeof(int) * width * height);
+    if (pixels == NULL) {
+        log_crit("Could not malloc pixel bytes");
+        return ERR_GFXINIT;
+    }
+
+    memset(pixels, 0, sizeof(int) * width * height);
+    pitch = 1;
 #endif
 
     // We plan to draw onto a surface that is xcoords x ycoords in area,
@@ -205,6 +235,21 @@ vm_screen_prepare(vm_screen *scr)
 void
 vm_screen_refresh(vm_screen *screen)
 {
+    SDL_Rect rect;
+
+    rect.w = width;
+    rect.h = height;
+    rect.x = 0;
+    rect.y = 0;
+
+    if (SDL_LockTexture(texture, &rect, (void **)&pixels, &pitch)) {
+        log_crit("Failed to lock texture for rendering: %s", SDL_GetError());
+        exit(1);
+    }
+
+    SDL_UnlockTexture(texture);
+
+    SDL_RenderCopy(screen->render, texture, NULL, NULL);
     SDL_RenderPresent(screen->render);
     screen->dirty = false;
 }
@@ -216,8 +261,9 @@ void
 vm_screen_set_color(vm_screen *scr, vm_color clr)
 {
     if (scr->render) {
-        SDL_SetRenderDrawColor(scr->render, clr.r, clr.g, clr.b,
-                               SDL_ALPHA_OPAQUE);
+        color = ((uint32_t)clr.r << 24) | ((uint32_t)clr.g << 16) | ((uint32_t)clr.b << 8) | 0xff;
+        //SDL_SetRenderDrawColor(scr->render, clr.r, clr.g, clr.b,
+        //                       SDL_ALPHA_OPAQUE);
     }
 }
 
@@ -228,11 +274,20 @@ vm_screen_set_color(vm_screen *scr, vm_color clr)
 void
 vm_screen_draw_rect(vm_screen *screen, vm_area *area)
 {
-    // The renderer will take care of translating the positions and
-    // sizes into whatever the window is really at.
-    MAKE_SDL_RECT(rect, *area);
+    size_t addr;
+    size_t base;
 
-    SDL_RenderFillRect(screen->render, &rect);
+    base = (width * area->yoff) + area->xoff;
+
+    for (int h = 0; h < area->height; h++) {
+        for (int w = 0; w < area->width; w++) {
+            addr = base + (h * width) + w;
+            pixels[addr] = color;
+            log_info("set pixel: w:%d h:%d addr:%04x color:%x", 
+                     w, h, addr, color);
+        }
+    }
+
     screen->dirty = true;
 }
 
