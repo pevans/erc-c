@@ -21,15 +21,6 @@
 #include "apple2.hires.h"
 #include "apple2.text.h"
 
-enum hires_color {
-    HIRES_GREEN,
-    HIRES_PURPLE,
-    HIRES_ORANGE,
-    HIRES_BLUE,
-    HIRES_BLACK,
-    HIRES_WHITE,
-};
-
 /*
  * This table maps a row number to a base address in the hires graphics
  * buffer. From there, (base + i) maps to column i in that row.
