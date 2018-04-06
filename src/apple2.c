@@ -338,12 +338,21 @@ void
 apple2_run_loop(apple2 *mach)
 {
     FILE *dlog = (FILE *)vm_di_get(VM_DISASM_LOG);
+    int sleep = 5;
 
     if (dlog != NULL) {
         vm_reflect_disasm(NULL);
     }
 
+    int i = 0;
     while (vm_screen_active(mach->screen)) {
+        i++;
+
+        if (i % sleep == 0) {
+            usleep(10);
+            i = 0;
+        }
+
         if (vm_debug_broke(mach->cpu->PC)) {
             mach->paused = true;
         }
