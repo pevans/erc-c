@@ -69,6 +69,9 @@ vm_screen_create()
     screen->key_pressed = false;
     screen->dirty = false;
     screen->should_exit = false;
+    screen->usec_until_refresh = 33333;
+
+    memset(&screen->reftime, 0, sizeof(struct timeval));
 
     screen->window = NULL;
     screen->render = NULL;
@@ -177,8 +180,6 @@ vm_screen_free(vm_screen *screen)
 bool
 vm_screen_active(vm_screen *scr)
 {
-    vm_event_poll(scr);
-
     // If something happened in the event loop that caused the user to
     // signal an exit, then returning false here will do the trick
     if (scr->should_exit) {
@@ -257,6 +258,29 @@ vm_screen_last_key(vm_screen *scr)
     return scr->last_key;
 }
 
+bool
+vm_screen_needs_frame(vm_screen *scr)
+{
+    struct timeval now;
+    unsigned int diff;
+
+    if (gettimeofday(&now, NULL) < 0) {
+        log_crit("Failed call to gettimeofday()");
+        return false;
+    }
+
+    diff = 
+        ((now.tv_sec - scr->reftime.tv_sec) * 1000000) +
+        (now.tv_usec - scr->reftime.tv_usec);
+
+    if (diff > scr->usec_until_refresh) {
+        memcpy(&scr->reftime, &now, sizeof(struct timeval));
+        return true;
+    }
+
+    return false;
+}
+
 /*
  * Return true if the screen is considered dirty (i.e., if the screen
  * needs to be redrawn).
@@ -264,22 +288,9 @@ vm_screen_last_key(vm_screen *scr)
 bool
 vm_screen_dirty(vm_screen *scr)
 {
-    struct timeval now;
-
-    if (scr->dirty) {
-        // If this returns an error, I have to assume the computer
-        // itself may be on fire, or has grown fangs and is presently
-        // nibbling on the user
-        if (gettimeofday(&now, NULL) < 0) {
-            return false;
-        }
-
-        if (now.tv_sec > refresh_time.tv_sec ||
-            (now.tv_usec > refresh_time.tv_usec + 50000)
-           ) {
-            memcpy(&refresh_time, &now, sizeof(struct timeval));
-            return true;
-        }
+    if (vm_screen_needs_frame(scr)) {
+        vm_event_poll(scr);
+        return scr->dirty;
     }
 
     return false;

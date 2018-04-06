@@ -1,8 +1,9 @@
 #ifndef _VM_SCREEN_H_
 #define _VM_SCREEN_H_
 
-#include <stdbool.h>
 #include <SDL.h>
+#include <stdbool.h>
+#include <sys/time.h>
 
 #include "vm_area.h"
 #include "vm_bits.h"
@@ -46,6 +47,18 @@ typedef struct {
     int ycoords;
 
     /*
+     * This is the time we last refreshed the screen.
+     */
+    struct timeval reftime;
+
+    /*
+     * This field is the number of microseconds we have to wait until we
+     * are ready to redraw the frame. It cannot be greater than 1000000,
+     * which is the number of microseconds within a second.
+     */
+    int usec_until_refresh;
+
+    /*
      * Hang onto the last key pressed and the status of whether a key
      * is pressed right now or not.
      */
@@ -68,6 +81,7 @@ typedef struct {
 extern bool vm_screen_active(vm_screen *);
 extern bool vm_screen_dirty(vm_screen *);
 extern bool vm_screen_key_pressed(vm_screen *);
+extern bool vm_screen_needs_frame(vm_screen *);
 extern char vm_screen_last_key(vm_screen *);
 extern int vm_screen_add_window(vm_screen *, int, int);
 extern int vm_screen_init();
