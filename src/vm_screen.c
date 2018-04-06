@@ -15,28 +15,6 @@
 #include "vm_event.h"
 #include "vm_screen.h"
 
-typedef struct {
-    /*
-     * The point coordinates of the change on-screen that we are looking
-     * to make
-     */
-    vm_area area;
-
-    /*
-     * The new color of the pixel
-     */
-    vm_color clr;
-} change;
-
-/*
- * An array of changes, arranged in a stack, plus the position in the
- * stack where we currently are at.
- */
-static change changestack[65536];
-static int changepos = 0;
-
-static vm_color curcolor;
-
 struct timeval refresh_time;
 
 /*
@@ -227,7 +205,7 @@ vm_screen_active(vm_screen *scr)
 void
 vm_screen_prepare(vm_screen *scr)
 {
-    SDL_RenderClear(scr->render);
+    //SDL_RenderClear(scr->render);
 }
 
 /*
@@ -235,22 +213,10 @@ vm_screen_prepare(vm_screen *scr)
  * made recently.
  */
 void
-vm_screen_refresh(vm_screen *scr)
+vm_screen_refresh(vm_screen *screen)
 {
-    change *chg;
-
-    while (changepos >= 0) {
-        chg = &changestack[changepos--];
-
-        SDL_SetRenderDrawColor(scr->render, chg->clr.r, chg->clr.g, 
-                               chg->clr.b, SDL_ALPHA_OPAQUE);
-
-        MAKE_SDL_RECT(rect, chg->area);
-        SDL_RenderFillRect(scr->render, &rect);
-    }
-
-    SDL_RenderPresent(scr->render);
-    scr->dirty = false;
+    SDL_RenderPresent(screen->render);
+    screen->dirty = false;
 }
 
 /*
@@ -263,8 +229,6 @@ vm_screen_set_color(vm_screen *scr, vm_color clr)
         SDL_SetRenderDrawColor(scr->render, clr.r, clr.g, clr.b,
                                SDL_ALPHA_OPAQUE);
     }
-
-    curcolor = clr;
 }
 
 /*
@@ -274,22 +238,11 @@ vm_screen_set_color(vm_screen *scr, vm_color clr)
 void
 vm_screen_draw_rect(vm_screen *screen, vm_area *area)
 {
-    change *chg;
-
-    // FIXME: magic number
-    if (changepos >= 65536) {
-        return;
-    }
-
-    chg = &changestack[changepos++];
-    memcpy(&chg->area, area, sizeof(vm_area));
-    chg->clr = curcolor;
-
     // The renderer will take care of translating the positions and
     // sizes into whatever the window is really at.
-    //MAKE_SDL_RECT(rect, *area);
+    MAKE_SDL_RECT(rect, *area);
 
-    //SDL_RenderFillRect(screen->render, &rect);
+    SDL_RenderFillRect(screen->render, &rect);
     screen->dirty = true;
 }
 
