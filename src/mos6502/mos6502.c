@@ -312,12 +312,6 @@ mos6502_execute(mos6502 *cpu)
     mos6502_address_resolver resolver;
     mos6502_instruction_handler handler;
 
-    // We shouldn't normally get here, if there was a breakpoint, but we
-    // will in testing.
-    if (vm_debug_broke(cpu->PC)) {
-        return;
-    }
-
     opcode = mos6502_get(cpu, cpu->PC);
 
     // The disassembler knows how many bytes each operand requires

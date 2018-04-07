@@ -391,7 +391,9 @@ apple2_run_loop(apple2 *mach)
             }
         }
 
-        mos6502_execute(mach->cpu);
+        if (!vm_debug_broke(mach->cpu->PC)) {
+            mos6502_execute(mach->cpu);
+        }
 
         if (vm_screen_dirty(mach->screen)) {
             apple2_draw(mach);
