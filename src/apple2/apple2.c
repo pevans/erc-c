@@ -48,14 +48,9 @@ apple2_create(int width, int height)
         return NULL;
     }
 
-    // By default, we have no strobe set; it should only be set when a
-    // key is pressed
     mach->strobe = false;
-
-    // Yes, please do execute opcodes to begin with
     mach->paused = false;
-
-    // Don't print opcodes by default
+    mach->debug = false;
     mach->disasm = false;
 
     // Forward set these to NULL in case we fail to build the machine
@@ -357,8 +352,7 @@ apple2_run_loop(apple2 *mach)
             mach->paused = true;
         }
 
-        // If we're paused, then just re-loop until we're not
-        if (mach->paused) {
+        if (mach->debug) {
             if (mach->selected_drive) {
                 mach->selected_drive->locked = true;
             }
@@ -376,6 +370,10 @@ apple2_run_loop(apple2 *mach)
             }
 
             free(input);
+        }
+
+        if (mach->paused) {
+            vm_event_poll(mach->screen);
             continue;
         }
 

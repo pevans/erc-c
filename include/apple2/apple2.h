@@ -340,6 +340,13 @@ struct apple2 {
     bool paused;
 
     /*
+     * When this and the paused fields are true, then we will print a
+     * debug prompt and allow the user to work with the machine through
+     * that.
+     */
+    bool debug;
+
+    /*
      * If this is true, then we will disassemble opcodes as we execute.
      */
     bool disasm;

@@ -328,6 +328,7 @@ DEBUG_CMD(resume)
     apple2_debug_unbreak(mach->cpu->PC);
 
     mach->paused = false;
+    mach->debug = false;
 }
 
 /*

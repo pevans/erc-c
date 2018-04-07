@@ -3,7 +3,8 @@
 
 #include "vm_event.h"
 
-extern void apple2_event_init();
+extern EVENT_DO(apple2_event_debug);
 extern EVENT_DO(apple2_event_pause);
+extern void apple2_event_init();
 
 #endif

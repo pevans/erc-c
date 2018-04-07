@@ -108,6 +108,10 @@ vm_event_keyboard_special(vm_event *ev, char ch)
                 ev->screen->should_exit = true;
                 break;
 
+            case 'd':
+                vm_event_do(VM_DEBUG_FUNC);
+                break;
+
             case 'p':
                 vm_event_do(VM_PAUSE_FUNC);
                 break;

@@ -17,16 +17,18 @@ void
 apple2_event_init()
 {
     vm_di_set(VM_PAUSE_FUNC, apple2_event_pause);
+    vm_di_set(VM_DEBUG_FUNC, apple2_event_debug);
 }
 
 EVENT_DO(apple2_event_pause)
 {
     apple2 *mach = (apple2 *)_mach;
-    mach->paused = true;
+    mach->paused = !mach->paused;
 }
 
 EVENT_DO(apple2_event_debug)
 {
     apple2 *mach = (apple2 *)_mach;
+    mach->debug = true;
     mach->paused = true;
 }
