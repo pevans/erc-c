@@ -341,7 +341,7 @@ apple2_run_loop(apple2 *mach)
     int sleep = 5;
 
     if (dlog != NULL) {
-        vm_reflect_disasm(NULL);
+        mach->disasm = true;
     }
 
     int i = 0;

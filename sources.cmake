@@ -6,12 +6,12 @@ set(erc_sources
 	apple2/dec.c
 	apple2/draw.c
 	apple2/enc.c
+	apple2/event.c
 	apple2/hires.c
 	apple2/kb.c
 	apple2/lores.c
 	apple2/mem.c
 	apple2/pc.c
-	apple2/reflect.c
 	apple2/text.c
 	log.c
 	mos6502/mos6502.c

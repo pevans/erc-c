@@ -15,7 +15,7 @@
 #include "mos6502/dis.h"
 #include "vm_debug.h"
 #include "vm_di.h"
-#include "vm_reflect.h"
+#include "vm_event.h"
 
 /*
  * The largest address size we can set a breakpoint for
@@ -321,13 +321,13 @@ DEBUG_CMD(help)
  */
 DEBUG_CMD(resume)
 {
-    mos6502 *cpu = (mos6502 *)vm_di_get(VM_CPU);
+    apple2 *mach = (apple2 *)vm_di_get(VM_MACHINE);
 
     // If we paused because of a breakpoint, then we need to clear it
     // before we can really keep moving.
-    vm_debug_unbreak(cpu->PC);
+    vm_debug_unbreak(mach->cpu->PC);
 
-    vm_reflect_pause(NULL);
+    mach->paused = false;
 }
 
 /*
@@ -365,9 +365,6 @@ DEBUG_CMD(printaddr)
  */
 DEBUG_CMD(jump)
 {
-    // FIXME: same issue as for printaddr -- overall we need to refactor
-    // vm_reflect quite a bit
-
     mos6502 *cpu = (mos6502 *)vm_di_get(VM_CPU);
     cpu->PC = args->addr1;
 }
@@ -439,7 +436,7 @@ DEBUG_CMD(disasm)
     apple2 *mach = (apple2 *)vm_di_get(VM_MACHINE);
     FILE *stream = (FILE *)vm_di_get(VM_OUTPUT);
 
-    vm_reflect_disasm(NULL);
+    mach->disasm = true;
 
     fprintf(stream, "disassembly %s\n", mach->disasm ? "ON" : "OFF");
 }
