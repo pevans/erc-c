@@ -16,7 +16,6 @@
 #include "apple2/enc.h"
 #include "apple2/apple2.h"
 #include "vm_di.h"
-#include "vm_reflect.h"
 
 /*
  * Create a new disk drive. We do not create a memory segment for the

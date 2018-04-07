@@ -17,7 +17,7 @@
 #include "option.h"
 #include "vm_debug.h"
 #include "vm_di.h"
-#include "vm_reflect.h"
+#include "vm_event.h"
 #include "vm_segment.h"
 
 /*

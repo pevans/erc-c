@@ -30,7 +30,6 @@ set(erc_sources
 	vm_debug.c
 	vm_di.c
 	vm_event.c
-	vm_reflect.c
 	vm_screen.c
 	vm_segment.c
 	)

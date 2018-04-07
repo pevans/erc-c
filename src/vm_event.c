@@ -10,7 +10,6 @@
 #include "log.h"
 #include "vm_di.h"
 #include "vm_event.h"
-#include "vm_reflect.h"
 
 /*
  * Look through all of the events that are queued up and, whatever we

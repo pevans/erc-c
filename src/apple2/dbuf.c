@@ -10,7 +10,7 @@
 
 #include "apple2/dbuf.h"
 #include "apple2/draw.h"
-#include "vm_reflect.h"
+#include "vm_event.h"
 
 static size_t switch_reads[] = {
     0xC01A,
