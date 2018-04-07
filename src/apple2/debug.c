@@ -1,5 +1,5 @@
 /*
- * vm_debug.c
+ * apple2_debug.c
  */
 
 #include <ctype.h>
@@ -10,10 +10,10 @@
 #include <strings.h>
 
 #include "apple2/apple2.h"
+#include "apple2/debug.h"
 #include "apple2/hires.h"
-#include "mos6502/mos6502.h"
 #include "mos6502/dis.h"
-#include "vm_debug.h"
+#include "mos6502/mos6502.h"
 #include "vm_di.h"
 #include "vm_event.h"
 
@@ -33,47 +33,47 @@ static bool breakpoints[BREAKPOINTS_MAX];
  * A table of commands that we support in the debugger. This list is
  * printed out (in somewhat readable form) by the help/h command.
  */
-vm_debug_cmd cmdtable[] = {
-    { "break", "b", vm_debug_cmd_break, 1, "<addr>",
+apple2_debug_cmd cmdtable[] = {
+    { "break", "b", apple2_debug_cmd_break, 1, "<addr>",
         "Add breakpoint at <addr>", },
-    { "dblock", "db", vm_debug_cmd_dblock, 2, "<from> <to>",
+    { "dblock", "db", apple2_debug_cmd_dblock, 2, "<from> <to>",
         "Disassemble a block of code", },
-    { "disasm", "d", vm_debug_cmd_disasm, 0, "",
+    { "disasm", "d", apple2_debug_cmd_disasm, 0, "",
         "Toggle disassembly", },
-    { "help", "h", vm_debug_cmd_help, 0, "",
+    { "help", "h", apple2_debug_cmd_help, 0, "",
         "Print out this list of commands", },
-    { "hdump", "hd", vm_debug_cmd_hdump, 2, "<from> <to>",
+    { "hdump", "hd", apple2_debug_cmd_hdump, 2, "<from> <to>",
         "Hex dump memory in a given region", },
-    { "hidump", "hid", vm_debug_cmd_hidump, 1, "<file>",
+    { "hidump", "hid", apple2_debug_cmd_hidump, 1, "<file>",
         "Dump hires graphics memory to file", },
-    { "jump", "j", vm_debug_cmd_jump, 1, "<addr>",
+    { "jump", "j", apple2_debug_cmd_jump, 1, "<addr>",
         "Jump to <addr> for next execution", },
-    { "printaddr", "pa", vm_debug_cmd_printaddr, 1, "<addr>",
+    { "printaddr", "pa", apple2_debug_cmd_printaddr, 1, "<addr>",
         "Print the value at memory address <addr>", },
-    { "printstate", "ps", vm_debug_cmd_printstate, 0, "",
+    { "printstate", "ps", apple2_debug_cmd_printstate, 0, "",
         "Print the machine and CPU state", },
-    { "quit", "q", vm_debug_cmd_quit, 0, "",
+    { "quit", "q", apple2_debug_cmd_quit, 0, "",
         "Quit the emulator", },
-    { "resume", "r", vm_debug_cmd_resume, 0, "",
+    { "resume", "r", apple2_debug_cmd_resume, 0, "",
         "Resume execution", },
-    { "step", "s", vm_debug_cmd_step, 0, "",
+    { "step", "s", apple2_debug_cmd_step, 0, "",
         "Execute the current opcode and break at the next", },
-    { "unbreak", "u", vm_debug_cmd_unbreak, 1, "<addr>",
+    { "unbreak", "u", apple2_debug_cmd_unbreak, 1, "<addr>",
         "Remove breakpoint at <addr>", },
-    { "writeaddr", "wa", vm_debug_cmd_writeaddr, 2, "<addr> <byte>",
+    { "writeaddr", "wa", apple2_debug_cmd_writeaddr, 2, "<addr> <byte>",
         "Write <byte> at <addr>", },
-    { "writestate", "ws", vm_debug_cmd_writestate, 2, "<reg> <byte>",
+    { "writestate", "ws", apple2_debug_cmd_writestate, 2, "<reg> <byte>",
         "Write <byte> into <reg>", },
 };
 
-#define CMDTABLE_SIZE (sizeof(cmdtable) / sizeof(vm_debug_cmd))
+#define CMDTABLE_SIZE (sizeof(cmdtable) / sizeof(apple2_debug_cmd))
 
 /*
  * Return the next argument in a string passed in for input with the
  * debugger. All arguments are space-separated.
  */
 char *
-vm_debug_next_arg(char **str)
+apple2_debug_next_arg(char **str)
 {
     char *tok;
 
@@ -94,7 +94,7 @@ vm_debug_next_arg(char **str)
  * with.
  */
 int
-vm_debug_addr(const char *str)
+apple2_debug_addr(const char *str)
 {
     int addr;
 
@@ -120,7 +120,7 @@ vm_debug_addr(const char *str)
  * Add a breakpoint for addr
  */
 void
-vm_debug_break(int addr)
+apple2_debug_break(int addr)
 {
     if (addr < 0 || addr >= BREAKPOINTS_MAX) {
         return;
@@ -133,7 +133,7 @@ vm_debug_break(int addr)
  * Remove a breakpoint for addr, if one is set
  */
 void
-vm_debug_unbreak(int addr)
+apple2_debug_unbreak(int addr)
 {
     if (addr < 0 || addr >= BREAKPOINTS_MAX) {
         return;
@@ -146,7 +146,7 @@ vm_debug_unbreak(int addr)
  * Return true if there is a breakpoint set for addr
  */
 bool
-vm_debug_broke(int addr)
+apple2_debug_broke(int addr)
 {
     if (addr < 0 || addr >= BREAKPOINTS_MAX) {
         return false;
@@ -162,7 +162,7 @@ vm_debug_broke(int addr)
  * array when tearing down for a given test.
  */
 void
-vm_debug_unbreak_all()
+apple2_debug_unbreak_all()
 {
     memset(breakpoints, false, BREAKPOINTS_MAX);
 }
@@ -174,7 +174,7 @@ vm_debug_unbreak_all()
  * Unless you're ok with memory leaks!)
  */
 char *
-vm_debug_prompt()
+apple2_debug_prompt()
 {
     char buf[256];
     FILE *stream = (FILE *)vm_di_get(VM_OUTPUT);
@@ -200,16 +200,16 @@ vm_debug_prompt()
  * it (assuming they are space-separated).
  */
 void
-vm_debug_execute(const char *str)
+apple2_debug_execute(const char *str)
 {
     char *tok, *ebuf, *orig;
-    vm_debug_cmd *cmd;
-    vm_debug_args args;
+    apple2_debug_cmd *cmd;
+    apple2_debug_args args;
 
     orig = ebuf = strdup(str);
     cmd = NULL;
 
-    tok = vm_debug_next_arg(&ebuf);
+    tok = apple2_debug_next_arg(&ebuf);
 
     // No input
     if (tok == NULL) {
@@ -217,7 +217,7 @@ vm_debug_execute(const char *str)
         return;
     }
 
-    cmd = vm_debug_find_cmd(tok);
+    cmd = apple2_debug_find_cmd(tok);
 
     // No command found
     if (cmd == NULL) {
@@ -231,13 +231,13 @@ vm_debug_execute(const char *str)
 
     switch (cmd->nargs) {
         case 2:
-            args.target = vm_debug_next_arg(&ebuf);
+            args.target = apple2_debug_next_arg(&ebuf);
 
             // This _may_ be -1 if we have a string target for argument
             // 1, as in the writestate command
-            args.addr1 = vm_debug_addr(args.target);
+            args.addr1 = apple2_debug_addr(args.target);
 
-            args.addr2 = vm_debug_addr(vm_debug_next_arg(&ebuf));
+            args.addr2 = apple2_debug_addr(apple2_debug_next_arg(&ebuf));
 
             // But if this is -1, then something went wrong
             if (args.addr2 == -1) {
@@ -248,8 +248,8 @@ vm_debug_execute(const char *str)
             break;
 
         case 1:
-            args.target = vm_debug_next_arg(&ebuf);
-            args.addr1 = vm_debug_addr(args.target);
+            args.target = apple2_debug_next_arg(&ebuf);
+            args.addr1 = apple2_debug_addr(args.target);
 
             break;
 
@@ -264,15 +264,15 @@ vm_debug_execute(const char *str)
 }
 
 /*
- * Compare a string key (k) with a vm_debug_cmd (elem) name or abbrev
+ * Compare a string key (k) with a apple2_debug_cmd (elem) name or abbrev
  * field. This is the function we use for bsearch() in
- * vm_debug_find_cmd().
+ * apple2_debug_find_cmd().
  */
 static int
 cmd_compar(const void *k, const void *elem)
 {
     const char *key = (const char *)k;
-    const vm_debug_cmd *cmd = (const vm_debug_cmd *)elem;
+    const apple2_debug_cmd *cmd = (const apple2_debug_cmd *)elem;
 
     if (strlen(key) < 3) {
         return strcmp(key, cmd->abbrev);
@@ -286,11 +286,11 @@ cmd_compar(const void *k, const void *elem)
  * either be an abbreviation (if 1 or 2 characters) or a full name (if
  * otherwise). If no matching cmd can be found, return NULL.
  */
-vm_debug_cmd *
-vm_debug_find_cmd(const char *str)
+apple2_debug_cmd *
+apple2_debug_find_cmd(const char *str)
 {
-    return (vm_debug_cmd *)bsearch(str, &cmdtable, CMDTABLE_SIZE,
-                                   sizeof(vm_debug_cmd), cmd_compar);
+    return (apple2_debug_cmd *)bsearch(str, &cmdtable, CMDTABLE_SIZE,
+                                   sizeof(apple2_debug_cmd), cmd_compar);
 }
 
 /*
@@ -298,7 +298,7 @@ vm_debug_find_cmd(const char *str)
  */
 DEBUG_CMD(break)
 {
-    vm_debug_break(args->addr1);
+    apple2_debug_break(args->addr1);
 }
 
 /*
@@ -307,7 +307,7 @@ DEBUG_CMD(break)
 DEBUG_CMD(help)
 {
     FILE *stream = (FILE *)vm_di_get(VM_OUTPUT);
-    vm_debug_cmd *cmd;
+    apple2_debug_cmd *cmd;
     
     for (int i = 0; i < CMDTABLE_SIZE; i++) {
         cmd = &cmdtable[i];
@@ -325,7 +325,7 @@ DEBUG_CMD(resume)
 
     // If we paused because of a breakpoint, then we need to clear it
     // before we can really keep moving.
-    vm_debug_unbreak(mach->cpu->PC);
+    apple2_debug_unbreak(mach->cpu->PC);
 
     mach->paused = false;
 }
@@ -411,7 +411,7 @@ DEBUG_CMD(quit)
  */
 DEBUG_CMD(unbreak)
 {
-    vm_debug_unbreak(args->addr1);
+    apple2_debug_unbreak(args->addr1);
 }
 
 /*
@@ -422,9 +422,9 @@ DEBUG_CMD(step)
 {
     mos6502 *cpu = (mos6502 *)vm_di_get(VM_CPU);
 
-    vm_debug_unbreak(cpu->PC);
+    apple2_debug_unbreak(cpu->PC);
     mos6502_execute(cpu);
-    vm_debug_break(cpu->PC);
+    apple2_debug_break(cpu->PC);
 }
 
 /*

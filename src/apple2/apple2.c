@@ -9,13 +9,13 @@
 #include <unistd.h>
 
 #include "apple2/apple2.h"
+#include "apple2/debug.h"
 #include "apple2/draw.h"
 #include "apple2/mem.h"
-#include "mos6502/enums.h"
 #include "mos6502/dis.h"
+#include "mos6502/enums.h"
 #include "objstore.h"
 #include "option.h"
-#include "vm_debug.h"
 #include "vm_di.h"
 #include "vm_event.h"
 #include "vm_segment.h"
@@ -353,7 +353,7 @@ apple2_run_loop(apple2 *mach)
             i = 0;
         }
 
-        if (vm_debug_broke(mach->cpu->PC)) {
+        if (apple2_debug_broke(mach->cpu->PC)) {
             mach->paused = true;
         }
 
@@ -369,10 +369,10 @@ apple2_run_loop(apple2 *mach)
                 mach->selected_drive->locked = false;
             }
 
-            char *input = vm_debug_prompt();
+            char *input = apple2_debug_prompt();
 
             if (input != NULL) {
-                vm_debug_execute(input);
+                apple2_debug_execute(input);
             }
 
             free(input);
@@ -391,7 +391,7 @@ apple2_run_loop(apple2 *mach)
             }
         }
 
-        if (!vm_debug_broke(mach->cpu->PC)) {
+        if (!apple2_debug_broke(mach->cpu->PC)) {
             mos6502_execute(mach->cpu);
         }
 

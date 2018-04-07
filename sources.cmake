@@ -3,6 +3,7 @@ set(erc_sources
 	apple2/bank.c
 	apple2/dbuf.c
 	apple2/dd.c
+	apple2/debug.c
 	apple2/dec.c
 	apple2/draw.c
 	apple2/enc.c
@@ -27,7 +28,6 @@ set(erc_sources
 	option.c
 	vm_area.c
 	vm_bitfont.c
-	vm_debug.c
 	vm_di.c
 	vm_event.c
 	vm_screen.c

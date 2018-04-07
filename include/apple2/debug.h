@@ -1,12 +1,12 @@
-#ifndef _VM_DEBUG_H_
-#define _VM_DEBUG_H_
+#ifndef _APPLE2_DEBUG_H_
+#define _APPLE2_DEBUG_H_
 
 #include <stdbool.h>
 
-struct vm_debug_args;
-typedef struct vm_debug_args vm_debug_args;
+struct apple2_debug_args;
+typedef struct apple2_debug_args apple2_debug_args;
 
-typedef void (*vm_debug_func)(vm_debug_args *);
+typedef void (*apple2_debug_func)(apple2_debug_args *);
 
 typedef struct {
     /*
@@ -20,7 +20,7 @@ typedef struct {
     /*
      * The function that will do something with the command's input
      */
-    vm_debug_func handler;
+    apple2_debug_func handler;
 
     /*
      * The number of arguments we expect to see
@@ -36,9 +36,9 @@ typedef struct {
      * What do we do?
      */
     char *desc;
-} vm_debug_cmd;
+} apple2_debug_cmd;
 
-struct vm_debug_args {
+struct apple2_debug_args {
     /*
      * Most commands that need an argument will simply use addr1, but a
      * few have more than one address--hence addr2.
@@ -60,22 +60,22 @@ struct vm_debug_args {
      * The command our arguments are attached to; from here we can call
      * the handler with ourselves. (Very meta.)
      */
-    vm_debug_cmd *cmd;
+    apple2_debug_cmd *cmd;
 };
 
 #define DEBUG_CMD(x) \
-    void vm_debug_cmd_##x (vm_debug_args *args)
+    void apple2_debug_cmd_##x (apple2_debug_args *args)
 
-extern int vm_debug_addr(const char *);
-extern bool vm_debug_broke(int);
-extern char *vm_debug_next_arg(char **);
-extern char *vm_debug_prompt();
-extern vm_debug_cmd *vm_debug_find_cmd(const char *);
-extern void vm_debug_break(int);
-extern void vm_debug_execute(const char *);
-extern void vm_debug_quit();
-extern void vm_debug_unbreak(int);
-extern void vm_debug_unbreak_all();
+extern int apple2_debug_addr(const char *);
+extern bool apple2_debug_broke(int);
+extern char *apple2_debug_next_arg(char **);
+extern char *apple2_debug_prompt();
+extern apple2_debug_cmd *apple2_debug_find_cmd(const char *);
+extern void apple2_debug_break(int);
+extern void apple2_debug_execute(const char *);
+extern void apple2_debug_quit();
+extern void apple2_debug_unbreak(int);
+extern void apple2_debug_unbreak_all();
 
 extern DEBUG_CMD(break);
 extern DEBUG_CMD(dblock);
