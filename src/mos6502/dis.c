@@ -26,9 +26,9 @@
 
 #include <stdbool.h>
 
-#include "mos6502.h"
-#include "mos6502.dis.h"
-#include "mos6502.enums.h"
+#include "mos6502/mos6502.h"
+#include "mos6502/dis.h"
+#include "mos6502/enums.h"
 
 static char s_bytes[10],
             s_inst[4],

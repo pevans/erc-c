@@ -12,12 +12,12 @@
 #include <unistd.h>
 
 #include "log.h"
-#include "mos6502.h"
-#include "mos6502.dis.h"
+#include "mos6502/mos6502.h"
+#include "mos6502/dis.h"
 #include "vm_debug.h"
 
 // All of our address modes, instructions, etc. are defined here.
-#include "mos6502.enums.h"
+#include "mos6502/enums.h"
 
 /*
  * This is a table which defines what instruction each opcode is mapped

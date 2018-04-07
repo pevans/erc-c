@@ -1,28 +1,28 @@
 set(erc_sources
-	apple2.c
-	apple2.bank.c
-	apple2.dbuf.c
-	apple2.dd.c
-	apple2.dec.c
-	apple2.draw.c
-	apple2.enc.c
-	apple2.hires.c
-	apple2.kb.c
-	apple2.lores.c
-	apple2.mem.c
-	apple2.pc.c
-	apple2.reflect.c
-	apple2.text.c
+	apple2/apple2.c
+	apple2/bank.c
+	apple2/dbuf.c
+	apple2/dd.c
+	apple2/dec.c
+	apple2/draw.c
+	apple2/enc.c
+	apple2/hires.c
+	apple2/kb.c
+	apple2/lores.c
+	apple2/mem.c
+	apple2/pc.c
+	apple2/reflect.c
+	apple2/text.c
 	log.c
-	mos6502.c
-	mos6502.addr.c
-	mos6502.arith.c
-	mos6502.bits.c
-	mos6502.branch.c
-	mos6502.dis.c
-	mos6502.exec.c
-	mos6502.loadstor.c
-	mos6502.stat.c
+	mos6502/mos6502.c
+	mos6502/addr.c
+	mos6502/arith.c
+	mos6502/bits.c
+	mos6502/branch.c
+	mos6502/dis.c
+	mos6502/exec.c
+	mos6502/loadstor.c
+	mos6502/stat.c
 	objstore.c
 	option.c
 	vm_area.c

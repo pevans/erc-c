@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 
-#include "apple2.mem.h"
+#include "apple2/mem.h"
 #include "vm_bits.h"
 
 typedef struct {

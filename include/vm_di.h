@@ -7,6 +7,13 @@ enum vm_di_entry {
     VM_REFLECT,
     VM_OUTPUT,
 
+    // This is a function which can be used to pause the running machine
+    VM_PAUSE_FUNC,
+
+    // This function will both 1) pause the machine, and 2) open the
+    // debugger
+    VM_DEBUG_FUNC,
+
     // These are the physical width and height of the emulator window
     VM_WIDTH,
     VM_HEIGHT,

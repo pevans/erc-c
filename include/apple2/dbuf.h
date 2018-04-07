@@ -1,7 +1,7 @@
 #ifndef _APPLE2_DBUF_H_
 #define _APPLE2_DBUF_H_
 
-#include "apple2.h"
+#include "apple2/apple2.h"
 #include "vm_segment.h"
 
 extern SEGMENT_READER(apple2_dbuf_read);

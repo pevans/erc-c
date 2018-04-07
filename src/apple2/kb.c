@@ -7,7 +7,7 @@
  * to determine if you've read last key pressed before or not).
  */
 
-#include "apple2.kb.h"
+#include "apple2/kb.h"
 
 /*
  * This mapper is considerably simpler than most, because it handles

@@ -12,7 +12,7 @@
 
 #include <ctype.h>
 
-#include "apple2.text.h"
+#include "apple2/text.h"
 
 /*
  * This table maps display buffer addresses for 40-column text to the

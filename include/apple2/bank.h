@@ -1,7 +1,7 @@
 #ifndef _APPLE2_BANK_H_
 #define _APPLE2_BANK_H_
 
-#include "apple2.mem.h"
+#include "apple2/mem.h"
 #include "vm_segment.h"
 
 extern SEGMENT_READER(apple2_bank_read);

@@ -5,9 +5,8 @@
  * apple2 machine is being emulated.
  */
 
-#include "apple2.h"
-#include "apple2.reflect.h"
-#include "mos6502.h"
+#include "apple2/apple2.h"
+#include "apple2/reflect.h"
 #include "vm_di.h"
 
 /*
@@ -15,59 +14,19 @@
  * all of the reflect methods we may want to use.
  */
 void
-apple2_reflect_init()
+apple2_event_init()
 {
-    vm_reflect *ref = (vm_reflect *)vm_di_get(VM_REFLECT);
-
-    ref->cpu_info = apple2_reflect_cpu_info;
-    ref->machine_info = apple2_reflect_machine_info;
-    ref->pause = apple2_reflect_pause;
-    ref->disasm = apple2_reflect_disasm;
+    vm_di_set(VM_PAUSE_FUNC, apple2_event_pause);
 }
 
-/*
- * Show some information about the CPU registers.
- */
-REFLECT(apple2_reflect_cpu_info)
+EVENT_DO(apple2_event_pause)
 {
-    mos6502 *cpu = (mos6502 *)vm_di_get(VM_CPU);
-    FILE *out = (FILE *)vm_di_get(VM_OUTPUT);
-
-    fprintf(out, "CPU:  A:%02x X:%02x Y:%02x P:%02x S:%02x PC:%04x\n",
-            cpu->A, cpu->X, cpu->Y, cpu->P, cpu->S, cpu->PC);
+    apple2 *mach = (apple2 *)_mach;
+    mach->paused = true;
 }
 
-/*
- * Show information about the apple2 machine--mostly some of the
- * metadata variables, like what the bank switch status is, or what
- * memory mode we're in.
- */
-REFLECT(apple2_reflect_machine_info)
+EVENT_DO(apple2_event_debug)
 {
-    apple2 *mach = (apple2 *)vm_di_get(VM_MACHINE);
-    FILE *out = (FILE *)vm_di_get(VM_OUTPUT);
-
-    fprintf(out, "MACH: BS:%02x CM:%02x DM:%02x MM:%02x STROBE:%02x\n",
-            mach->bank_switch, mach->color_mode, mach->display_mode,
-            mach->memory_mode, mach->strobe);
-}
-
-/*
- * If we are paused, we will unpause; if we are not paused, we will
- * pause.
- */
-REFLECT(apple2_reflect_pause)
-{
-    apple2 *mach = (apple2 *)vm_di_get(VM_MACHINE);
-    mach->paused = !mach->paused;
-}
-
-/*
- * Enable or disable disassembly output, toggling from one state to the
- * other for each invocation.
- */
-REFLECT(apple2_reflect_disasm)
-{
-    apple2 *mach = (apple2 *)vm_di_get(VM_MACHINE);
-    mach->disasm = !mach->disasm;
+    apple2 *mach = (apple2 *)_mach;
+    mach->paused = true;
 }

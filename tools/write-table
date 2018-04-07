@@ -1,0 +1,21 @@
+#!/usr/bin/env python
+
+import sys
+
+def map400(frm, off):
+    row = off
+    written = 0
+    per_row = 0
+    for addr in range(frm, frm + 0x400):
+        sys.stdout.write("{0:>4d}, ".format(row))
+        per_row += 1
+        written += 1
+
+        if per_row == 40:
+            row += 1
+            per_row = 0
+
+        if written % 16 == 0:
+            sys.stdout.write("${0:04X}\n".format(frm + written - 16))
+
+map400(0x2000, 0)

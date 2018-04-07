@@ -9,10 +9,10 @@
 #include <stdlib.h>
 #include <strings.h>
 
-#include "apple2.h"
-#include "apple2.hires.h"
-#include "mos6502.h"
-#include "mos6502.dis.h"
+#include "apple2/apple2.h"
+#include "apple2/hires.h"
+#include "mos6502/mos6502.h"
+#include "mos6502/dis.h"
 #include "vm_debug.h"
 #include "vm_di.h"
 #include "vm_reflect.h"
@@ -335,8 +335,16 @@ DEBUG_CMD(resume)
  */
 DEBUG_CMD(printstate)
 {
-    vm_reflect_cpu_info(NULL);
-    vm_reflect_machine_info(NULL);
+    apple2 *mach = (apple2 *)vm_di_get(VM_MACHINE);
+    mos6502 *cpu = mach->cpu;
+    FILE *out = (FILE *)vm_di_get(VM_OUTPUT);
+
+    fprintf(out, "CPU:  A:%02x X:%02x Y:%02x P:%02x S:%02x PC:%04x\n",
+            cpu->A, cpu->X, cpu->Y, cpu->P, cpu->S, cpu->PC);
+
+    fprintf(out, "MACH: BS:%02x CM:%02x DM:%02x MM:%02x STROBE:%02x\n",
+            mach->bank_switch, mach->color_mode, mach->display_mode,
+            mach->memory_mode, mach->strobe);
 }
 
 /*

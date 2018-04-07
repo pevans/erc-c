@@ -7,9 +7,9 @@
 
 #include <stdbool.h>
 
-#include "apple2.dd.h"
-#include "apple2.dec.h"
-#include "apple2.enc.h"
+#include "apple2/dd.h"
+#include "apple2/dec.h"
+#include "apple2/enc.h"
 #include "vm_segment.h"
 
 /*

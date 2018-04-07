@@ -8,8 +8,8 @@
  * when writes do happen.
  */
 
-#include "apple2.dbuf.h"
-#include "apple2.draw.h"
+#include "apple2/dbuf.h"
+#include "apple2/draw.h"
 #include "vm_reflect.h"
 
 static size_t switch_reads[] = {

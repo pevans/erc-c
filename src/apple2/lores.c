@@ -13,9 +13,9 @@
  * would have been rendered in full graphical mode will be skipped.
  */
 
-#include "apple2.h"
-#include "apple2.lores.h"
-#include "apple2.text.h"
+#include "apple2/apple2.h"
+#include "apple2/lores.h"
+#include "apple2/text.h"
 
 /*
  * These are the color codes for the lo-res colors that are available.

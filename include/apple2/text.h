@@ -1,7 +1,7 @@
 #ifndef _APPLE2_TEXT_H_
 #define _APPLE2_TEXT_H_
 
-#include "apple2.h"
+#include "apple2/apple2.h"
 #include "vm_bitfont.h"
 #include "vm_bits.h"
 

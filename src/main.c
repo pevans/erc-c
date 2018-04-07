@@ -11,9 +11,9 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "apple2.h"
-#include "apple2.draw.h"
-#include "apple2.reflect.h"
+#include "apple2/apple2.h"
+#include "apple2/draw.h"
+#include "apple2/reflect.h"
 #include "log.h"
 #include "option.h"
 #include "vm_di.h"
@@ -120,7 +120,7 @@ main(int argc, char **argv)
     ref = vm_reflect_create();
     vm_di_set(VM_REFLECT, ref);
 
-    apple2_reflect_init();
+    apple2_event_init();
 
     // Ok, it's time to boot this up!
     err = apple2_boot(mach);

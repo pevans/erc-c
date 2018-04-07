@@ -8,11 +8,11 @@
 
 #include <unistd.h>
 
-#include "apple2.h"
-#include "apple2.draw.h"
-#include "apple2.mem.h"
-#include "mos6502.enums.h"
-#include "mos6502.dis.h"
+#include "apple2/apple2.h"
+#include "apple2/draw.h"
+#include "apple2/mem.h"
+#include "mos6502/enums.h"
+#include "mos6502/dis.h"
 #include "objstore.h"
 #include "option.h"
 #include "vm_debug.h"

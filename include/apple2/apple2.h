@@ -8,8 +8,8 @@
 struct apple2;
 typedef struct apple2 apple2;
 
-#include "apple2.dd.h"
-#include "mos6502.h"
+#include "apple2/dd.h"
+#include "mos6502/mos6502.h"
 #include "vm_bitfont.h"
 #include "vm_screen.h"
 

@@ -18,8 +18,8 @@
 
 #include <stdbool.h>
 
-#include "apple2.hires.h"
-#include "apple2.text.h"
+#include "apple2/hires.h"
+#include "apple2/text.h"
 
 enum hires_color {
     HIRES_GREEN,

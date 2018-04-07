@@ -7,13 +7,13 @@
  * right! FIXME: we should break this file up into smaller parts.
  */
 
-#include "apple2.bank.h"
-#include "apple2.dbuf.h"
-#include "apple2.dd.h"
-#include "apple2.h"
-#include "apple2.kb.h"
-#include "apple2.mem.h"
-#include "apple2.pc.h"
+#include "apple2/bank.h"
+#include "apple2/dbuf.h"
+#include "apple2/dd.h"
+#include "apple2/apple2.h"
+#include "apple2/kb.h"
+#include "apple2/mem.h"
+#include "apple2/pc.h"
 #include "objstore.h"
 
 static size_t switch_reads[] = {

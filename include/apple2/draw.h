@@ -1,7 +1,7 @@
 #ifndef _APPLE2_DRAW_H_
 #define _APPLE2_DRAW_H_
 
-#include "apple2.h"
+#include "apple2/apple2.h"
 #include "vm_bits.h"
 
 extern void apple2_draw(apple2 *);

@@ -11,10 +11,10 @@
 
 #include <stdlib.h>
 
-#include "apple2.dd.h"
-#include "apple2.dec.h"
-#include "apple2.enc.h"
-#include "apple2.h"
+#include "apple2/dd.h"
+#include "apple2/dec.h"
+#include "apple2/enc.h"
+#include "apple2/apple2.h"
 #include "vm_di.h"
 #include "vm_reflect.h"
 

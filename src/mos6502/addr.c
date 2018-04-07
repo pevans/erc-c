@@ -9,8 +9,8 @@
 
 #include <stdlib.h>
 
-#include "mos6502.h"
-#include "mos6502.enums.h"
+#include "mos6502/mos6502.h"
+#include "mos6502/enums.h"
 
 /*
  * This is a table of all the possible opcodes the 6502 understands,

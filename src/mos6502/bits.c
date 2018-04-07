@@ -5,8 +5,8 @@
  * specifically on bits of values.
  */
 
-#include "mos6502.h"
-#include "mos6502.enums.h"
+#include "mos6502/mos6502.h"
+#include "mos6502/enums.h"
 
 /*
  * The and instruction will assign the bitwise-and of the accumulator

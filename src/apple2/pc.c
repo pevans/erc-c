@@ -7,7 +7,7 @@
  * (apple2.dd.c).
  */
 
-#include "apple2.pc.h"
+#include "apple2/pc.h"
 
 static size_t switch_reads[] = {
     0xC015,

@@ -1,7 +1,7 @@
 #ifndef _APPLE2_TESTS_H_
 #define _APPLE2_TESTS_H_
 
-#include "apple2.h"
+#include "apple2/apple2.h"
 #include "vm_segment.h"
 
 static apple2 *mach = NULL;

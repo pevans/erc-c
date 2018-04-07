@@ -12,7 +12,7 @@ typedef struct apple2dd apple2dd;
 #include <stdio.h>
 #include <sys/stat.h>
 
-#include "apple2.h"
+#include "apple2/apple2.h"
 #include "vm_bits.h"
 #include "vm_segment.h"
 

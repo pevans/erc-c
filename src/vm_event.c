@@ -7,6 +7,8 @@
  * mouse events, and more.
  */
 
+#include "log.h"
+#include "vm_di.h"
 #include "vm_event.h"
 #include "vm_reflect.h"
 
@@ -107,18 +109,29 @@ vm_event_keyboard_special(vm_event *ev, char ch)
                 ev->screen->should_exit = true;
                 break;
 
-            case 'i':
-                vm_reflect_cpu_info(NULL);
-                vm_reflect_machine_info(NULL);
-                break;
-
             case 'p':
-                vm_reflect_pause(NULL);
-                break;
-
-            case 'd':
-                vm_reflect_disasm(NULL);
+                vm_event_do(VM_PAUSE_FUNC);
                 break;
         }
     }
+}
+
+/*
+ * Given a DI identifier, assume that we have registered a function that
+ * does something with the also-registered machine object. If the result
+ * of the lookup from difunc is NULL, return ERR_INVALID; otherwise,
+ * execute the function and return OK.
+ */
+int
+vm_event_do(int difunc)
+{
+    vm_event_fn func = (vm_event_fn)vm_di_get(difunc);
+    void *mach = vm_di_get(VM_MACHINE);
+
+    if (func == NULL) {
+        return ERR_INVALID;
+    }
+
+    func(mach);
+    return OK;
 }

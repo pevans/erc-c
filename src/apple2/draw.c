@@ -6,10 +6,10 @@
  * further into development.
  */
 
-#include "apple2.h"
-#include "apple2.hires.h"
-#include "apple2.lores.h"
-#include "apple2.text.h"
+#include "apple2/apple2.h"
+#include "apple2/hires.h"
+#include "apple2/lores.h"
+#include "apple2/text.h"
 
 /*
  * Draw a pixel on screen at the given address.

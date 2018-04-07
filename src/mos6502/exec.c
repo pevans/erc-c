@@ -6,8 +6,8 @@
  */
 
 #include "log.h"
-#include "mos6502.h"
-#include "mos6502.enums.h"
+#include "mos6502/mos6502.h"
+#include "mos6502/enums.h"
 
 /*
  * Log the attempt to execute a "bad" (which is to say, _undefined_)
