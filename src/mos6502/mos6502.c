@@ -367,6 +367,8 @@ mos6502_execute(mos6502 *cpu)
     cpu->last_addr = cpu->eff_addr;
     cpu->last_operand = operand;
 
+    cpu->P |= MOS_UNUSED | MOS_BREAK;
+
     // Ok -- we're done! This wasn't so hard, was it?
     return;
 }
