@@ -192,21 +192,15 @@ mos6502_free(mos6502 *cpu)
 }
 
 /*
- * Push a _16-bit_ number to the stack. Generally speaking, only
- * addresses are pushed to the stack, such that would be contained in
- * the PC register (which is 16-bit).
- *
- * The stack is contained within a single page of memory, so you would
- * be right in observing that the stack can contain at most 128, not
- * 256, addresses.
+ * Push an 8-bit value to the stack, and then decrement the S register
+ * so that it points at the place where a new value would be deposited
+ * by a subsequent push. If S is decremented below 0, it rolls around to
+ * FF.
  */
 void
 mos6502_push_stack(mos6502 *cpu, vm_8bit addr)
 {
     mos6502_set(cpu, 0x100 + cpu->S, addr);
-
-    // And finally we need to increment S by 2 (since we've used two
-    // bytes in the stack).
     cpu->S--;
 }
 
