@@ -348,6 +348,10 @@ apple2_run_loop(apple2 *mach)
             i = 0;
         }
 
+        if (vm_screen_last_key(mach->screen)) {
+            mach->strobe = true;
+        }
+
         if (apple2_debug_broke(mach->cpu->PC)) {
             mach->paused = true;
         }
