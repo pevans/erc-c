@@ -211,18 +211,15 @@ mos6502_push_stack(mos6502 *cpu, vm_8bit addr)
 }
 
 /*
- * Pop an address from the stack and return that.
+ * Increment the stack register and return the value that is pointed at
+ * by the new offset. Because the S register is 8-bit, the following
+ * (correct) behavior is exhibited: when S overflows beyond 0xFF, it
+ * rolls over to 0x00.
  */
 vm_8bit
 mos6502_pop_stack(mos6502 *cpu)
 {
-    // The first thing we want to do here is to decrement S by 2, since
-    // the value we want to return is two positions back.
     cpu->S++;
-
-    // We need to use a bitwise-or operation to combine the hi and lo
-    // bytes we retrieve from the stack into the actual position we
-    // would use for the PC register.
     return mos6502_get(cpu, 0x0100 + cpu->S);
 }
 
