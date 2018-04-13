@@ -22,6 +22,7 @@ enum status_flags {
     MOS_INTERRUPT = 4,
     MOS_DECIMAL = 8,
     MOS_BREAK = 16,
+    MOS_UNUSED = 32,
     MOS_OVERFLOW = 64,
     MOS_NEGATIVE = 128,
 };
