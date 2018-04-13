@@ -1,9 +1,9 @@
 #include <criterion/criterion.h>
 #include <unistd.h>
 
-#include "mos6502.h"
-#include "mos6502.dis.h"
-#include "mos6502.enums.h"
+#include "mos6502/mos6502.h"
+#include "mos6502/dis.h"
+#include "mos6502/enums.h"
 
 /*
  * BUFSIZ is the normal block-buffer size that a FILE stream would use

@@ -1,7 +1,7 @@
 #include <criterion/criterion.h>
 
-#include "apple2.h"
-#include "mos6502.enums.h"
+#include "apple2/apple2.h"
+#include "mos6502/enums.h"
 #include "option.h"
 #include "vm_di.h"
 

@@ -1,9 +1,9 @@
 #include <criterion/criterion.h>
 
-#include "apple2.bank.h"
-#include "apple2.h"
-#include "apple2.mem.h"
-#include "apple2.tests.h"
+#include "apple2/bank.h"
+#include "apple2/apple2.h"
+#include "apple2/mem.h"
+#include "apple2/tests.h"
 
 TestSuite(apple2_mem, .init = setup, .fini = teardown);
 

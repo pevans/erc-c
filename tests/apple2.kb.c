@@ -1,7 +1,7 @@
 #include <criterion/criterion.h>
 
-#include "apple2.kb.h"
-#include "apple2.tests.h"
+#include "apple2/kb.h"
+#include "apple2/tests.h"
 
 TestSuite(apple2_kb, .init = setup, .fini = teardown);
 

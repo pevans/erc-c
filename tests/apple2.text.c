@@ -1,6 +1,6 @@
 #include <criterion/criterion.h>
 
-#include "apple2.text.h"
+#include "apple2/text.h"
 #include "objstore.h"
 
 /*

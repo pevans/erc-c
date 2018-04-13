@@ -1,8 +1,8 @@
 #include <criterion/criterion.h>
 
-#include "apple2.dec.h"
-#include "apple2.enc.h"
-#include "apple2.dd.h"
+#include "apple2/dd.h"
+#include "apple2/dec.h"
+#include "apple2/enc.h"
 
 /*
  * This is the DOS 3.3 order; just to have something to use as a basis

@@ -1,64 +1,59 @@
 #include <criterion/criterion.h>
 
-#include "apple2.h"
-#include "apple2.reflect.h"
+#include "apple2/apple2.h"
+#include "apple2/event.h"
 #include "vm_di.h"
-#include "vm_reflect.h"
 
 static apple2 *mach;
-static vm_reflect *ref;
 
 static void
 setup()
 {
-    ref = vm_reflect_create();
-    vm_di_set(VM_REFLECT, ref);
-
     mach = apple2_create(100, 100);
-    vm_di_set(VM_MACHINE, mach);
-    vm_di_set(VM_CPU, mach->cpu);
 
-    apple2_reflect_init();
+    mach->paused = false;
+    mach->debug = false;
+
+    vm_di_set(VM_PAUSE_FUNC, NULL);
+    vm_di_set(VM_DEBUG_FUNC, NULL);
+
+    apple2_event_init();
 }
 
 static void
 teardown()
 {
-    vm_reflect_free(ref);
     apple2_free(mach);
 
-    vm_di_set(VM_REFLECT, NULL);
-    vm_di_set(VM_MACHINE, NULL);
-    vm_di_set(VM_CPU, NULL);
+    vm_di_set(VM_PAUSE_FUNC, NULL);
+    vm_di_set(VM_DEBUG_FUNC, NULL);
 }
 
-TestSuite(apple2_reflect, .init = setup, .fini = teardown);
+TestSuite(apple2_event, .init = setup, .fini = teardown);
 
-Test(apple2_reflect, init)
+Test(apple2_event, init)
 {
-    cr_assert_neq(ref->cpu_info, NULL);
-    cr_assert_neq(ref->machine_info, NULL);
-    cr_assert_neq(ref->pause, NULL);
-    cr_assert_neq(ref->disasm, NULL);
+    cr_assert_neq(vm_di_get(VM_PAUSE_FUNC), NULL);
+    cr_assert_neq(vm_di_get(VM_DEBUG_FUNC), NULL);
 }
 
 /* Test(apple2_reflect, cpu_info) */
 /* Test(apple2_reflect, machine_info) */
 
-Test(apple2_reflect, pause)
+Test(apple2_event, pause)
 {
-    mach->paused = false;
-    vm_reflect_pause(NULL);
+    apple2_event_pause(mach);
     cr_assert_eq(mach->paused, true);
-    vm_reflect_pause(NULL);
+    apple2_event_pause(mach);
     cr_assert_eq(mach->paused, false);
 }
 
-Test(apple2_reflect, disasm)
+Test(apple2_event, debug)
 {
-    mach->disasm = false;
-    vm_reflect_disasm(NULL);
-    cr_assert_eq(mach->disasm, true);
-    vm_reflect_disasm(NULL);
-    cr_assert_eq(mach->disasm, false);
+    apple2_event_debug(mach);
+    cr_assert_eq(mach->paused, true);
+    cr_assert_eq(mach->debug, true);
+    apple2_event_debug(mach);
+    cr_assert_eq(mach->paused, true);
+    cr_assert_eq(mach->debug, true);
 }

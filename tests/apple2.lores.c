@@ -1,7 +1,7 @@
 #include <criterion/criterion.h>
 
-#include "apple2.h"
-#include "apple2.lores.h"
+#include "apple2/apple2.h"
+#include "apple2/lores.h"
 
 /* Test(apple2_lores, draw) */
 

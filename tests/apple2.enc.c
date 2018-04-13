@@ -1,7 +1,7 @@
 #include <criterion/criterion.h>
 
-#include "apple2.dd.h"
-#include "apple2.enc.h"
+#include "apple2/dd.h"
+#include "apple2/enc.h"
 #include "vm_segment.h"
 
 /*

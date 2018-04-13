@@ -1,8 +1,8 @@
 #include <criterion/criterion.h>
 
-#include "mos6502.h"
-#include "mos6502.enums.h"
-#include "mos6502.tests.h"
+#include "mos6502/mos6502.h"
+#include "mos6502/enums.h"
+#include "mos6502/tests.h"
 
 TestSuite(mos6502_loadstor, .init = setup, .fini = teardown);
 

@@ -1,8 +1,8 @@
 #include <criterion/criterion.h>
 
-#include "apple2.h"
-#include "apple2.pc.h"
-#include "apple2.tests.h"
+#include "apple2/apple2.h"
+#include "apple2/pc.h"
+#include "apple2/tests.h"
 
 TestSuite(apple2_pc, .init = setup, .fini = teardown);
 

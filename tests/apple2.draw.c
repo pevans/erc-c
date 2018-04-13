@@ -1,6 +1,6 @@
 #include <criterion/criterion.h>
 
-#include "apple2.tests.h"
+#include "apple2/tests.h"
 
 /* Test(apple2_draw, pixel) */
 /* Test(apple2_draw, pixel_lores) */

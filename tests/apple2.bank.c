@@ -1,8 +1,8 @@
 #include <criterion/criterion.h>
 
-#include "apple2.bank.h"
-#include "apple2.h"
-#include "apple2.tests.h"
+#include "apple2/apple2.h"
+#include "apple2/bank.h"
+#include "apple2/tests.h"
 #include "vm_segment.h"
 
 TestSuite(apple2_bank, .init = setup, .fini = teardown);
