@@ -92,22 +92,21 @@ Test(mos6502_arith, cpy)
 Test(mos6502_arith, dec)
 {
     cpu->A = 5;
+    mos6502_set(cpu, cpu->PC, 0x3A);
     mos6502_handle_dec(cpu, 0);
     cr_assert_eq(cpu->A, 4);
-
-    cpu->eff_addr = 123;
-    mos6502_set(cpu, 123, 44);
-
-    // Note _also_ that DEC expects the number to be decremented will be
-    // passed in as the effective operand, although it doesn't
-    // necessarily need for that to be so.
-    mos6502_handle_dec(cpu, 44);
-    cr_assert_eq(mos6502_get(cpu, 123), 43);
 
     cpu->eff_addr = 0;
     cpu->A = 0;
     mos6502_handle_dec(cpu, 0);
     cr_assert_eq(cpu->A, 0xff);
+
+    cpu->eff_addr = 123;
+    mos6502_set(cpu, 123, 44);
+
+    mos6502_set(cpu, cpu->PC, 0x00);
+    mos6502_handle_dec(cpu, 44);
+    cr_assert_eq(mos6502_get(cpu, 123), 43);
 }
 
 Test(mos6502_arith, dex)
@@ -132,6 +131,7 @@ Test(mos6502_arith, inc)
 
     cpu->A = 8;
     cpu->eff_addr = 0;
+    mos6502_set(cpu, cpu->PC, 0x1A);
     mos6502_handle_inc(cpu, 0);
     cr_assert_eq(cpu->A, 9);
 
