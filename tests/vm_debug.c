@@ -266,7 +266,10 @@ Test(apple2_debug, cmd_step)
     cr_assert_eq(mach->cpu->PC, 1);
 
     // We should go nowhere here
-    mos6502_execute(mach->cpu);
+    if (!apple2_debug_broke(mach->cpu->PC)) {
+        mos6502_execute(mach->cpu);
+    }
+
     cr_assert_eq(mach->cpu->PC, 1);
 
     // Step should a) unbreak at PC, b) execute at PC
