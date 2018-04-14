@@ -38,8 +38,6 @@ apple2_debug_cmd cmdtable[] = {
         "Add breakpoint at <addr>", },
     { "dblock", "db", apple2_debug_cmd_dblock, 2, "<from> <to>",
         "Disassemble a block of code", },
-    { "disasm", "d", apple2_debug_cmd_disasm, 0, "",
-        "Toggle disassembly", },
     { "help", "h", apple2_debug_cmd_help, 0, "",
         "Print out this list of commands", },
     { "hdump", "hd", apple2_debug_cmd_hdump, 2, "<from> <to>",
@@ -426,20 +424,6 @@ DEBUG_CMD(step)
     apple2_debug_unbreak(cpu->PC);
     mos6502_execute(cpu);
     apple2_debug_break(cpu->PC);
-}
-
-/*
- * Toggle disassembly, and print a notice of the change and its new
- * status.
- */
-DEBUG_CMD(disasm)
-{
-    apple2 *mach = (apple2 *)vm_di_get(VM_MACHINE);
-    FILE *stream = (FILE *)vm_di_get(VM_OUTPUT);
-
-    mach->disasm = true;
-
-    fprintf(stream, "disassembly %s\n", mach->disasm ? "ON" : "OFF");
 }
 
 /*

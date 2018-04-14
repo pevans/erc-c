@@ -276,14 +276,6 @@ Test(apple2_debug, cmd_step)
 
 /* Test(apple2_debug, cmd_quit) */
 
-Test(apple2_debug, cmd_disassemble)
-{
-    cr_assert_eq(mach->disasm, false);
-    apple2_debug_cmd_disasm(&args);
-    cr_assert_neq(strlen(buf), 0);
-    cr_assert_eq(mach->disasm, true);
-}
-
 Test(apple2_debug, cmd_dblock)
 {
     mos6502_set(mach->cpu, 0, 0xEA);
