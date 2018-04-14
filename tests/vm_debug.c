@@ -194,11 +194,22 @@ Test(apple2_debug, break)
     mos6502_set(mach->cpu, 2, 0xEA);
     mos6502_set(mach->cpu, 3, 0xEA);
 
-    mos6502_execute(mach->cpu);
+    if (!apple2_debug_broke(mach->cpu->PC)) {
+        mos6502_execute(mach->cpu);
+    }
+
     cr_assert_eq(mach->cpu->PC, 1);
-    mos6502_execute(mach->cpu);
+
+    if (!apple2_debug_broke(mach->cpu->PC)) {
+        mos6502_execute(mach->cpu);
+    }
+
     cr_assert_eq(mach->cpu->PC, 2);
-    mos6502_execute(mach->cpu);
+
+    if (!apple2_debug_broke(mach->cpu->PC)) {
+        mos6502_execute(mach->cpu);
+    }
+
     cr_assert_eq(mach->cpu->PC, 2);
 }
 
