@@ -282,8 +282,6 @@ Test(apple2_debug, cmd_disassemble)
     apple2_debug_cmd_disasm(&args);
     cr_assert_neq(strlen(buf), 0);
     cr_assert_eq(mach->disasm, true);
-    apple2_debug_cmd_disasm(&args);
-    cr_assert_eq(mach->disasm, false);
 }
 
 Test(apple2_debug, cmd_dblock)
