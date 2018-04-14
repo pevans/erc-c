@@ -108,7 +108,7 @@ Test(apple2_dec, track)
     int i;
 
     orig = vm_segment_create(ENC_DTRACK);
-    enc = vm_segment_create(ENC_ETRACK);
+    enc = vm_segment_create(ENC_ETRACK + 0x30);
     dec = vm_segment_create(ENC_DTRACK);
 
     for (i = 0; i < ENC_DTRACK; i++) {
