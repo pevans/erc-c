@@ -38,10 +38,12 @@ endforeach(src)
 # test_sources should also include the main source file, so we don't need to
 # make any particular effort to include it in add_executable().
 file(GLOB test_sources "*.c")
+file(GLOB_RECURSE mos6502_sources "mos6502/*.c")
+file(GLOB_RECURSE apple2_sources "apple2/*.c")
 
 add_definitions(-DINSTALL_PATH="../../")
 
-add_executable(erc-test ${sources} ${test_sources})
+add_executable(erc-test ${sources} ${test_sources} ${mos6502_sources} ${apple2_sources})
 
 # Our unit-testing library
 target_link_libraries(erc-test criterion)
