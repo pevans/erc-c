@@ -105,6 +105,11 @@ typedef struct {
     vm_16bit eff_addr;
 
     /*
+     * This is the address mode of the current execution.
+     */
+    int addr_mode;
+
+    /*
      * These are the last opcode and last effective address that was
      * used in the instruction previous to the one currently being
      * executed. Some things (notably soft switches) may need to

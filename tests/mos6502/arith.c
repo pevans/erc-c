@@ -92,7 +92,7 @@ Test(mos6502_arith, cpy)
 Test(mos6502_arith, dec)
 {
     cpu->A = 5;
-    mos6502_set(cpu, cpu->PC, 0x3A);
+    cpu->addr_mode = ACC;
     mos6502_handle_dec(cpu, 0);
     cr_assert_eq(cpu->A, 4);
 
@@ -104,7 +104,7 @@ Test(mos6502_arith, dec)
     cpu->eff_addr = 123;
     mos6502_set(cpu, 123, 44);
 
-    mos6502_set(cpu, cpu->PC, 0x00);
+    cpu->addr_mode = 0;
     mos6502_handle_dec(cpu, 44);
     cr_assert_eq(mos6502_get(cpu, 123), 43);
 }
@@ -131,7 +131,7 @@ Test(mos6502_arith, inc)
 
     cpu->A = 8;
     cpu->eff_addr = 0;
-    mos6502_set(cpu, cpu->PC, 0x1A);
+    cpu->addr_mode = ACC;
     mos6502_handle_inc(cpu, 0);
     cr_assert_eq(cpu->A, 9);
 

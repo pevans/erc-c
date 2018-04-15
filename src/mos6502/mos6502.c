@@ -170,6 +170,7 @@ mos6502_create(vm_segment *rmem, vm_segment *wmem)
     mos6502_set_memory(cpu, rmem, wmem);
 
     cpu->eff_addr = 0;
+    cpu->addr_mode = 0;
     cpu->PC = 0;
     cpu->A = 0;
     cpu->X = 0;
@@ -303,16 +304,17 @@ mos6502_execute(mos6502 *cpu)
     mos6502_instruction_handler handler;
 
     opcode = mos6502_get(cpu, cpu->PC);
+    cpu->addr_mode = mos6502_addr_mode(opcode);
 
     // The disassembler knows how many bytes each operand requires
     // (maybe this code doesn't belong in the disassembler); let's use
     // that to figure out the total number of bytes to skip. We add 1
     // because we need to account for the opcode as well.
-    bytes = 1 + mos6502_dis_expected_bytes(mos6502_addr_mode(opcode));
+    bytes = 1 + mos6502_dis_expected_bytes(cpu->addr_mode);
 
     // First, we need to know how to resolve our effective address and
     // how to execute anything.
-    resolver = mos6502_get_address_resolver(mos6502_addr_mode(opcode));
+    resolver = mos6502_get_address_resolver(cpu->addr_mode);
     handler = mos6502_get_instruction_handler(opcode);
 
     // The operand is the effective operand, the value that the

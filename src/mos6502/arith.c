@@ -154,19 +154,14 @@ DEFINE_INST(cpy)
  */
 DEFINE_INST(dec) 
 {
-    vm_8bit opcode = mos6502_get(cpu, cpu->PC);
-    bool is_acc = mos6502_addr_mode(opcode) == ACC;
-
-    if (!is_acc) {
-        MOS_CHECK_NZ(oper - 1);
-        mos6502_set(cpu, cpu->eff_addr, oper - 1);
+    if (cpu->addr_mode == ACC) {
+        MOS_CHECK_NZ(cpu->A - 1);
+        cpu->A--;
         return;
     }
 
-    // If we get here, then this is ACC mode, and we should work off
-    // that.
-    MOS_CHECK_NZ(cpu->A - 1);
-    cpu->A--;
+    MOS_CHECK_NZ(oper - 1);
+    mos6502_set(cpu, cpu->eff_addr, oper - 1);
 }
 
 /*
@@ -192,17 +187,14 @@ DEFINE_INST(dey)
  */
 DEFINE_INST(inc)
 {
-    vm_8bit opcode = mos6502_get(cpu, cpu->PC);
-    bool is_acc = mos6502_addr_mode(opcode) == ACC;
-
-    if (!is_acc) {
-        MOS_CHECK_NZ(oper + 1);
-        mos6502_set(cpu, cpu->eff_addr, oper + 1);
+    if (cpu->addr_mode == ACC) {
+        MOS_CHECK_NZ(cpu->A + 1);
+        cpu->A++;
         return;
     }
 
-    MOS_CHECK_NZ(cpu->A + 1);
-    cpu->A++;
+    MOS_CHECK_NZ(oper + 1);
+    mos6502_set(cpu, cpu->eff_addr, oper + 1);
 }
 
 /*

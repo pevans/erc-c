@@ -23,7 +23,7 @@ Test(mos6502_bits, asl)
     mos6502_handle_asl(cpu, 22);
     cr_assert_eq(mos6502_get(cpu, 123), 44);
 
-    mos6502_set(cpu, cpu->PC, 0x0A);
+    cpu->addr_mode = ACC;
     mos6502_handle_asl(cpu, 5);
     cr_assert_eq(cpu->A, 10);
 
@@ -98,7 +98,7 @@ Test(mos6502_bits, lsr)
     cr_assert_eq(mos6502_get(cpu, 123), 5);
     cr_assert_eq(cpu->P & MOS_CARRY, MOS_CARRY);
 
-    mos6502_set(cpu, cpu->PC, 0x4A);
+    cpu->addr_mode = ACC;
     mos6502_handle_lsr(cpu, 5);
     cr_assert_eq(cpu->A, 2);
     cr_assert_eq(cpu->P & MOS_CARRY, MOS_CARRY);
@@ -122,7 +122,7 @@ Test(mos6502_bits, rol)
     mos6502_handle_rol(cpu, 128);
     cr_assert_eq(mos6502_get(cpu, 234), 0);
 
-    mos6502_set(cpu, cpu->PC, 0x2A);
+    cpu->addr_mode = ACC;
     cpu->P = 0;
     cpu->A = 0xff;
     mos6502_handle_rol(cpu, cpu->A);
@@ -141,7 +141,7 @@ Test(mos6502_bits, ror)
     mos6502_handle_ror(cpu, 0);
     cr_assert_eq(mos6502_get(cpu, 123), 128);
 
-    mos6502_set(cpu, cpu->PC, 0x6A);
+    cpu->addr_mode = ACC;
     cpu->P = 0;
     cpu->A = 0xff;
     mos6502_handle_ror(cpu, cpu->A);
