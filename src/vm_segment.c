@@ -23,39 +23,39 @@
 vm_segment *
 vm_segment_create(size_t size)
 {
-    vm_segment *segment;
+    vm_segment *seg;
 
     // Allocate memory for the current memory segment.
-    segment = malloc(sizeof(vm_segment));
+    seg = malloc(sizeof(vm_segment));
 
     // Ack! We couldn't get the memory we wanted. Let's bail.
-    if (segment == NULL) {
+    if (seg == NULL) {
         log_crit("Couldn't allocate enough space for vm_segment");
         return NULL;
     }
 
-    segment->memory = malloc(sizeof(vm_8bit) * size);
-    if (segment->memory == NULL) {
-        free(segment);
+    seg->memory = malloc(sizeof(vm_8bit) * size);
+    if (seg->memory == NULL) {
+        free(seg);
         log_crit("Couldn't allocate enough space for vm_segment");
         return NULL;
     }
 
     // We should zero out memory and make explicit that any new segment
     // begins life in that state.
-    memset(segment->memory, 0, sizeof(vm_8bit) * size);
+    memset(seg->memory, 0, sizeof(vm_8bit) * size);
 
-    segment->read_table = malloc(sizeof(vm_segment_read_fn) * size);
-    if (segment->read_table == NULL) {
+    seg->read_table = malloc(sizeof(vm_segment_read_fn) * size);
+    if (seg->read_table == NULL) {
         log_crit("Couldn't allocate enough space for segment read_table");
-        vm_segment_free(segment);
+        vm_segment_free(seg);
         return NULL;
     }
 
-    segment->write_table = malloc(sizeof(vm_segment_write_fn) * size);
-    if (segment->write_table == NULL) {
+    seg->write_table = malloc(sizeof(vm_segment_write_fn) * size);
+    if (seg->write_table == NULL) {
         log_crit("Couldn't allocate enough space for segment write_table");
-        vm_segment_free(segment);
+        vm_segment_free(seg);
         return NULL;
     }
 
@@ -64,38 +64,38 @@ vm_segment_create(size_t size)
     // read/write mapper code to attempt to a run a function with
     // garbage. We could have undefined garbage! We can only properly
     // work with defined garbage.
-    memset(segment->read_table, (int)NULL, sizeof(vm_segment_read_fn) * size);
-    memset(segment->write_table, (int)NULL, sizeof(vm_segment_write_fn) * size);
+    memset(seg->read_table, (int)NULL, sizeof(vm_segment_read_fn) * size);
+    memset(seg->write_table, (int)NULL, sizeof(vm_segment_write_fn) * size);
 
-    segment->size = size;
+    seg->size = size;
 
-    return segment;
+    return seg;
 }
 
 /*
  * Free the memory consumed by a given segment.
  */
 void
-vm_segment_free(vm_segment *segment)
+vm_segment_free(vm_segment *seg)
 {
-    free(segment->memory);
-    free(segment);
+    free(seg->memory);
+    free(seg);
 }
 
 /*
- * Set the byte in `segment`, at `index`, to the given `value`. Our
+ * Set the byte in `segment`, at `addr`, to the given `value`. Our
  * bounds-checking here will _crash_ the program if we are
  * out-of-bounds.
  */
 int
-vm_segment_set(vm_segment *segment, size_t index, vm_8bit value)
+vm_segment_set(vm_segment *seg, size_t addr, vm_8bit value)
 {
     // Some bounds checking.
-    if (!vm_segment_bounds_check(segment, index)) {
+    if (!vm_segment_bounds_check(seg, addr)) {
         log_crit(
-            "Attempt to set segment index (%d) greater than bounds (%d)",
-            index,
-            segment->size);
+            "Attempt to set segment addr (%d) greater than bounds (%d)",
+            addr,
+            seg->size);
 
         return ERR_OOB;
     }
@@ -103,28 +103,28 @@ vm_segment_set(vm_segment *segment, size_t index, vm_8bit value)
     void *map_mach = vm_di_get(VM_MACHINE);
 
     // Check if we have a write mapper
-    if (segment->write_table[index]) {
-        segment->write_table[index](segment, index, value, map_mach);
+    if (seg->write_table[addr]) {
+        seg->write_table[addr](seg, addr, value, map_mach);
         return OK;
     }
 
-    segment->memory[index] = value;
+    seg->memory[addr] = value;
     return OK;
 }
 
 /*
- * Return the byte in `segment` at the given `index` point. Our
- * bounds-checking will _crash_ the program if an index is requested out
+ * Return the byte in `segment` at the given `addr` point. Our
+ * bounds-checking will _crash_ the program if an addr is requested out
  * of bounds.
  */
 vm_8bit
-vm_segment_get(vm_segment *segment, size_t index)
+vm_segment_get(vm_segment *seg, size_t addr)
 {
-    if (!vm_segment_bounds_check(segment, index)) {
+    if (!vm_segment_bounds_check(seg, addr)) {
         log_crit(
-            "Attempt to get segment index (%d) greater than bounds (%d)",
-            index,
-            segment->size);
+            "Attempt to get segment addr (%d) greater than bounds (%d)",
+            addr,
+            seg->size);
 
         // See vm_segment_set() for a justification of this behavior.
         exit(1);
@@ -133,11 +133,11 @@ vm_segment_get(vm_segment *segment, size_t index)
     void *map_mach = vm_di_get(VM_MACHINE);
 
     // We may have a read mapper for this address
-    if (segment->read_table[index]) {
-        return segment->read_table[index](segment, index, map_mach);
+    if (seg->read_table[addr]) {
+        return seg->read_table[addr](seg, addr, map_mach);
     }
 
-    return segment->memory[index];
+    return seg->memory[addr];
 }
 
 /*
@@ -147,52 +147,52 @@ vm_segment_get(vm_segment *segment, size_t index)
  * contains the least significant byte.
  */
 vm_16bit
-vm_segment_get16(vm_segment *segment, size_t addr)
+vm_segment_get16(vm_segment *seg, size_t addr)
 {
     vm_16bit msb, lsb;
 
-    lsb = (vm_16bit)vm_segment_get(segment, addr);
-    msb = (vm_16bit)vm_segment_get(segment, addr+1);
+    lsb = (vm_16bit)vm_segment_get(seg, addr);
+    msb = (vm_16bit)vm_segment_get(seg, addr+1);
 
     return (msb << 8) | lsb;
 }
 
 /*
- * Copy a set of bytes from `src` (at `src_index`) to `dest` (at
- * `dest_index`), such that the range is `length` bytes long. Note that
+ * Copy a set of bytes from `src` (at `src_addr`) to `dest` (at
+ * `dest_addr`), such that the range is `length` bytes long. Note that
  * this function presently bypasses our mapper function code... we may
  * need to implement such in the future.
  */
 int
 vm_segment_copy(vm_segment *dest, 
             vm_segment *src, 
-            size_t dest_index, 
-            size_t src_index, 
+            size_t dest_addr, 
+            size_t src_addr, 
             size_t length)
 {
-    if (src_index + length > src->size) {
+    if (src_addr + length > src->size) {
         log_crit(
             "Attempt to copy beyond bounds of vm_segment (%d + %d >= %d)",
-            src_index,
+            src_addr,
             length,
             src->size);
 
         return ERR_OOB;
     }
 
-    if (dest_index + length > dest->size) {
+    if (dest_addr + length > dest->size) {
         log_crit(
             "Attempt to copy beyond bounds of vm_segment (%d + %d >= %d)",
-            dest_index,
+            dest_addr,
             length,
             dest->size);
 
         return ERR_OOB;
     }
 
-    memcpy(dest->memory + dest_index, 
-           src->memory + src_index, 
-           length * sizeof(src->memory[src_index]));
+    memcpy(dest->memory + dest_addr, 
+           src->memory + src_addr, 
+           length * sizeof(src->memory[src_addr]));
 
     return OK;
 }
@@ -229,15 +229,15 @@ vm_segment_copy_buf(vm_segment *dest, const vm_8bit *src,
  * instead of the normal logic on a get for that address.
  */
 int
-vm_segment_read_map(vm_segment *segment, 
+vm_segment_read_map(vm_segment *seg, 
                     size_t addr, 
                     vm_segment_read_fn fn)
 {
-    if (addr >= segment->size) {
+    if (addr >= seg->size) {
         return ERR_OOB;
     }
 
-    segment->read_table[addr] = fn;
+    seg->read_table[addr] = fn;
     return OK;
 }
 
@@ -246,15 +246,15 @@ vm_segment_read_map(vm_segment *segment,
  * which is to say, when we use the `vm_segment_set()` function.
  */
 int
-vm_segment_write_map(vm_segment *segment,
+vm_segment_write_map(vm_segment *seg,
                      size_t addr,
                      vm_segment_write_fn fn)
 {
-    if (addr >= segment->size) {
+    if (addr >= seg->size) {
         return ERR_OOB;
     }
 
-    segment->write_table[addr] = fn;
+    seg->write_table[addr] = fn;
     return OK;
 }
 
@@ -264,9 +264,9 @@ vm_segment_write_map(vm_segment *segment,
  * for some reason, signal that and return an error.
  */
 int
-vm_segment_fread(vm_segment *segment, FILE *stream, size_t offset, size_t len)
+vm_segment_fread(vm_segment *seg, FILE *stream, size_t offset, size_t len)
 {
-    fread(segment->memory + offset, sizeof(vm_8bit), len, stream);
+    fread(seg->memory + offset, sizeof(vm_8bit), len, stream);
 
     // fread() may return zero in the case of an error, but it may
     // return a positive non-zero number short of len; we can't quite
@@ -305,7 +305,7 @@ vm_segment_fwrite(vm_segment *seg, FILE *stream, size_t off, size_t len)
  * therefore consumes bytes at both addr and addr+1.
  */
 int
-vm_segment_set16(vm_segment *segment, size_t addr, vm_16bit value)
+vm_segment_set16(vm_segment *seg, size_t addr, vm_16bit value)
 {
     vm_8bit lsb, msb;
     int err;
@@ -315,12 +315,12 @@ vm_segment_set16(vm_segment *segment, size_t addr, vm_16bit value)
 
     // This data needs to be saved in little-endian order; e.g. if we
     // get $1234, then we need to store it as $34 $12.
-    err = vm_segment_set(segment, addr, lsb);
+    err = vm_segment_set(seg, addr, lsb);
 
     // If the previous set() worked out, then let's try it again with
     // the msb.
     if (err == OK) {
-        err = vm_segment_set(segment, addr + 1, msb);
+        err = vm_segment_set(seg, addr + 1, msb);
     }
 
     // If err != OK above, we will just return the err code. If err was
