@@ -52,8 +52,6 @@ apple2_mem_map(apple2 *mach, vm_segment *segment)
     size_t addr;
     int i, rlen, wlen;
 
-    vm_segment_set_map_machine(mach);
-
     // Set up all of the bank-switch-related mapping. Well--almost all
     // of it.
     apple2_bank_map(segment);

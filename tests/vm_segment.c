@@ -156,17 +156,6 @@ Test(vm_segment, fread)
     cr_assert_eq(vm_segment_fread(segment, stream, 0, 123), OK);
 }
 
-/* Test(vm_segment, get_map_machine) */
-Test(vm_segment, set_map_machine)
-{
-    void *ptr = (void *)123;
-
-    cr_assert_eq(vm_segment_get_map_machine(), NULL);
-    vm_segment_set_map_machine(ptr);
-    cr_assert_eq(vm_segment_get_map_machine(), ptr);
-    vm_segment_set_map_machine(NULL);
-}
-
 Test(vm_segment, get16)
 {
     vm_segment_set(segment, 0, 0x34);

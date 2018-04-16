@@ -70,9 +70,7 @@ extern int vm_segment_write_map(vm_segment *, size_t, vm_segment_write_fn);
 extern vm_16bit vm_segment_get16(vm_segment *, size_t);
 extern vm_8bit vm_segment_get(vm_segment *, size_t);
 extern vm_segment *vm_segment_create(size_t);
-extern void *vm_segment_get_map_machine();
 extern void vm_segment_free(vm_segment *);
 extern void vm_segment_hexdump(vm_segment *, FILE *, size_t, size_t);
-extern void vm_segment_set_map_machine(void *);
 
 #endif
