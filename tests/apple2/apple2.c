@@ -11,12 +11,14 @@ void
 setup()
 {
     mach = apple2_create(700, 480);
+    vm_di_set(VM_MACHINE, mach);
 }
 
 void
 teardown()
 {
     apple2_free(mach);
+    vm_di_set(VM_MACHINE, NULL);
 }
 
 TestSuite(apple2, .init = setup, .fini = teardown);
