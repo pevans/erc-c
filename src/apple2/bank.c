@@ -245,13 +245,13 @@ SEGMENT_WRITER(apple2_bank_switch_write)
         // Turn on auxiliary memory for zero page + stack
         case 0xC008:
             apple2_set_bank_switch(mach,
-                                   mach->bank_switch | BANK_ALTZP);
+                                   mach->bank_switch & ~BANK_ALTZP);
             break;
 
         // Disable auxiliary memory for zero page + stack
         case 0xC009:
             apple2_set_bank_switch(mach,
-                                   mach->bank_switch & ~BANK_ALTZP);
+                                   mach->bank_switch | BANK_ALTZP);
             break;
     }
 }
