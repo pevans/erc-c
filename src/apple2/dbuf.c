@@ -261,12 +261,12 @@ SEGMENT_WRITER(apple2_dbuf_switch_write)
 
         case 0xC050:
             apple2_set_display(mach,
-                               mach->display_mode | DISPLAY_TEXT);
+                               mach->display_mode & ~DISPLAY_TEXT);
             break;
 
         case 0xC051:
             apple2_set_display(mach,
-                               mach->display_mode & ~DISPLAY_TEXT);
+                               mach->display_mode | DISPLAY_TEXT);
             break;
 
         case 0xC052:
