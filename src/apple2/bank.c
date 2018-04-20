@@ -17,6 +17,8 @@
 #include "apple2/bank.h"
 #include "apple2/mem.h"
 #include "objstore.h"
+#include "vm_di.h"
+#include "vm_event.h"
 
 /*
  * These are the addresses that need to be mapped to the
@@ -169,22 +171,16 @@ SEGMENT_READER(apple2_bank_switch_read)
             return 0x80;
 
         case 0xC081:
-            if (last_addr == addr) {
-                apple2_set_bank_switch(mach, BANK_WRITE | BANK_RAM2);
-                return 0x80;
-            }
-            return 0x00;
+            apple2_set_bank_switch(mach, BANK_WRITE | BANK_RAM2);
+            return 0x80;
 
         case 0xC082:
             apple2_set_bank_switch(mach, BANK_RAM2);
             return 0x80;
 
         case 0xC083:
-            if (last_addr == addr) {
-                apple2_set_bank_switch(mach, BANK_RAM | BANK_WRITE | BANK_RAM2);
-                return 0x80;
-            }
-            return 0x00;
+            apple2_set_bank_switch(mach, BANK_RAM | BANK_WRITE | BANK_RAM2);
+            return 0x80;
 
         // Conversely, the $C088 - $C08B range control memory access
         // while using bank 1 RAM.
@@ -193,22 +189,16 @@ SEGMENT_READER(apple2_bank_switch_read)
             return 0x80;
 
         case 0xC089:
-            if (last_addr == addr) {
-                apple2_set_bank_switch(mach, BANK_WRITE);
-                return 0x80;
-            }
-            return 0x00;
+            apple2_set_bank_switch(mach, BANK_WRITE);
+            return 0x80;
 
         case 0xC08A:
             apple2_set_bank_switch(mach, BANK_DEFAULT);
             return 0x80;
 
         case 0xC08B:
-            if (last_addr == addr) {
-                apple2_set_bank_switch(mach, BANK_RAM | BANK_WRITE);
-                return 0x80;
-            }
-            return 0x00;
+            apple2_set_bank_switch(mach, BANK_RAM | BANK_WRITE);
+            return 0x80;
 
         // Return high on the 7th bit if we're using bank 2 memory
         case 0xC011:
