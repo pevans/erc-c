@@ -166,6 +166,7 @@ typedef vm_8bit (*mos6502_address_resolver)(mos6502 *);
 typedef void (*mos6502_instruction_handler)(mos6502 *, vm_8bit);
 
 extern bool mos6502_would_jump(int);
+extern bool mos6502_would_write_mem(int);
 extern int mos6502_cycles(mos6502 *, vm_8bit);
 extern int mos6502_instruction(vm_8bit);
 extern mos6502 *mos6502_create(vm_segment *, vm_segment *);

@@ -405,6 +405,22 @@ mos6502_would_jump(int inst_code)
 }
 
 /*
+ * Return true if the given instruction _might_ write to memory, if used
+ * with an appropriate address mode (e.g. anything other than ACC).
+ */
+inline bool
+mos6502_would_write_mem(int inst_code)
+{
+    return
+        inst_code == ASL ||
+        inst_code == DEC ||
+        inst_code == INC ||
+        inst_code == LSR ||
+        inst_code == ROL ||
+        inst_code == ROR;
+}
+
+/*
  * This is a _kind_ of factory method, except we're obviously not
  * instantiating an object. Given an address mode, we return the
  * resolver function which will give you the right value (for a given
