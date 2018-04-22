@@ -151,13 +151,8 @@ apple2_bank_map(vm_segment *segment)
 SEGMENT_READER(apple2_bank_switch_read)
 {
     apple2 *mach;
-    vm_16bit last_addr;
 
     mach = (apple2 *)_mach;
-
-    // We need to know the last opcode and address, because some of our
-    // soft switches require two consecutive reads
-    mos6502_last_executed(mach->cpu, NULL, NULL, &last_addr);
 
     switch (addr) {
         // The $C080 - $C083 range all control memory access while using
