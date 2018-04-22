@@ -303,7 +303,7 @@ mos6502_execute(mos6502 *cpu)
     mos6502_address_resolver resolver;
     mos6502_instruction_handler handler;
 
-    opcode = mos6502_get(cpu, cpu->PC);
+    cpu->opcode = opcode = mos6502_get(cpu, cpu->PC);
     cpu->addr_mode = mos6502_addr_mode(opcode);
 
     // The disassembler knows how many bytes each operand requires
@@ -328,8 +328,9 @@ mos6502_execute(mos6502 *cpu)
     // Note also that resolver may be NULL, as there may not be any
     // operand for this instruction! If so, we let the default for
     // operand stand, which is zero.
+    cpu->operand = 0;
     if (resolver) {
-        operand = resolver(cpu);
+        cpu->operand = operand = resolver(cpu);
     }
 
     // Here's where the magic happens. Whatever the instruction does, it
@@ -354,12 +355,6 @@ mos6502_execute(mos6502 *cpu)
     // something.
     //usleep(cycles);
 
-    // We need to record the opcode and the effective address for
-    // anything which might need to reference it.
-    cpu->last_opcode = opcode;
-    cpu->last_addr = cpu->eff_addr;
-    cpu->last_operand = operand;
-
     cpu->P |= MOS_UNUSED | MOS_BREAK;
 
     // Ok -- we're done! This wasn't so hard, was it?
@@ -376,15 +371,11 @@ mos6502_last_executed(mos6502 *cpu, vm_8bit *opcode,
                       vm_8bit *operand, vm_16bit *addr)
 {
     if (opcode) {
-        *opcode = cpu->last_opcode;
+        *opcode = cpu->opcode;
     }
 
     if (operand) {
-        *operand = cpu->last_operand;
-    }
-
-    if (addr) {
-        *addr = cpu->last_addr;
+        *operand = cpu->operand;
     }
 }
 

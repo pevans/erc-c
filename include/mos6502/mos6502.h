@@ -115,9 +115,8 @@ typedef struct {
      * executed. Some things (notably soft switches) may need to
      * the last opcode.
      */
-    vm_8bit last_opcode;
-    vm_8bit last_operand;
-    vm_16bit last_addr;
+    vm_8bit opcode;
+    vm_8bit operand;
 
     /*
      * Our program counter register; this is what we'll use to determine
