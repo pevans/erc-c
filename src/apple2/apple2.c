@@ -354,6 +354,7 @@ apple2_run_loop(apple2 *mach)
 
         if (apple2_debug_broke(mach->cpu->PC)) {
             mach->paused = true;
+            mach->debug = true;
         }
 
         if (mach->debug) {
