@@ -122,7 +122,6 @@ Test(apple2_bank, switch_read)
     // consecutive reads to trigger.
     vm_segment_get(mach->main, 0xC081);
     cr_assert_neq(mach->bank_switch, BANK_WRITE | BANK_RAM2);
-    mach->cpu->last_addr = 0xC081;
     vm_segment_get(mach->main, 0xC081);
     cr_assert_eq(mach->bank_switch, BANK_WRITE | BANK_RAM2);
 
@@ -132,7 +131,6 @@ Test(apple2_bank, switch_read)
     // Another that needs consecutives
     vm_segment_get(mach->main, 0xC083);
     cr_assert_neq(mach->bank_switch, BANK_RAM | BANK_WRITE | BANK_RAM2);
-    mach->cpu->last_addr = 0xC083;
     vm_segment_get(mach->main, 0xC083);
     cr_assert_eq(mach->bank_switch, BANK_RAM | BANK_WRITE | BANK_RAM2);
 
@@ -142,7 +140,6 @@ Test(apple2_bank, switch_read)
     // You get the idea
     vm_segment_get(mach->main, 0xC089);
     cr_assert_neq(mach->bank_switch, BANK_WRITE);
-    mach->cpu->last_addr = 0xC089;
     vm_segment_get(mach->main, 0xC089);
     cr_assert_eq(mach->bank_switch, BANK_WRITE);
 
@@ -151,7 +148,6 @@ Test(apple2_bank, switch_read)
 
     vm_segment_get(mach->main, 0xC08B);
     cr_assert_neq(mach->bank_switch, BANK_RAM | BANK_WRITE);
-    mach->cpu->last_addr = 0xC08B;
     vm_segment_get(mach->main, 0xC08B);
     cr_assert_eq(mach->bank_switch, BANK_RAM | BANK_WRITE);
 
