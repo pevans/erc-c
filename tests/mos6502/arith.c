@@ -46,47 +46,83 @@ Test(mos6502_arith, adc_dec)
     cr_assert_eq(cpu->A, 0x29);
 }
 
+/*
+ * In CMP, the following occurs:
+ *
+ * Z = 1 if A = DATA (which is to say: Z = 1 if A - DATA = 0)
+ * N = 1 if DATA BIT 7 is high
+ * C = 1 if A >= DATA
+ *
+ * Only status flags are changed by the operation of CMP.
+ *
+ * We need to test four permutations:
+ *   - A > DATA
+ *   - A = DATA
+ *   - A < DATA
+ */
 Test(mos6502_arith, cmp)
 {
-    cpu->A = 5;
-    mos6502_handle_cmp(cpu, 3);
+    cpu->A = 123;
+    mos6502_handle_cmp(cpu, cpu->A - 1);
     cr_assert_eq(cpu->P & MOS_CARRY, MOS_CARRY);
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
     cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
-    cr_assert_eq(cpu->P & MOS_ZERO, 0);
 
-    cpu->A = 3;
-    mos6502_handle_cmp(cpu, 4);
-    cr_assert_eq(cpu->P & MOS_CARRY, 0);
-    cr_assert_eq(cpu->P & MOS_NEGATIVE, MOS_NEGATIVE);
-    cr_assert_eq(cpu->P & MOS_ZERO, 0);
-
-    cpu->A = 192;
-    mos6502_handle_cmp(cpu, 3);
+    mos6502_handle_cmp(cpu, cpu->A);
     cr_assert_eq(cpu->P & MOS_CARRY, MOS_CARRY);
-    cr_assert_eq(cpu->P & MOS_NEGATIVE, MOS_NEGATIVE);
-    cr_assert_eq(cpu->P & MOS_ZERO, 0);
-
-    cpu->A = 111;
-    mos6502_handle_cmp(cpu, 111);
     cr_assert_eq(cpu->P & MOS_ZERO, MOS_ZERO);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
+
+    mos6502_handle_cmp(cpu, cpu->A + 1);
+    cr_assert_eq(cpu->P & MOS_CARRY, 0);
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, MOS_NEGATIVE);
 }
 
+/*
+ * As in the CMP test, we check the same qualities: X > DATA, X = DATA,
+ * X < DATA.
+ */
 Test(mos6502_arith, cpx)
 {
-    cpu->X = 5;
-    mos6502_handle_cpx(cpu, 3);
+    cpu->X = 123;
+    mos6502_handle_cpx(cpu, cpu->X - 1);
     cr_assert_eq(cpu->P & MOS_CARRY, MOS_CARRY);
-    cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
     cr_assert_eq(cpu->P & MOS_ZERO, 0);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
+
+    mos6502_handle_cpx(cpu, cpu->X);
+    cr_assert_eq(cpu->P & MOS_CARRY, MOS_CARRY);
+    cr_assert_eq(cpu->P & MOS_ZERO, MOS_ZERO);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
+
+    mos6502_handle_cpx(cpu, cpu->X + 1);
+    cr_assert_eq(cpu->P & MOS_CARRY, 0);
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, MOS_NEGATIVE);
 }
 
+/*
+ * And, finally, we check similarly as to the CPX test, except with Y
+ * instead of X.
+ */
 Test(mos6502_arith, cpy)
 {
-    cpu->Y = 5;
-    mos6502_handle_cpy(cpu, 3);
+    cpu->Y = 123;
+    mos6502_handle_cpy(cpu, cpu->Y - 1);
     cr_assert_eq(cpu->P & MOS_CARRY, MOS_CARRY);
-    cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
     cr_assert_eq(cpu->P & MOS_ZERO, 0);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
+
+    mos6502_handle_cpy(cpu, cpu->Y);
+    cr_assert_eq(cpu->P & MOS_CARRY, MOS_CARRY);
+    cr_assert_eq(cpu->P & MOS_ZERO, MOS_ZERO);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
+
+    mos6502_handle_cpy(cpu, cpu->Y + 1);
+    cr_assert_eq(cpu->P & MOS_CARRY, 0);
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, MOS_NEGATIVE);
 }
 
 Test(mos6502_arith, dec)
