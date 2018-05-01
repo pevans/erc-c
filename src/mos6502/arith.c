@@ -154,14 +154,15 @@ DEFINE_INST(cpy)
  */
 DEFINE_INST(dec) 
 {
+    oper--;
+    MOS_CHECK_NZ(oper);
+
     if (cpu->addr_mode == ACC) {
-        MOS_CHECK_NZ(cpu->A - 1);
-        cpu->A--;
+        cpu->A = oper;
         return;
     }
 
-    MOS_CHECK_NZ(oper - 1);
-    mos6502_set(cpu, cpu->eff_addr, oper - 1);
+    mos6502_set(cpu, cpu->eff_addr, oper);
 }
 
 /*
@@ -169,8 +170,9 @@ DEFINE_INST(dec)
  */
 DEFINE_INST(dex)
 {
-    MOS_CHECK_NZ(cpu->X - 1);
-    cpu->X--;
+    oper--;
+    MOS_CHECK_NZ(oper);
+    cpu->X = oper;
 }
 
 /*
@@ -178,8 +180,9 @@ DEFINE_INST(dex)
  */
 DEFINE_INST(dey)
 {
-    MOS_CHECK_NZ(cpu->Y - 1);
-    cpu->Y--;
+    oper--;
+    MOS_CHECK_NZ(oper);
+    cpu->Y = oper;
 }
 
 /*
