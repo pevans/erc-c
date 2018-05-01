@@ -6,23 +6,85 @@
 
 TestSuite(mos6502_arith, .init = setup, .fini = teardown);
 
+/*
+ * ADC is a deceptively simple instruction. It works like this:
+ *
+ * A = A + DATA + C
+ *
+ * If D = 1, then ADC works in an entirely different manner, treating
+ * the input as BCD (Binary-Coded Decimal).
+ *
+ * Z = 1 if RESULT = 0
+ * N = 1 if RESULT has BIT 7 high
+ * V = 1 if (A ^ DATA) has BIT 7 high AND (A ^ RESULT) has BIT 7 high
+ * C = 1 if (16-BIT) RESULT > 0xFF
+ */
 Test(mos6502_arith, adc)
 {
-    cpu->A = 5;
-    mos6502_handle_adc(cpu, 3);
-    cr_assert_eq(cpu->A, 9);
+    vm_8bit start = 30,
+            main = 60,
+            ztest = 0x100 - start,
+            vtest = 0x80,
+            ctest = 0xff;
 
-    cpu->A = 0xfe;
-    mos6502_handle_adc(cpu, 0x5);
-    cr_assert_eq(cpu->A, (vm_8bit)(0xfe + 0x5));
-
+    // Test with and without carry
+    cpu->P |= MOS_CARRY;
+    cpu->A = start;
+    mos6502_handle_adc(cpu, main);
+    cr_assert_eq(cpu->A, start + main + 1);
     cpu->P &= ~MOS_CARRY;
-    cpu->A = 9;
-    mos6502_handle_adc(cpu, 64);
-    cr_assert_eq(cpu->A, 73);
+    cpu->A = start;
+    mos6502_handle_adc(cpu, main);
+    cr_assert_eq(cpu->A, start + main);
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
+    cr_assert_eq(cpu->P & MOS_OVERFLOW, 0);
+    cr_assert_eq(cpu->P & MOS_CARRY, 0);
+
+    // If an add results in Z = 1, it necessarily implies C = 1. Say you
+    // have A = 1, and add -1. With two's complement, the binary coded
+    // form of -1 is 0xff; thus 0xff + 0x1 = 0x100, or 0x00 after
+    // variable overflow, and thus C = 1.
+    //
+    // NOTE: variable overflow is e.g. when you go from 0xff to 0x00; it
+    // means something different from the V/OVERFLOW status in the 6502
+    // chip, which cares about going from a positive to a negative, or
+    // from a negative to a positive.
+    cpu->A = start;
+    cpu->P &= ~MOS_CARRY;
+    mos6502_handle_adc(cpu, ztest);
+    cr_assert_eq(cpu->A, 0);
+    cr_assert_eq(cpu->P & MOS_ZERO, MOS_ZERO);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
+    cr_assert_eq(cpu->P & MOS_OVERFLOW, 0);
+    cr_assert_eq(cpu->P & MOS_CARRY, MOS_CARRY);
+
+    // We can test both negative and overflow here. We could do a
+    // separate test on the N flag if we set A = 0x80 and added a small
+    // number, like 0x3; we would essentially begin with a negative
+    // number and end with a negative number.
+    cpu->A = start;
+    cpu->P &= ~MOS_CARRY;
+    mos6502_handle_adc(cpu, vtest);
+    cr_assert_eq(cpu->A, start + vtest);
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, MOS_NEGATIVE);
+    cr_assert_eq(cpu->P & MOS_OVERFLOW, MOS_OVERFLOW);
+    cr_assert_eq(cpu->P & MOS_CARRY, 0);
+
+    cpu->A = start;
+    cpu->P &= ~MOS_CARRY;
+    mos6502_handle_adc(cpu, ctest);
+    // Cast to vm_8bit since we're working with variable overflow
+    cr_assert_eq(cpu->A, (vm_8bit)(start + ctest));
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
+    cr_assert_eq(cpu->P & MOS_OVERFLOW, 0);
+    cr_assert_eq(cpu->P & MOS_CARRY, MOS_CARRY);
 
     // This should handle decimal mode without complaint
     cpu->P |= MOS_DECIMAL;
+    cpu->P &= ~MOS_CARRY;
     cpu->A = 0x18;
     mos6502_handle_adc(cpu, 0x3);
     cr_assert_eq(cpu->A, 0x21);
@@ -270,8 +332,6 @@ Test(mos6502_arith, inx)
             ntest = 0x7F,
             ztest = 0xFF;
 
-    vm_16bit addr = 0x123;
-
     cpu->addr_mode = ACC;
     mos6502_handle_inx(cpu, main);
     cr_assert_eq(cpu->X, main + 1);
@@ -296,8 +356,6 @@ Test(mos6502_arith, iny)
     vm_8bit main = 123,
             ntest = 0x7F,
             ztest = 0xFF;
-
-    vm_16bit addr = 0x123;
 
     cpu->addr_mode = ACC;
     mos6502_handle_iny(cpu, main);
