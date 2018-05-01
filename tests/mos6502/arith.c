@@ -227,35 +227,95 @@ Test(mos6502_arith, dey)
     cr_assert_eq(cpu->P & MOS_ZERO, MOS_ZERO);
 }
 
+/*
+ * The INC instruction works similarly to DEC; the same status flags are
+ * updated. But, of course, we increment rather than decrement.
+ */
 Test(mos6502_arith, inc)
 {
-    cpu->eff_addr = 123;
-    mos6502_handle_inc(cpu, 55);
-    cr_assert_eq(mos6502_get(cpu, 123), 56);
+    vm_8bit main = 123,
+            ntest = 0x7F,
+            ztest = 0xFF;
 
-    cpu->A = 8;
-    cpu->eff_addr = 0;
+    vm_16bit addr = 0x123;
+
+    cpu->A = main;
     cpu->addr_mode = ACC;
-    mos6502_handle_inc(cpu, 0);
-    cr_assert_eq(cpu->A, 9);
+    mos6502_handle_inc(cpu, main);
+    cr_assert_eq(cpu->A, main + 1);
 
-    cpu->A = 0xff;
-    mos6502_handle_inc(cpu, 0);
-    cr_assert_eq(cpu->A, 0);
+    cpu->eff_addr = addr;
+    cpu->addr_mode = ABS;
+    mos6502_handle_inc(cpu, main);
+    cr_assert_eq(mos6502_get(cpu, addr), main + 1);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
+
+    mos6502_handle_inc(cpu, ntest);
+    // Cast ntest - 1 so that the result we compare is 8-bit negative
+    // and not 32-bit negative
+    cr_assert_eq(mos6502_get(cpu, addr), (vm_8bit)(ntest + 1));
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, MOS_NEGATIVE);
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
+
+    mos6502_handle_inc(cpu, ztest);
+    cr_assert_eq(mos6502_get(cpu, addr), (vm_8bit)(ztest + 1));
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
+    cr_assert_eq(cpu->P & MOS_ZERO, MOS_ZERO);
 }
 
 Test(mos6502_arith, inx)
 {
-    cpu->X = 5;
-    mos6502_handle_inx(cpu, 0);
-    cr_assert_eq(cpu->X, 6);
+    vm_8bit main = 123,
+            ntest = 0x7F,
+            ztest = 0xFF;
+
+    vm_16bit addr = 0x123;
+
+    cpu->addr_mode = ACC;
+    mos6502_handle_inx(cpu, main);
+    cr_assert_eq(cpu->X, main + 1);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
+
+    mos6502_handle_inx(cpu, ntest);
+    // Cast ntest - 1 so that the result we compare is 8-bit negative
+    // and not 32-bit negative
+    cr_assert_eq(cpu->X, (vm_8bit)(ntest + 1));
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, MOS_NEGATIVE);
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
+
+    mos6502_handle_inx(cpu, ztest);
+    cr_assert_eq(cpu->X, (vm_8bit)(ztest + 1));
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
+    cr_assert_eq(cpu->P & MOS_ZERO, MOS_ZERO);
 }
 
 Test(mos6502_arith, iny)
 {
-    cpu->Y = 5;
-    mos6502_handle_iny(cpu, 0);
-    cr_assert_eq(cpu->Y, 6);
+    vm_8bit main = 123,
+            ntest = 0x7F,
+            ztest = 0xFF;
+
+    vm_16bit addr = 0x123;
+
+    cpu->addr_mode = ACC;
+    mos6502_handle_iny(cpu, main);
+    cr_assert_eq(cpu->Y, main + 1);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
+
+    mos6502_handle_iny(cpu, ntest);
+    // Cast ntest - 1 so that the result we compare is 8-bit negative
+    // and not 32-bit negative
+    cr_assert_eq(cpu->Y, (vm_8bit)(ntest + 1));
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, MOS_NEGATIVE);
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
+
+    mos6502_handle_iny(cpu, ztest);
+    cr_assert_eq(cpu->Y, (vm_8bit)(ztest + 1));
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
+    cr_assert_eq(cpu->P & MOS_ZERO, MOS_ZERO);
 }
 
 Test(mos6502_arith, sbc)
