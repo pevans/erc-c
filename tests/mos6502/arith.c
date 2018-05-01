@@ -125,38 +125,106 @@ Test(mos6502_arith, cpy)
     cr_assert_eq(cpu->P & MOS_NEGATIVE, MOS_NEGATIVE);
 }
 
+/*
+ * In DEC, we simply decrement an address of memory (or the accumulator)
+ * by 1. 
+ *
+ * Status flags:
+ *   - N = 1 if (DATA - 1) has BIT 7 high
+ *   - Z = 1 if (DATA - 1) = 0, i.e. if DATA = 1
+ */
 Test(mos6502_arith, dec)
 {
-    cpu->A = 5;
+    vm_8bit main = 123,
+            ntest = 0,
+            ztest = 1;
+
+    vm_16bit addr = 0x123;
+
+    cpu->A = main;
     cpu->addr_mode = ACC;
-    mos6502_handle_dec(cpu, 0);
-    cr_assert_eq(cpu->A, 4);
+    mos6502_handle_dec(cpu, cpu->A);
+    cr_assert_eq(cpu->A, main - 1);
 
-    cpu->eff_addr = 0;
-    cpu->A = 0;
-    mos6502_handle_dec(cpu, 0);
-    cr_assert_eq(cpu->A, 0xff);
+    cpu->eff_addr = addr;
+    cpu->addr_mode = ABS;
+    mos6502_handle_dec(cpu, main);
+    cr_assert_eq(mos6502_get(cpu, addr), main - 1);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
 
-    cpu->eff_addr = 123;
-    mos6502_set(cpu, 123, 44);
+    mos6502_handle_dec(cpu, ntest);
+    // Cast ntest - 1 so that the result we compare is 8-bit negative
+    // and not 32-bit negative
+    cr_assert_eq(mos6502_get(cpu, addr), (vm_8bit)(ntest - 1));
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, MOS_NEGATIVE);
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
 
-    cpu->addr_mode = 0;
-    mos6502_handle_dec(cpu, 44);
-    cr_assert_eq(mos6502_get(cpu, 123), 43);
+    mos6502_handle_dec(cpu, ztest);
+    cr_assert_eq(mos6502_get(cpu, addr), ztest - 1);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
+    cr_assert_eq(cpu->P & MOS_ZERO, MOS_ZERO);
 }
 
+/*
+ * Same principles as the test for DEC, but there is no need to test for
+ * memory sets; DEX only modifies the X register.
+ */
 Test(mos6502_arith, dex)
 {
-    cpu->X = 5;
-    mos6502_handle_dex(cpu, 0);
-    cr_assert_eq(cpu->X, 4);
+    vm_8bit main = 123,
+            ntest = 0,
+            ztest = 1;
+
+    cpu->X = main;
+    cpu->addr_mode = ACC;
+
+    mos6502_handle_dex(cpu, cpu->X);
+    cr_assert_eq(cpu->X, main - 1);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
+
+    mos6502_handle_dex(cpu, ntest);
+    // Cast ntest - 1 so that the result we compare is 8-bit negative
+    // and not 32-bit negative
+    cr_assert_eq(cpu->X, (vm_8bit)(ntest - 1));
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, MOS_NEGATIVE);
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
+
+    mos6502_handle_dex(cpu, ztest);
+    cr_assert_eq(cpu->X, ztest - 1);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
+    cr_assert_eq(cpu->P & MOS_ZERO, MOS_ZERO);
 }
 
+/*
+ * Similar tests as for DEX, except for the Y register instead of the X.
+ */
 Test(mos6502_arith, dey)
 {
-    cpu->Y = 5;
-    mos6502_handle_dey(cpu, 0);
-    cr_assert_eq(cpu->Y, 4);
+    vm_8bit main = 123,
+            ntest = 0,
+            ztest = 1;
+
+    cpu->Y = main;
+    cpu->addr_mode = ACC;
+
+    mos6502_handle_dey(cpu, cpu->Y);
+    cr_assert_eq(cpu->Y, main - 1);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
+
+    mos6502_handle_dey(cpu, ntest);
+    // Cast ntest - 1 so that the result we compare is 8-bit negative
+    // and not 32-bit negative
+    cr_assert_eq(cpu->Y, (vm_8bit)(ntest - 1));
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, MOS_NEGATIVE);
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
+
+    mos6502_handle_dey(cpu, ztest);
+    cr_assert_eq(cpu->Y, ztest - 1);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
+    cr_assert_eq(cpu->P & MOS_ZERO, MOS_ZERO);
 }
 
 Test(mos6502_arith, inc)
