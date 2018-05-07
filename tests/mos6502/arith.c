@@ -376,25 +376,69 @@ Test(mos6502_arith, iny)
     cr_assert_eq(cpu->P & MOS_ZERO, MOS_ZERO);
 }
 
+/*
+ * SBC has a lot of similarities with the spirit of ADC; it is
+ * deceptively simple, doing the following:
+ *
+ * A = A - DATA if C = 1
+ * A = A - DATA - 1 if C = 0
+ *
+ * Z = 1 if RESULT = 0
+ * V = 1 if (A ^ DATA) has BIT 7 high AND (A ^ RESULT) has BIT 7 high
+ * N = 1 if RESULT has BIT 7 high
+ * C = 1 if (16-BIT) RESULT < 0
+ */
 Test(mos6502_arith, sbc)
 {
-    cpu->A = 5;
-    mos6502_handle_sbc(cpu, 3);
-    cr_assert_eq(cpu->A, 2);
+    vm_8bit start = 90,
+            main = 60,
+            ztest = start,
+            vtest = 0x80,
+            ntest = 0xff;
 
-    cpu->A = 0x3;
-    mos6502_handle_sbc(cpu, 5);
-    cr_assert_eq(cpu->A, (vm_8bit)(0x3 - 0x5));
+    // Test with and without carry
+    cpu->P |= MOS_CARRY;
+    cpu->A = start;
+    mos6502_handle_sbc(cpu, main);
+    cr_assert_eq(cpu->A, start - main);
 
     cpu->P &= ~MOS_CARRY;
-    cpu->A = 16;
-    mos6502_handle_sbc(cpu, 8);
-    cr_assert_eq(cpu->A, 7);
+    cpu->A = start;
+    mos6502_handle_sbc(cpu, main);
+    cr_assert_eq(cpu->A, start - main - 1);
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
+    cr_assert_eq(cpu->P & MOS_OVERFLOW, 0);
+    cr_assert_eq(cpu->P & MOS_CARRY, MOS_CARRY);
 
-    cpu->P |= MOS_DECIMAL;
-    cpu->A = 0x12;
-    mos6502_handle_sbc(cpu, 0x3);
-    cr_assert_eq(cpu->A, 0x9);
+    cpu->A = start;
+    cpu->P |= MOS_CARRY;
+    mos6502_handle_sbc(cpu, ztest);
+    cr_assert_eq(cpu->A, 0);
+    cr_assert_eq(cpu->P & MOS_ZERO, MOS_ZERO);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, 0);
+    cr_assert_eq(cpu->P & MOS_OVERFLOW, 0);
+    cr_assert_eq(cpu->P & MOS_CARRY, MOS_CARRY);
+
+    cpu->A = start;
+    cpu->P |= MOS_CARRY;
+    mos6502_handle_sbc(cpu, vtest);
+    cr_assert_eq(cpu->A, (vm_8bit)(start - vtest));
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, MOS_NEGATIVE);
+    cr_assert_eq(cpu->P & MOS_OVERFLOW, MOS_OVERFLOW);
+    cr_assert_eq(cpu->P & MOS_CARRY, 0);
+
+    cpu->A = start;
+    cpu->P |= MOS_CARRY;
+    mos6502_handle_sbc(cpu, ntest);
+    cr_assert_eq(cpu->A, (vm_8bit)(start - ntest));
+    cr_assert_eq(cpu->P & MOS_ZERO, 0);
+    cr_assert_eq(cpu->P & MOS_NEGATIVE, MOS_NEGATIVE);
+    cr_assert_eq(cpu->P & MOS_OVERFLOW, 0);
+    cr_assert_eq(cpu->P & MOS_CARRY, 0);
+    
+    // FIXME: add a decimal test
 }
 
 Test(mos6502_arith, sbc_dec)
